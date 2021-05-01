@@ -5,20 +5,20 @@ using C = Constants;
 
 public class Bishop : ShogiPiece
 {
-    public override bool[,] PossibleMove(){
+    public override bool[,] PossibleMoves(){
         bool[,] moves = new bool[C.numberRows,C.numberRows];
 
         // Forward left
-        DiagonalLine(moves, C.forwardLeft);
+        DiagonalLine(moves, DirectionDiagonal.forwardLeft);
 
         // Forward right
-        DiagonalLine(moves, C.forwardRight);
+        DiagonalLine(moves, DirectionDiagonal.forwardRight);
 
         // Backward left
-        DiagonalLine(moves, C.backLeft);
+        DiagonalLine(moves, DirectionDiagonal.backLeft);
 
         // Backward right
-        DiagonalLine(moves, C.backRight);
+        DiagonalLine(moves, DirectionDiagonal.backRight);
 
         return moves;
     }

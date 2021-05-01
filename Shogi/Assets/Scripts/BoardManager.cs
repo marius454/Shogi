@@ -5,27 +5,36 @@ using C = Constants;
 
 public class BoardManager : MonoBehaviour
 {
-    public static BoardManager Instance{set;get;}
-    private bool[,] allowedMoves{set;get;}
+    // Decide whether to allow free movement for dubugging
+    public bool freeMove;
 
-    public ShogiPiece[,] ShogiPieces{set;get;}
+    public static BoardManager Instance{set;get;}
+
+    private Player player1;
+    private Player player2;
+    
+    
+    private bool[,] allowedMoves{set;get;}    
     private ShogiPiece selectedShogiPiece;
 
-    private int selectionX = -1;
-    private int selectionY = -1;
+    private int selectionX;
+    private int selectionY;
 
+    
     public List<GameObject> piecePrefabs;
     public List<float> pieceZValues;
-    private List<GameObject> activePiece;
+    private List<GameObject> activePieces;
+    public ShogiPiece[,] ShogiPieces{set;get;}
 
-    public short currentPlayer;
-
+    public Player currentPlayer;
+    public Player opponentPlayer;
 
     // Start is called before the first frame update
     private void Start(){
         // Make game cap out at 60 fps for less stress on the computer
         Application.targetFrameRate = 60;
         Instance = this;
+        InitializeGame();
         SpawnAllShogiPieces();
     }
     // Update is called once per frame
@@ -35,7 +44,7 @@ public class BoardManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown (0)){
             if (selectionX >= 0 && selectionY >= 0){
-                if (selectedShogiPiece == null || (ShogiPieces[selectionX, selectionY] != null && ShogiPieces[selectionX, selectionY].player == currentPlayer)){
+                if (selectedShogiPiece == null || (ShogiPieces[selectionX, selectionY] != null && ShogiPieces[selectionX, selectionY].player == currentPlayer.playerNumber)){
                     // select the shogi piece
                     SelectShogiPiece(selectionX, selectionY);
                 }else{
@@ -44,6 +53,22 @@ public class BoardManager : MonoBehaviour
                 }
             }
         }
+    }
+    private void InitializeGame(){
+        player1 = new Player(PlayerNumber.player1, this);
+        player1 = new Player(PlayerNumber.player2, this);
+        selectionX = -1;
+        selectionY = -1;
+
+        activePieces = new List<GameObject>();
+        ShogiPieces = new ShogiPiece[C.numberRows, C.numberRows];
+        currentPlayer = player1;
+        opponentPlayer = player2;
+
+        SpawnAllShogiPieces();
+        player1.InitializePiecesInPlay();
+        player2.InitializePiecesInPlay();
+        
     }
 
     private void UpdateSelection(){
@@ -70,64 +95,60 @@ public class BoardManager : MonoBehaviour
         return center;
     }
 
-    private void SpawnPiece(int index, int x, int y, Quaternion rotation, short player){
+    private void SpawnPiece(PieceType index, int x, int y, Quaternion rotation, PlayerNumber player){
         //position.z = pieceZValues[index];
-        GameObject piece = Instantiate(piecePrefabs[index], GetTileCenter(x, y), rotation) as GameObject;
+        GameObject piece = Instantiate(piecePrefabs[(int)index], GetTileCenter(x, y), rotation) as GameObject;
         piece.transform.SetParent(transform);
         ShogiPieces[x, y] = piece.GetComponent<ShogiPiece>();
         ShogiPieces[x, y].SetPosition(x,y);
         ShogiPieces[x, y].player = player;
-        activePiece.Add(piece);
+        activePieces.Add(piece);
     }
 
     private void SpawnAllShogiPieces(){
         Quaternion rotation1 = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
         Quaternion rotation2 = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
 
-        activePiece = new List<GameObject>();
-        ShogiPieces = new ShogiPiece[C.numberRows, C.numberRows];
-        currentPlayer = 1;
-
         // Kings
-        SpawnPiece(C.king, 4, 0, rotation1, 1);
-        SpawnPiece(C.king, 4, 8, rotation2, 2);
+        SpawnPiece(PieceType.king, 4, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.king, 4, 8, rotation2, PlayerNumber.player2);
 
         // Rook
-        SpawnPiece(C.rook, 7, 1, rotation1, 1);
-        SpawnPiece(C.rook, 1, 7, rotation2, 2);
+        SpawnPiece(PieceType.rook, 7, 1, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.rook, 1, 7, rotation2, PlayerNumber.player2);
 
         // Bishop
-        SpawnPiece(C.bishop, 1, 1, rotation1, 1);
-        SpawnPiece(C.bishop, 7, 7, rotation2, 2);
+        SpawnPiece(PieceType.bishop, 1, 1, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.bishop, 7, 7, rotation2, PlayerNumber.player2);
 
         // Gold generals
-        SpawnPiece(C.gold, 3, 0, rotation1, 1);
-        SpawnPiece(C.gold, 5, 0, rotation1, 1);
-        SpawnPiece(C.gold, 3, 8, rotation2, 2);
-        SpawnPiece(C.gold, 5, 8, rotation2, 2);
+        SpawnPiece(PieceType.gold, 3, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.gold, 5, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.gold, 3, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.gold, 5, 8, rotation2, PlayerNumber.player2);
 
         // Silver generals
-        SpawnPiece(C.silver, 2, 0, rotation1, 1);
-        SpawnPiece(C.silver, 6, 0, rotation1, 1);
-        SpawnPiece(C.silver, 2, 8, rotation2, 2);
-        SpawnPiece(C.silver, 6, 8, rotation2, 2);
+        SpawnPiece(PieceType.silver, 2, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.silver, 6, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.silver, 2, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.silver, 6, 8, rotation2, PlayerNumber.player2);
 
         // Knights
-        SpawnPiece(C.knight, 1, 0, rotation1, 1);
-        SpawnPiece(C.knight, 7, 0, rotation1, 1);
-        SpawnPiece(C.knight, 1, 8, rotation2, 2);
-        SpawnPiece(C.knight, 7, 8, rotation2, 2);
+        SpawnPiece(PieceType.knight, 1, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.knight, 7, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.knight, 1, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.knight, 7, 8, rotation2, PlayerNumber.player2);
 
         // Lances
-        SpawnPiece(C.lance, 0, 0, rotation1, 1);
-        SpawnPiece(C.lance, 8, 0, rotation1, 1);
-        SpawnPiece(C.lance, 0, 8, rotation2, 2);
-        SpawnPiece(C.lance, 8, 8, rotation2, 2);
+        SpawnPiece(PieceType.lance, 0, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.lance, 8, 0, rotation1, PlayerNumber.player1);
+        SpawnPiece(PieceType.lance, 0, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.lance, 8, 8, rotation2, PlayerNumber.player2);
 
         // Pawns (rotations switched, becouse of the orientation of the pawn asset)
         for (int i = 0; i < C.numberRows; i++){
-            SpawnPiece(C.pawn, i, 2, rotation2, 1);
-            SpawnPiece(C.pawn, i, 6, rotation1, 2);
+            SpawnPiece(PieceType.pawn, i, 2, rotation2, PlayerNumber.player1);
+            SpawnPiece(PieceType.pawn, i, 6, rotation1, PlayerNumber.player2);
         }
     }
 
@@ -159,24 +180,42 @@ public class BoardManager : MonoBehaviour
         }
     }
     private void SelectShogiPiece(int x, int y){
+
         if (ShogiPieces[x, y] == null)
             return;
-        if (ShogiPieces[x, y].player != currentPlayer)
+        if (ShogiPieces[x, y].player != currentPlayer.playerNumber && !freeMove)
             return;
+        if (ShogiPieces[x, y] == selectedShogiPiece){
+            selectedShogiPiece = null;
+            return;
+        }
 
-        
-        allowedMoves = ShogiPieces[x, y].PossibleMove();
         selectedShogiPiece = ShogiPieces[x, y];
-
-        BoardHighlights.Instance.HideHighlights();
-        BoardHighlights.Instance.HighlightAllowedMoves(allowedMoves);
+        if (!freeMove){
+            allowedMoves = selectedShogiPiece.PossibleMoves();
+            BoardHighlights.Instance.HideHighlights();
+            BoardHighlights.Instance.HighlightAllowedMoves(allowedMoves);
+        }
+        else{
+            allowedMoves = new bool [C.numberRows,C.numberRows];
+            for (int i=0; i < C.numberRows*C.numberRows; i++) allowedMoves[i%C.numberRows,i/C.numberRows] = true;
+            BoardHighlights.Instance.HideHighlights();
+            BoardHighlights.Instance.HighlightAllowedMoves(selectedShogiPiece.PossibleMoves());
+        } 
     }
     private void MoveShogiPiece(int x, int y){
         if (allowedMoves[x,y]){
+            // Check if the kill wil come under attack if you do this move
+            ShogiPiece[,] tempShogiPieces = new ShogiPiece[C.numberRows,C.numberRows];
+            ShogiPieces.CopyTo(tempShogiPieces, 0);
+            ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
+            ShogiPieces[x, y] = selectedShogiPiece;
+
+
             ShogiPiece targetPiece = ShogiPieces[x,y];
-            if (targetPiece != null && targetPiece.player != currentPlayer){
+            if (targetPiece != null && targetPiece.player != currentPlayer.playerNumber){
                 // Capture piece
-                activePiece.Remove(targetPiece.gameObject);
+                activePieces.Remove(targetPiece.gameObject);
                 Destroy (targetPiece.gameObject);
             }
 
@@ -185,14 +224,43 @@ public class BoardManager : MonoBehaviour
             selectedShogiPiece.SetPosition(x, y);
             ShogiPieces[x, y] = selectedShogiPiece;
 
+
             // Check win condition
-            // ..
-            
-            if (currentPlayer == 1) currentPlayer = 2;
-            else currentPlayer = 1;
+            if (CheckGameOver()){
+                EndGame();
+            }
+            else if (!freeMove){
+                ChangePlayer();
+            }
         }
-        
         BoardHighlights.Instance.HideHighlights();
         selectedShogiPiece = null;
+    }
+    // Check if the kill wil come under attack if you do this move
+    private bool CheckIfMoveWillPutCurrentPlayerInCheck(int x, int y){
+        bool isInCheck;
+        
+        ShogiPiece[,] tempShogiPieces = new ShogiPiece[C.numberRows,C.numberRows];
+        ShogiPieces.CopyTo(tempShogiPieces, 0);
+        ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
+        ShogiPieces[x, y] = selectedShogiPiece;
+
+        opponentPlayer.CalculateAttackedTiles();
+        
+    }
+
+    private void ChangePlayer(){
+        if (currentPlayer == player1){
+            currentPlayer = player2;
+            opponentPlayer = player1;
+        }
+        else{
+            currentPlayer = player1;
+            opponentPlayer = player2;
+        }
+    }
+
+    private void EndGame(){
+        //SetGameState(GameState.Finished);
     }
 }

@@ -5,20 +5,20 @@ using C = Constants;
 
 public class Rook : ShogiPiece
 {
-    public override bool[,] PossibleMove(){
+    public override bool[,] PossibleMoves(){
         bool[,] moves = new bool[C.numberRows,C.numberRows];
 
         // Right
-        OrthagonalLine(moves, C.right);
+        OrthagonalLine(moves, DirectionOrthagonal.right);
 
         // Left
-        OrthagonalLine(moves, C.left);
+        OrthagonalLine(moves, DirectionOrthagonal.left);
 
         // Forwards
-        OrthagonalLine(moves, C.forward);
+        OrthagonalLine(moves, DirectionOrthagonal.forward);
 
         // Backwards
-        OrthagonalLine(moves, C.back);
+        OrthagonalLine(moves, DirectionOrthagonal.back);
 
         return moves;
     }
