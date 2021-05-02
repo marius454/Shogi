@@ -5,8 +5,9 @@ using C = Constants;
 
 public class Bishop : ShogiPiece
 {
-    public override bool[,] PossibleMoves(){
-        bool[,] moves = new bool[C.numberRows,C.numberRows];
+    public Bishop(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
+    public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
+        moves = new bool[C.numberRows,C.numberRows];
 
         // Forward left
         DiagonalLine(moves, DirectionDiagonal.forwardLeft);
@@ -20,6 +21,8 @@ public class Bishop : ShogiPiece
         // Backward right
         DiagonalLine(moves, DirectionDiagonal.backRight);
 
+        removeIllegalMoves(moves, checkForSelfCheck);
+        
         return moves;
     }
 }

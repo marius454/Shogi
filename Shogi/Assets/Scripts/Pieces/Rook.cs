@@ -5,8 +5,9 @@ using C = Constants;
 
 public class Rook : ShogiPiece
 {
-    public override bool[,] PossibleMoves(){
-        bool[,] moves = new bool[C.numberRows,C.numberRows];
+    public Rook(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
+    public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
+        moves = new bool[C.numberRows,C.numberRows];
 
         // Right
         OrthagonalLine(moves, DirectionOrthagonal.right);
@@ -20,6 +21,8 @@ public class Rook : ShogiPiece
         // Backwards
         OrthagonalLine(moves, DirectionOrthagonal.back);
 
+        removeIllegalMoves(moves, checkForSelfCheck);
+        
         return moves;
     }
 }

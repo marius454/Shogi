@@ -3,19 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using C = Constants;
 
-public abstract class ShogiPiece : MonoBehaviour
+public class ShogiPiece : MonoBehaviour
 {
     public int CurrentX {set;get;}
     public int CurrentY {set;get;}
-    public PlayerNumber player;
-    public BoardManager board;
+    public PlayerNumber player{set;get;}
+    public BoardManager board{set;get;}
+    public bool[,] moves{set;get;}
+
+    public ShogiPiece(int x, int y, PlayerNumber player, BoardManager board){
+        Init(x, y, player, board);
+    }
+    public void Init(int x, int y, PlayerNumber player, BoardManager board){
+        SetPosition(x, y);
+        this.player = player;
+        this.board = board;
+        moves = new bool[C.numberRows, C.numberRows];
+    }
 
     public void SetPosition (int x, int y){
         CurrentX = x;
         CurrentY = y;
     }
 
-    public virtual bool[,] PossibleMoves(){
+    public virtual bool[,] PossibleMoves(bool checkForSelfCheck = true){
         return new bool[C.numberRows, C.numberRows];
     }
 
@@ -77,16 +88,44 @@ public abstract class ShogiPiece : MonoBehaviour
             }
         }
     }
-    // public List<ShogiPiece> GetAttackingPieces(){
-    //     List<ShogiPiece> attackedPieces = new List<ShogiPiece>();
-    //     bool[,] moves = PossibleMoves();
-    //     for (int x=0; x < C.numberRows; x++)
-    //         for (int y=0; y < C.numberRows; y++){
-    //             if (moves[x,y] == true && board.ShogiPieces[x,y]){
-    //                 attackedPieces.Add(board.ShogiPieces[x,y]);
-    //             }
-    //         }
+    public List<ShogiPiece> GetAttackedPieces(){
+        List<ShogiPiece> attackedPieces = new List<ShogiPiece>();
+        for (int x=0; x < C.numberRows; x++)
+            for (int y=0; y < C.numberRows; y++){
+                if (moves[x,y] && board.ShogiPieces[x,y]){
+                    attackedPieces.Add(board.ShogiPieces[x,y]);
+                }
+            }
+        return attackedPieces;
+    }
+
+    // check if any of the possible moves are illegal, and remove them
+    public void removeIllegalMoves(bool[,] moves, bool checkForSelfCheck){
         
-    //     return attackedPieces;
-    // }
+        // check if after this move the players' King will be under attack
+        if (checkForSelfCheck){
+            for (int x=0; x < C.numberRows; x++)
+                for (int y=0; y < C.numberRows; y++){
+                    if (moves[x,y]){
+                        if(CheckIfMoveWillCauseSelfCheck(x, y)) moves[x, y] = false;
+                    }
+                }
+        }
+        // check if after this move a perpetual check will be called
+
+    }
+    private bool CheckIfMoveWillCauseSelfCheck(int x, int y){
+        bool wouldCauseCheck;
+        
+        ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
+        board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
+        board.ShogiPieces[x, y] = this;
+
+        board.opponentPlayer.CalculatePossibleMoves(false);
+        wouldCauseCheck = board.opponentPlayer.isAttackingKing ? true : false;
+        board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
+        board.opponentPlayer.CalculatePossibleMoves(false);
+
+        return wouldCauseCheck;
+    }
 }

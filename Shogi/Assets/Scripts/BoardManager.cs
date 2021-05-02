@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using C = Constants;
+
 
 public class BoardManager : MonoBehaviour
 {
@@ -35,7 +37,6 @@ public class BoardManager : MonoBehaviour
         Application.targetFrameRate = 60;
         Instance = this;
         InitializeGame();
-        SpawnAllShogiPieces();
     }
     // Update is called once per frame
     private void Update(){
@@ -56,7 +57,7 @@ public class BoardManager : MonoBehaviour
     }
     private void InitializeGame(){
         player1 = new Player(PlayerNumber.player1, this);
-        player1 = new Player(PlayerNumber.player2, this);
+        player2 = new Player(PlayerNumber.player2, this);
         selectionX = -1;
         selectionY = -1;
 
@@ -100,8 +101,7 @@ public class BoardManager : MonoBehaviour
         GameObject piece = Instantiate(piecePrefabs[(int)index], GetTileCenter(x, y), rotation) as GameObject;
         piece.transform.SetParent(transform);
         ShogiPieces[x, y] = piece.GetComponent<ShogiPiece>();
-        ShogiPieces[x, y].SetPosition(x,y);
-        ShogiPieces[x, y].player = player;
+        ShogiPieces[x, y].Init(x, y, player, this);
         activePieces.Add(piece);
     }
 
@@ -201,21 +201,28 @@ public class BoardManager : MonoBehaviour
             for (int i=0; i < C.numberRows*C.numberRows; i++) allowedMoves[i%C.numberRows,i/C.numberRows] = true;
             BoardHighlights.Instance.HideHighlights();
             BoardHighlights.Instance.HighlightAllowedMoves(selectedShogiPiece.PossibleMoves());
-        } 
+        }
+
+        int nrMoves = 0;
+        for (int a=0; a < C.numberRows; a++)
+            for (int b=0; b < C.numberRows; b++){
+                if (allowedMoves[a,b]){
+                    Debug.Log("allowed tile at " + a + " " + b);
+                    nrMoves++;
+                }
+            }
+        //Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
     }
     private void MoveShogiPiece(int x, int y){
         if (allowedMoves[x,y]){
-            // Check if the kill wil come under attack if you do this move
-            ShogiPiece[,] tempShogiPieces = new ShogiPiece[C.numberRows,C.numberRows];
-            ShogiPieces.CopyTo(tempShogiPieces, 0);
-            ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
-            ShogiPieces[x, y] = selectedShogiPiece;
-
-
             ShogiPiece targetPiece = ShogiPieces[x,y];
             if (targetPiece != null && targetPiece.player != currentPlayer.playerNumber){
                 // Capture piece
                 activePieces.Remove(targetPiece.gameObject);
+                opponentPlayer.RemovePieceInPlay(targetPiece);
+                opponentPlayer.AddCapturedPiece(targetPiece);
+
+                // will not be destroyed when capture and drop is implemented
                 Destroy (targetPiece.gameObject);
             }
 
@@ -223,6 +230,9 @@ public class BoardManager : MonoBehaviour
             selectedShogiPiece.transform.position = GetTileCenter (x, y);
             selectedShogiPiece.SetPosition(x, y);
             ShogiPieces[x, y] = selectedShogiPiece;
+
+            currentPlayer.CalculatePossibleMoves();
+            opponentPlayer.CalculatePossibleMoves();
 
 
             // Check win condition
@@ -236,19 +246,6 @@ public class BoardManager : MonoBehaviour
         BoardHighlights.Instance.HideHighlights();
         selectedShogiPiece = null;
     }
-    // Check if the kill wil come under attack if you do this move
-    private bool CheckIfMoveWillPutCurrentPlayerInCheck(int x, int y){
-        bool isInCheck;
-        
-        ShogiPiece[,] tempShogiPieces = new ShogiPiece[C.numberRows,C.numberRows];
-        ShogiPieces.CopyTo(tempShogiPieces, 0);
-        ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
-        ShogiPieces[x, y] = selectedShogiPiece;
-
-        opponentPlayer.CalculateAttackedTiles();
-        
-    }
-
     private void ChangePlayer(){
         if (currentPlayer == player1){
             currentPlayer = player2;
@@ -261,6 +258,24 @@ public class BoardManager : MonoBehaviour
     }
 
     private void EndGame(){
-        //SetGameState(GameState.Finished);
+        Debug.Log("Victory for " + currentPlayer.playerNumber);
+        // Lock The game from being played further
+    }
+    private bool CheckGameOver(){
+        int nrMoves = 0;
+        for (int x=0; x < C.numberRows; x++)
+            for (int y=0; y < C.numberRows; y++){
+                if (opponentPlayer.possibleMoves[x,y]){
+                    Debug.Log("attacking tile at " + x + " " + y);
+                    nrMoves++;
+                }
+            }
+        Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
+
+        if (currentPlayer.isAttackingKing){
+            opponentPlayer.isInCheck = true;
+            if (!opponentPlayer.hasPossibleMoves) return true;
+        }
+        return false;
     }
 }

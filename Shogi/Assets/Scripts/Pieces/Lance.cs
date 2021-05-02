@@ -4,8 +4,9 @@ using C = Constants;
 
 public class Lance : ShogiPiece
 {
-    public override bool[,] PossibleMoves(){
-        bool[,] moves = new bool[C.numberRows,C.numberRows];
+    public Lance(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
+    public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
+        moves = new bool[C.numberRows,C.numberRows];
 
         // Player 1
         if (player == PlayerNumber.player1)
@@ -14,6 +15,7 @@ public class Lance : ShogiPiece
         else if (player == PlayerNumber.player2) 
             OrthagonalLine(moves, DirectionOrthagonal.back);
 
+        removeIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
 }
