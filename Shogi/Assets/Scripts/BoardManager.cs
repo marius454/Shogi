@@ -12,8 +12,10 @@ public class BoardManager : MonoBehaviour
 
     public static BoardManager Instance{set;get;}
 
-    private Player player1;
-    private Player player2;
+    public Player player1;
+    public Player player2;
+    public Player currentPlayer;
+    public Player opponentPlayer;
     
     
     private bool[,] allowedMoves{set;get;}    
@@ -28,8 +30,7 @@ public class BoardManager : MonoBehaviour
     private List<GameObject> activePieces;
     public ShogiPiece[,] ShogiPieces{set;get;}
 
-    public Player currentPlayer;
-    public Player opponentPlayer;
+    
 
     // Start is called before the first frame update
     private void Start(){

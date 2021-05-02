@@ -121,10 +121,14 @@ public class ShogiPiece : MonoBehaviour
         board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
         board.ShogiPieces[x, y] = this;
 
-        board.opponentPlayer.CalculatePossibleMoves(false);
-        wouldCauseCheck = board.opponentPlayer.isAttackingKing ? true : false;
+        Player opponentPlayer;
+        if (player == board.player1.playerNumber) opponentPlayer = board.player2;
+        else opponentPlayer = board.player1;
+
+        opponentPlayer.CalculatePossibleMoves(false);
+        wouldCauseCheck = opponentPlayer.isAttackingKing ? true : false;
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
-        board.opponentPlayer.CalculatePossibleMoves(false);
+        opponentPlayer.CalculatePossibleMoves(false);
 
         return wouldCauseCheck;
     }
