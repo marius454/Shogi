@@ -7,27 +7,30 @@ public class Player
 {
     public PlayerNumber playerNumber{set;get;}
     private BoardManager board{set;get;}
-    public bool[,] possibleMoves{set;get;}
+    public bool[,] attackedTiles{set;get;}
     private List<ShogiPiece> piecesInPlay{set;get;}
+    public CaptureBoard captureBoard{set;get;}
     public bool isInCheck{set; get;}
     public bool isAttackingKing{set; get;}
     // to set this check both attacked tiles and whether are legal drops available
     public bool hasPossibleMoves{set; get;}
 
+
     private List<ShogiPiece> capturedPieces{set;get;}
-    public Player (PlayerNumber playerNumber, BoardManager board){
+    public Player (PlayerNumber playerNumber, BoardManager board, CaptureBoard captureBoard){
         piecesInPlay = new List<ShogiPiece>();
         capturedPieces = new List<ShogiPiece>();
-        possibleMoves = new bool[C.numberRows, C.numberRows];
+        attackedTiles = new bool[C.numberRows, C.numberRows];
         hasPossibleMoves = true;
         isAttackingKing = false;
         isInCheck = false;
+        this.captureBoard = new CaptureBoard();
 
         this.board = board;
         this.playerNumber = playerNumber;
     }
-    public void CalculatePossibleMoves(bool checkForSelfCheck = true){
-        possibleMoves = new bool[C.numberRows, C.numberRows];
+    public void CalculateAttackedTiles(bool checkForSelfCheck = true){
+        attackedTiles = new bool[C.numberRows, C.numberRows];
         int nrMoves = 0;
         //Debug.Log(checkForSelfCheck);
         foreach(ShogiPiece piece in piecesInPlay){
@@ -35,7 +38,7 @@ public class Player
             for (int x=0; x < C.numberRows; x++)
                 for (int y=0; y < C.numberRows; y++){
                     if (moves[x,y]){
-                        possibleMoves[x,y] = true;
+                        attackedTiles[x,y] = true;
                         nrMoves++;
                     }
                 }
@@ -61,7 +64,7 @@ public class Player
         // Another way to do this is checking all attacked tile for a king
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
-                if (possibleMoves[x, y]){
+                if (attackedTiles[x, y]){
                     if (board.ShogiPieces[x, y]){
                         if (board.ShogiPieces[x, y] is King){
                             isAttackingKing = true;

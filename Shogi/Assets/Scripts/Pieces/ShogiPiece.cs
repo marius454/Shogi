@@ -15,15 +15,19 @@ public class ShogiPiece : MonoBehaviour
         Init(x, y, player, board);
     }
     public void Init(int x, int y, PlayerNumber player, BoardManager board){
-        SetPosition(x, y);
+        SetXY(x, y);
+        SetHeight();
         this.player = player;
         this.board = board;
         moves = new bool[C.numberRows, C.numberRows];
     }
 
-    public void SetPosition (int x, int y){
+    public void SetXY (int x, int y){
         CurrentX = x;
         CurrentY = y;
+    }
+    public virtual void SetHeight (){
+        //this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
     }
 
     public virtual bool[,] PossibleMoves(bool checkForSelfCheck = true){
@@ -125,10 +129,10 @@ public class ShogiPiece : MonoBehaviour
         if (player == board.player1.playerNumber) opponentPlayer = board.player2;
         else opponentPlayer = board.player1;
 
-        opponentPlayer.CalculatePossibleMoves(false);
+        opponentPlayer.CalculateAttackedTiles(false);
         wouldCauseCheck = opponentPlayer.isAttackingKing ? true : false;
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
-        opponentPlayer.CalculatePossibleMoves(false);
+        opponentPlayer.CalculateAttackedTiles(false);
 
         return wouldCauseCheck;
     }

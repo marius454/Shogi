@@ -42,7 +42,7 @@ public class BoardManager : MonoBehaviour
     // Update is called once per frame
     private void Update(){
         UpdateSelection();
-        DrawBoard();
+        // DrawBoard();
 
         if (Input.GetMouseButtonDown (0)){
             if (selectionX >= 0 && selectionY >= 0){
@@ -57,8 +57,8 @@ public class BoardManager : MonoBehaviour
         }
     }
     private void InitializeGame(){
-        player1 = new Player(PlayerNumber.player1, this);
-        player2 = new Player(PlayerNumber.player2, this);
+        player1 = new Player(PlayerNumber.player1, this, GameObject.Find("CaptureBoardPlayer1").GetComponent<CaptureBoard>());
+        player2 = new Player(PlayerNumber.player2, this, GameObject.Find("CaptureBoardPlayer2").GetComponent<CaptureBoard>());
         selectionX = -1;
         selectionY = -1;
 
@@ -70,7 +70,6 @@ public class BoardManager : MonoBehaviour
         SpawnAllShogiPieces();
         player1.InitializePiecesInPlay();
         player2.InitializePiecesInPlay();
-        
     }
 
     private void UpdateSelection(){
@@ -98,7 +97,6 @@ public class BoardManager : MonoBehaviour
     }
 
     private void SpawnPiece(PieceType index, int x, int y, Quaternion rotation, PlayerNumber player){
-        //position.z = pieceZValues[index];
         GameObject piece = Instantiate(piecePrefabs[(int)index], GetTileCenter(x, y), rotation) as GameObject;
         piece.transform.SetParent(transform);
         ShogiPieces[x, y] = piece.GetComponent<ShogiPiece>();
@@ -229,11 +227,12 @@ public class BoardManager : MonoBehaviour
 
             ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
             selectedShogiPiece.transform.position = GetTileCenter (x, y);
-            selectedShogiPiece.SetPosition(x, y);
+            selectedShogiPiece.SetXY(x, y);
+            selectedShogiPiece.SetHeight();
             ShogiPieces[x, y] = selectedShogiPiece;
 
-            currentPlayer.CalculatePossibleMoves();
-            opponentPlayer.CalculatePossibleMoves();
+            currentPlayer.CalculateAttackedTiles();
+            opponentPlayer.CalculateAttackedTiles();
 
 
             // Check win condition
@@ -266,7 +265,7 @@ public class BoardManager : MonoBehaviour
         int nrMoves = 0;
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
-                if (opponentPlayer.possibleMoves[x,y]){
+                if (opponentPlayer.attackedTiles[x,y]){
                     Debug.Log("attacking tile at " + x + " " + y);
                     nrMoves++;
                 }

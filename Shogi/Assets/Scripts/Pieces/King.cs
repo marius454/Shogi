@@ -1,10 +1,14 @@
 using System;
 using UnityEngine;
 using C = Constants;
+using Y = PieceYValues;
 
 public class King : ShogiPiece
 {
     public King(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
+    public override void SetHeight(){
+        this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.King, gameObject.transform.position.z);
+    }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
         moves = new bool[C.numberRows,C.numberRows];
         int a = 1;
