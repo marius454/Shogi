@@ -24,7 +24,7 @@ public class Player
         hasPossibleMoves = true;
         isAttackingKing = false;
         isInCheck = false;
-        this.captureBoard = new CaptureBoard();
+        this.captureBoard = captureBoard;
 
         this.board = board;
         this.playerNumber = playerNumber;
@@ -50,17 +50,6 @@ public class Player
         CheckIfAttackingKing();
     }
     public void CheckIfAttackingKing(){
-        // foreach (ShogiPiece piece in piecesInPlay){
-        //     foreach (ShogiPiece attackedPiece in piece.GetAttackedPieces()){
-        //         // Debug.Log("Piece " + piece + " is attacking piece " + attackedPiece);
-        //         // Debug.Log("Is the attacked piece a King? - " + (attackedPiece is King));
-        //         if (attackedPiece is King){
-        //             isAttackingKing = true;
-        //             return;
-        //         }
-        //     }
-        // }
-
         // Another way to do this is checking all attacked tile for a king
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
@@ -85,7 +74,7 @@ public class Player
     }
     public void AddPieceInPlay(ShogiPiece piece)
 	{
-		if (!piecesInPlay.Contains(piece))
+		if (!piecesInPlay.Contains(piece)){}
 			piecesInPlay.Add(piece);
         // perkelti prie pagrindeines lentos
 	}
@@ -95,14 +84,17 @@ public class Player
 		if (piecesInPlay.Contains(piece))
 			piecesInPlay.Remove(piece);
 	}
-    public void AddCapturedPiece(ShogiPiece piece)
+    public void CapturePiece(ShogiPiece piece)
 	{
-		if (!piecesInPlay.Contains(piece))
+		if (!piecesInPlay.Contains(piece)){
+            piece.player = this.playerNumber;
 			capturedPieces.Add(piece);
+            captureBoard.AddPiece(piece);
+        }
         // perkelti prie capture lentos.
 	}
 
-	public void RemoveCapturedPiece(ShogiPiece piece)
+	public void DropPiece(ShogiPiece piece)
 	{
 		if (piecesInPlay.Contains(piece))
 			capturedPieces.Remove(piece);

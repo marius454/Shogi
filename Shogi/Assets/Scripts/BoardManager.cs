@@ -219,10 +219,11 @@ public class BoardManager : MonoBehaviour
                 // Capture piece
                 activePieces.Remove(targetPiece.gameObject);
                 opponentPlayer.RemovePieceInPlay(targetPiece);
-                opponentPlayer.AddCapturedPiece(targetPiece);
+                currentPlayer.CapturePiece(targetPiece);
+                ShogiPieces[x, y] = null;
 
                 // will not be destroyed when capture and drop is implemented
-                Destroy (targetPiece.gameObject);
+                // Destroy (targetPiece.gameObject);
             }
 
             ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
@@ -256,7 +257,6 @@ public class BoardManager : MonoBehaviour
             opponentPlayer = player2;
         }
     }
-
     private void EndGame(){
         Debug.Log("Victory for " + currentPlayer.playerNumber);
         // Lock The game from being played further

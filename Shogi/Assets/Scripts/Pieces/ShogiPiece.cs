@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using C = Constants;
 
-public class ShogiPiece : MonoBehaviour
+public abstract class ShogiPiece : MonoBehaviour
 {
     public int CurrentX {set;get;}
     public int CurrentY {set;get;}
@@ -26,8 +26,11 @@ public class ShogiPiece : MonoBehaviour
         CurrentX = x;
         CurrentY = y;
     }
-    public virtual void SetHeight (){
-        //this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
+    public abstract void SetHeight();
+    public virtual void SetRotation(){
+        // TO DO
+        // move piece rotation to the ShogiPiece class
+        // one of the pieces will have to override the basic method because the asset is turned to the other side.
     }
 
     public virtual bool[,] PossibleMoves(bool checkForSelfCheck = true){
