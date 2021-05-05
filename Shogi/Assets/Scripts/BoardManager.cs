@@ -18,8 +18,8 @@ public class BoardManager : MonoBehaviour
     public Player opponentPlayer;
     
     
-    private bool[,] allowedMoves{set;get;}    
-    private ShogiPiece selectedShogiPiece;
+    public bool[,] allowedMoves{set;get;}
+    public ShogiPiece selectedShogiPiece{set;get;}
 
     private int selectionX;
     private int selectionY;
@@ -43,18 +43,7 @@ public class BoardManager : MonoBehaviour
     private void Update(){
         UpdateSelection();
         // DrawBoard();
-
-        if (Input.GetMouseButtonDown (0)){
-            if (selectionX >= 0 && selectionY >= 0){
-                if (selectedShogiPiece == null || (ShogiPieces[selectionX, selectionY] != null && ShogiPieces[selectionX, selectionY].player == currentPlayer.playerNumber)){
-                    // select the shogi piece
-                    SelectShogiPiece(selectionX, selectionY);
-                }else{
-                    // move the shogi piece
-                    MoveShogiPiece(selectionX, selectionY);
-                }
-            }
-        }
+        ComputeMouseClick();
     }
     private void InitializeGame(){
         player1 = new Player(PlayerNumber.player1, this, GameObject.Find("CaptureBoardPlayer1").GetComponent<CaptureBoard>());
@@ -88,7 +77,17 @@ public class BoardManager : MonoBehaviour
             selectionY = -1;
         }
     }
-
+    private void ComputeMouseClick(){
+        if (Input.GetMouseButtonDown (0)){
+            if (selectionX >= 0 && selectionY >= 0 && selectionX <= C.numberRows && selectionY <= C.numberRows){
+                if (selectedShogiPiece == null || (ShogiPieces[selectionX, selectionY] != null && ShogiPieces[selectionX, selectionY].player == currentPlayer.playerNumber)){
+                    SelectShogiPiece(selectionX, selectionY);
+                }else{
+                    MoveShogiPiece(selectionX, selectionY);
+                }
+            }
+        }
+    }
     private Vector3 GetTileCenter(int x, int y){
         Vector3 center = Vector3.zero;
         center.x += (C.tileSize * x) + C.tileOffset;
@@ -96,8 +95,8 @@ public class BoardManager : MonoBehaviour
         return center;
     }
 
-    private void SpawnPiece(PieceType index, int x, int y, Quaternion rotation, PlayerNumber player){
-        GameObject piece = Instantiate(piecePrefabs[(int)index], GetTileCenter(x, y), rotation) as GameObject;
+    private void SpawnPiece(PieceType index, int x, int y, PlayerNumber player){
+        GameObject piece = Instantiate(piecePrefabs[(int)index], GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
         piece.transform.SetParent(transform);
         ShogiPieces[x, y] = piece.GetComponent<ShogiPiece>();
         ShogiPieces[x, y].Init(x, y, player, this);
@@ -105,49 +104,45 @@ public class BoardManager : MonoBehaviour
     }
 
     private void SpawnAllShogiPieces(){
-        Quaternion rotation1 = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
-        Quaternion rotation2 = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
-
         // Kings
-        SpawnPiece(PieceType.king, 4, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.king, 4, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.king, 4, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.king, 4, 8, PlayerNumber.player2);
 
         // Rook
-        SpawnPiece(PieceType.rook, 7, 1, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.rook, 1, 7, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.rook, 7, 1, PlayerNumber.player1);
+        SpawnPiece(PieceType.rook, 1, 7, PlayerNumber.player2);
 
         // Bishop
-        SpawnPiece(PieceType.bishop, 1, 1, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.bishop, 7, 7, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.bishop, 1, 1, PlayerNumber.player1);
+        SpawnPiece(PieceType.bishop, 7, 7, PlayerNumber.player2);
 
         // Gold generals
-        SpawnPiece(PieceType.gold, 3, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.gold, 5, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.gold, 3, 8, rotation2, PlayerNumber.player2);
-        SpawnPiece(PieceType.gold, 5, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.gold, 3, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.gold, 5, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.gold, 3, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.gold, 5, 8, PlayerNumber.player2);
 
         // Silver generals
-        SpawnPiece(PieceType.silver, 2, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.silver, 6, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.silver, 2, 8, rotation2, PlayerNumber.player2);
-        SpawnPiece(PieceType.silver, 6, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.silver, 2, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.silver, 6, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.silver, 2, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.silver, 6, 8, PlayerNumber.player2);
 
         // Knights
-        SpawnPiece(PieceType.knight, 1, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.knight, 7, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.knight, 1, 8, rotation2, PlayerNumber.player2);
-        SpawnPiece(PieceType.knight, 7, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.knight, 1, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.knight, 7, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.knight, 1, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.knight, 7, 8, PlayerNumber.player2);
 
         // Lances
-        SpawnPiece(PieceType.lance, 0, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.lance, 8, 0, rotation1, PlayerNumber.player1);
-        SpawnPiece(PieceType.lance, 0, 8, rotation2, PlayerNumber.player2);
-        SpawnPiece(PieceType.lance, 8, 8, rotation2, PlayerNumber.player2);
+        SpawnPiece(PieceType.lance, 0, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.lance, 8, 0, PlayerNumber.player1);
+        SpawnPiece(PieceType.lance, 0, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.lance, 8, 8, PlayerNumber.player2);
 
-        // Pawns (rotations switched, becouse of the orientation of the pawn asset)
         for (int i = 0; i < C.numberRows; i++){
-            SpawnPiece(PieceType.pawn, i, 2, rotation2, PlayerNumber.player1);
-            SpawnPiece(PieceType.pawn, i, 6, rotation1, PlayerNumber.player2);
+            SpawnPiece(PieceType.pawn, i, 2, PlayerNumber.player1);
+            SpawnPiece(PieceType.pawn, i, 6, PlayerNumber.player2);
         }
     }
 
@@ -206,7 +201,7 @@ public class BoardManager : MonoBehaviour
         for (int a=0; a < C.numberRows; a++)
             for (int b=0; b < C.numberRows; b++){
                 if (allowedMoves[a,b]){
-                    Debug.Log("allowed tile at " + a + " " + b);
+                    //Debug.Log("allowed tile at " + a + " " + b);
                     nrMoves++;
                 }
             }
@@ -266,11 +261,11 @@ public class BoardManager : MonoBehaviour
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
                 if (opponentPlayer.attackedTiles[x,y]){
-                    Debug.Log("attacking tile at " + x + " " + y);
+                    //Debug.Log("attacking tile at " + x + " " + y);
                     nrMoves++;
                 }
             }
-        Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
+        //Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
 
         if (currentPlayer.isAttackingKing){
             opponentPlayer.isInCheck = true;

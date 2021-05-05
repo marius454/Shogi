@@ -25,7 +25,7 @@ public class Player
         isAttackingKing = false;
         isInCheck = false;
         this.captureBoard = captureBoard;
-
+        this.captureBoard.board = board;
         this.board = board;
         this.playerNumber = playerNumber;
     }
@@ -43,7 +43,6 @@ public class Player
                     }
                 }
         }
-        if (checkForSelfCheck) Debug.Log(playerNumber + " " + nrMoves);
         if (nrMoves == 0){
             hasPossibleMoves = false;
         }

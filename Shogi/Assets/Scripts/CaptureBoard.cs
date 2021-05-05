@@ -6,7 +6,9 @@ using C = Constants;
 public class CaptureBoard : MonoBehaviour
 {
     [SerializeField] private PlayerNumber player;
+    public BoardManager board{set;get;}
     public ShogiPiece[,] capturedPieces{set;get;}
+    private ShogiPiece selectedCapturedPiece{set;get;}
     private int selectionX;
     private int selectionY;
     private int layerMask;
@@ -22,14 +24,14 @@ public class CaptureBoard : MonoBehaviour
         capturedPieces = new ShogiPiece[C.captureNumberColumns, C.captureNumberRows];
         if (player == PlayerNumber.player1){
             layerMask = LayerMask.GetMask("CapturePlanePlayer1");
-            setBoardLimits(C.numberRows + C.captureNumberColumns, C.captureNumberColumns, C.numberRows + 1, 0);
+            SetBoardLimits(C.numberRows + C.captureNumberColumns, C.captureNumberColumns, C.numberRows + 1, 0);
         } 
         else{
             layerMask = LayerMask.GetMask("CapturePlanePlayer2");
-            setBoardLimits(-2, C.numberRows - 1, -1 - C.captureNumberColumns, C.numberRows - C.captureNumberRows);
+            SetBoardLimits(-2, C.numberRows - 1, -1 - C.captureNumberColumns, C.numberRows - C.captureNumberRows);
         } 
     }
-    private void setBoardLimits(int maxX, int maxY, int minX, int minY){
+    private void SetBoardLimits(int maxX, int maxY, int minX, int minY){
         this.maxX = maxX;
         this.maxY = maxY;
         this.minX = minX;
@@ -38,6 +40,18 @@ public class CaptureBoard : MonoBehaviour
     private void Update(){
         UpdateSelection();
         DrawBoard();
+        ComputeMouseClick();
+    }
+    private (int x, int y) CoordinatesToIndeces(int x, int y){
+        if (player == PlayerNumber.player1){
+            x = x - minX;
+            y = maxY - y;
+        } 
+        else{
+            x = maxX - x;
+            y = y - minY;
+        } 
+        return (x, y);
     }
     private void UpdateSelection(){
         if (!Camera.main)
@@ -58,6 +72,19 @@ public class CaptureBoard : MonoBehaviour
         else {
             selectionX = minX - 1;
             selectionY = minY - 1;
+        }
+    }
+    private void ComputeMouseClick(){
+        if (Input.GetMouseButtonDown (0)){
+            if (selectionX >= minX && selectionY >= minY && selectionX <= maxX && selectionY <= maxY){
+                int x, y;
+                (x, y) = CoordinatesToIndeces(selectionX, selectionY);
+                if (selectedCapturedPiece == null && capturedPieces[x, y]){
+                    SelectCapturedPiece(x, y);
+                }else{
+                    // DropCapturedPiece(x, y);
+                }
+            }
         }
     }
     private void DrawBoard(){
@@ -105,8 +132,9 @@ public class CaptureBoard : MonoBehaviour
                         piece.SetXY(maxX - x, minY + y);
                     }
                     piece.SetHeight();
-                    // piece.SetRotation();
+                    piece.SetNormalRotation();
                     capturedPieces[x, y] = piece;
+                    Debug.Log(x + " " + y);
                     return;
                 }
             }
@@ -115,14 +143,25 @@ public class CaptureBoard : MonoBehaviour
         Vector3 center = Vector3.zero;
         center.x += (C.tileSize * x) + C.tileOffset;
         center.z += (C.tileSize * y) + C.tileOffset;
-        // if (player == PlayerNumber.player1){
-        //     center.x += (C.tileSize * (minX + x)) + C.tileOffset;
-        //     center.z += (C.tileSize * (maxY - y)) + C.tileOffset;
-        // }
-        // else {
-        //     center.x += (C.tileSize * (maxX - x)) + C.tileOffset;
-        //     center.z += (C.tileSize * (minY + y)) + C.tileOffset;
-        // }
         return center;
+    }
+    private void SelectCapturedPiece(int x, int y){
+        if (capturedPieces[x, y] == null)
+            return;
+        if (capturedPieces[x, y] == selectedCapturedPiece){
+            selectedCapturedPiece = null;
+            return;
+        }
+
+        board.selectedShogiPiece = capturedPieces[x, y];
+        Debug.Log(x + " " + y);
+        Debug.Log(selectedCapturedPiece);
+        board.allowedMoves = board.selectedShogiPiece.PossibleDrops();
+        BoardHighlights.Instance.HideHighlights();
+        BoardHighlights.Instance.HighlightAllowedMoves(board.allowedMoves);
+    }
+
+    private void DropCapturedPiece(){
+        // TO DO
     }
 }

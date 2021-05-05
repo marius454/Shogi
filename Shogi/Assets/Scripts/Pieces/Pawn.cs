@@ -9,6 +9,17 @@ public class Pawn : ShogiPiece
     public override void SetHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.Pawn, gameObject.transform.position.z);
     }
+    public override void SetNormalRotation()
+    {
+        if (player == PlayerNumber.player1){
+            Quaternion rotation = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
+            this.gameObject.transform.rotation = rotation;
+        } 
+        else {
+            Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
+            this.gameObject.transform.rotation = rotation;
+        }
+    }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
         moves = new bool[C.numberRows,C.numberRows];
 

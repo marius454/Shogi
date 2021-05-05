@@ -15,10 +15,11 @@ public abstract class ShogiPiece : MonoBehaviour
         Init(x, y, player, board);
     }
     public void Init(int x, int y, PlayerNumber player, BoardManager board){
-        SetXY(x, y);
-        SetHeight();
         this.player = player;
         this.board = board;
+        SetXY(x, y);
+        SetHeight();
+        SetNormalRotation();
         moves = new bool[C.numberRows, C.numberRows];
     }
 
@@ -27,14 +28,62 @@ public abstract class ShogiPiece : MonoBehaviour
         CurrentY = y;
     }
     public abstract void SetHeight();
-    public virtual void SetRotation(){
+    public virtual void SetNormalRotation(){
+        if (player == PlayerNumber.player1){
+            Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
+            this.gameObject.transform.rotation = rotation;
+        } 
+        else {
+            Quaternion rotation = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
+            this.gameObject.transform.rotation = rotation;
+        }
+    }
+    public virtual void SetPromotedRotation(){
         // TO DO
-        // move piece rotation to the ShogiPiece class
-        // one of the pieces will have to override the basic method because the asset is turned to the other side.
+        // need to change this in a way that will flip the piece correctly to it's oppositesdie
+        // might need a different one for every piece
+        if (player == PlayerNumber.player1){
+            Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
+            this.gameObject.transform.rotation = rotation;
+        } 
+        else {
+            Quaternion rotation = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
+            this.gameObject.transform.rotation = rotation;
+        }
     }
 
     public virtual bool[,] PossibleMoves(bool checkForSelfCheck = true){
-        return new bool[C.numberRows, C.numberRows];
+        moves = new bool[C.numberRows, C.numberRows];
+        return moves;
+    }
+    // check if any of the possible moves are illegal, and remove them
+    public void removeIllegalMoves(bool[,] moves, bool checkForSelfCheck){
+        
+        // check if after this move the players' King will be under attack
+        if (checkForSelfCheck){
+            for (int x=0; x < C.numberRows; x++)
+                for (int y=0; y < C.numberRows; y++){
+                    if (moves[x,y]){
+                        if(CheckIfMoveWillCauseSelfCheck(x, y)) moves[x, y] = false;
+                    }
+                }
+        }
+        // check if after this move a perpetual check will be called
+        // TO DO
+
+    }
+    public virtual bool[,] PossibleDrops(bool checkForSelfCheck = true){
+        moves = new bool[C.numberRows, C.numberRows];
+        for (int x=0; x < C.numberRows; x++)
+            for (int y=0; y < C.numberRows; y++){
+                if (board.ShogiPieces[x, y] == null){
+                    moves[x, y] = true;
+                }
+            }
+        return moves;
+    }
+    public void removeIllegalDrops(){
+        // TO DO
     }
 
     public void SingleMove(bool[,] moves, int x, int y){
@@ -106,21 +155,6 @@ public abstract class ShogiPiece : MonoBehaviour
         return attackedPieces;
     }
 
-    // check if any of the possible moves are illegal, and remove them
-    public void removeIllegalMoves(bool[,] moves, bool checkForSelfCheck){
-        
-        // check if after this move the players' King will be under attack
-        if (checkForSelfCheck){
-            for (int x=0; x < C.numberRows; x++)
-                for (int y=0; y < C.numberRows; y++){
-                    if (moves[x,y]){
-                        if(CheckIfMoveWillCauseSelfCheck(x, y)) moves[x, y] = false;
-                    }
-                }
-        }
-        // check if after this move a perpetual check will be called
-
-    }
     private bool CheckIfMoveWillCauseSelfCheck(int x, int y){
         bool wouldCauseCheck;
         
