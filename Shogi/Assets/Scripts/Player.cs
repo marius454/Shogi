@@ -8,15 +8,14 @@ public class Player
     public PlayerNumber playerNumber{set;get;}
     private BoardManager board{set;get;}
     public bool[,] attackedTiles{set;get;}
-    private List<ShogiPiece> piecesInPlay{set;get;}
+    public List<ShogiPiece> piecesInPlay{set;get;}
+    public List<ShogiPiece> capturedPieces{set;get;}
     public CaptureBoard captureBoard{set;get;}
     public bool isInCheck{set; get;}
     public bool isAttackingKing{set; get;}
     // to set this check both attacked tiles and whether are legal drops available
     public bool hasPossibleMoves{set; get;}
 
-
-    private List<ShogiPiece> capturedPieces{set;get;}
     public Player (PlayerNumber playerNumber, BoardManager board, CaptureBoard captureBoard){
         piecesInPlay = new List<ShogiPiece>();
         capturedPieces = new List<ShogiPiece>();
@@ -25,7 +24,6 @@ public class Player
         isAttackingKing = false;
         isInCheck = false;
         this.captureBoard = captureBoard;
-        this.captureBoard.board = board;
         this.board = board;
         this.playerNumber = playerNumber;
     }
@@ -75,7 +73,6 @@ public class Player
 	{
 		if (!piecesInPlay.Contains(piece)){}
 			piecesInPlay.Add(piece);
-        // perkelti prie pagrindeines lentos
 	}
 
 	public void RemovePieceInPlay(ShogiPiece piece)
@@ -90,14 +87,14 @@ public class Player
 			capturedPieces.Add(piece);
             captureBoard.AddPiece(piece);
         }
-        // perkelti prie capture lentos.
 	}
 
 	public void DropPiece(ShogiPiece piece)
 	{
-		if (piecesInPlay.Contains(piece))
-			capturedPieces.Remove(piece);
-
+		if (piecesInPlay.Contains(piece)){
+            capturedPieces.Remove(piece);
+            captureBoard.DropCapturedPiece(piece);
+        }
 	}
 
 }

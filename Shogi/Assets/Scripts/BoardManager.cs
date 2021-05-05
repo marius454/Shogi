@@ -69,7 +69,13 @@ public class BoardManager : MonoBehaviour
         RaycastHit hit;
         if(Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 25.0f, LayerMask.GetMask("ShogiPlane"))){
             // Check where the ray collided with the plane
-            selectionX = (int)hit.point.x;
+            if ((int)hit.point.x >= 0){
+                selectionX = (int)hit.point.x;
+            }
+            else {
+                // special case for player2 capture board
+                selectionX = (int)hit.point.x - 1;
+            }
             selectionY = (int)hit.point.z;
         }
         else {
@@ -79,11 +85,27 @@ public class BoardManager : MonoBehaviour
     }
     private void ComputeMouseClick(){
         if (Input.GetMouseButtonDown (0)){
+            Debug.Log(selectedShogiPiece + " " + selectionX + " " + selectionY);
+            Debug.Log(currentPlayer.captureBoard.minX + " " + currentPlayer.captureBoard.minY + " " + currentPlayer.captureBoard.maxX + " " + currentPlayer.captureBoard.maxY);
             if (selectionX >= 0 && selectionY >= 0 && selectionX <= C.numberRows && selectionY <= C.numberRows){
+                Debug.Log("main board");
                 if (selectedShogiPiece == null || (ShogiPieces[selectionX, selectionY] != null && ShogiPieces[selectionX, selectionY].player == currentPlayer.playerNumber)){
                     SelectShogiPiece(selectionX, selectionY);
                 }else{
-                    MoveShogiPiece(selectionX, selectionY);
+                    if (currentPlayer.capturedPieces.Contains(selectedShogiPiece)){
+                        DropShogiPiece(selectionX, selectionY);
+                    }
+                    else{
+                        MoveShogiPiece(selectionX, selectionY);
+                    }
+                }
+            }
+            else if (selectionX >= currentPlayer.captureBoard.minX && selectionY >= currentPlayer.captureBoard.minY 
+              && selectionX <= currentPlayer.captureBoard.maxX && selectionY <= currentPlayer.captureBoard.maxY)
+            {
+                Debug.Log("capture board");
+                if (currentPlayer.captureBoard.ExistsPiece(selectionX, selectionY)){
+                    currentPlayer.captureBoard.SelectCapturedPiece(selectionX, selectionY);
                 }
             }
         }
@@ -209,38 +231,60 @@ public class BoardManager : MonoBehaviour
     }
     private void MoveShogiPiece(int x, int y){
         if (allowedMoves[x,y]){
-            ShogiPiece targetPiece = ShogiPieces[x,y];
-            if (targetPiece != null && targetPiece.player != currentPlayer.playerNumber){
-                // Capture piece
-                activePieces.Remove(targetPiece.gameObject);
-                opponentPlayer.RemovePieceInPlay(targetPiece);
-                currentPlayer.CapturePiece(targetPiece);
-                ShogiPieces[x, y] = null;
-
-                // will not be destroyed when capture and drop is implemented
-                // Destroy (targetPiece.gameObject);
-            }
-
+            // Capture piece if possible
+            CapturePiece(x, y);
             ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
-            selectedShogiPiece.transform.position = GetTileCenter (x, y);
-            selectedShogiPiece.SetXY(x, y);
-            selectedShogiPiece.SetHeight();
-            ShogiPieces[x, y] = selectedShogiPiece;
-
-            currentPlayer.CalculateAttackedTiles();
-            opponentPlayer.CalculateAttackedTiles();
-
-
-            // Check win condition
-            if (CheckGameOver()){
-                EndGame();
-            }
-            else if (!freeMove){
-                ChangePlayer();
-            }
+            PlacePiece(selectedShogiPiece, x, y);
+            EndTurn();
         }
         BoardHighlights.Instance.HideHighlights();
         selectedShogiPiece = null;
+    }
+    // public void DropShogiPiece(ShogiPiece piece, int x, int y){
+    //     Debug.Log("good");
+    //     currentPlayer.DropPiece(piece);
+    //     Debug.Log(currentPlayer.piecesInPlay.Contains(piece));
+    //     currentPlayer.AddPieceInPlay(piece);
+    //     Debug.Log(currentPlayer.capturedPieces.Contains(piece));
+    //     PlacePiece(piece, x ,y);
+    //     EndTurn();
+    // }
+    private void DropShogiPiece(int x, int y){
+        if (allowedMoves[x,y]){
+            currentPlayer.DropPiece(selectedShogiPiece);
+            currentPlayer.AddPieceInPlay(selectedShogiPiece);
+            PlacePiece(selectedShogiPiece, x, y);
+            EndTurn();
+        }
+        BoardHighlights.Instance.HideHighlights();
+        selectedShogiPiece = null;
+    }
+    private void CapturePiece(int x, int y){
+        ShogiPiece targetPiece = ShogiPieces[x,y];
+        if (targetPiece != null && targetPiece.player != currentPlayer.playerNumber){
+            activePieces.Remove(targetPiece.gameObject);
+            opponentPlayer.RemovePieceInPlay(targetPiece);
+            currentPlayer.CapturePiece(targetPiece);
+            ShogiPieces[x, y] = null;
+        }
+    }
+    private void PlacePiece(ShogiPiece piece, int x, int y){
+        piece.transform.position = GetTileCenter (x, y);
+        piece.SetXY(x, y);
+        piece.SetHeight();
+        ShogiPieces[x, y] = piece;
+
+        currentPlayer.CalculateAttackedTiles();
+        opponentPlayer.CalculateAttackedTiles();
+    }
+    private void EndTurn(){
+        // Check win condition
+        if (CheckGameOver()){
+            EndGame();
+        }
+        else if (!freeMove){
+            ChangePlayer();
+        }
     }
     private void ChangePlayer(){
         if (currentPlayer == player1){
@@ -266,7 +310,6 @@ public class BoardManager : MonoBehaviour
                 }
             }
         //Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
-
         if (currentPlayer.isAttackingKing){
             opponentPlayer.isInCheck = true;
             if (!opponentPlayer.hasPossibleMoves) return true;

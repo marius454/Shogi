@@ -13,14 +13,15 @@ public class CaptureBoard : MonoBehaviour
     private int selectionY;
     private int layerMask;
     // Ribos bus naudingos transformuojant absoliucias koordinates i masyvo koordinates
-    private int maxX;
-    private int maxY;
-    private int minX;
-    private int minY;
+    public int maxX;
+    public int maxY;
+    public int minX;
+    public int minY;
     private void Start(){
         Init();
     }
     private void Init(){
+        board = BoardManager.Instance;
         capturedPieces = new ShogiPiece[C.captureNumberColumns, C.captureNumberRows];
         if (player == PlayerNumber.player1){
             layerMask = LayerMask.GetMask("CapturePlanePlayer1");
@@ -40,7 +41,6 @@ public class CaptureBoard : MonoBehaviour
     private void Update(){
         UpdateSelection();
         DrawBoard();
-        ComputeMouseClick();
     }
     private (int x, int y) CoordinatesToIndeces(int x, int y){
         if (player == PlayerNumber.player1){
@@ -69,24 +69,51 @@ public class CaptureBoard : MonoBehaviour
             selectionX = x;
             selectionY = z;
         }
-        else {
-            selectionX = minX - 1;
-            selectionY = minY - 1;
-        }
+        // else {
+        //     selectionX = minX - 1;
+        //     selectionY = minY - 1;
+        // }
     }
-    private void ComputeMouseClick(){
-        if (Input.GetMouseButtonDown (0)){
-            if (selectionX >= minX && selectionY >= minY && selectionX <= maxX && selectionY <= maxY){
-                int x, y;
-                (x, y) = CoordinatesToIndeces(selectionX, selectionY);
-                if (selectedCapturedPiece == null && capturedPieces[x, y]){
-                    SelectCapturedPiece(x, y);
-                }else{
-                    // DropCapturedPiece(x, y);
-                }
-            }
-        }
-    }
+    // private void ComputeMouseClick(){
+    //     // if (Input.GetMouseButtonDown (0) && player == board.currentPlayer.playerNumber){
+    //     //     Debug.Log(selectedCapturedPiece + " " + selectionX + " " + selectionY);
+    //     //     if (selectionX >= minX && selectionY >= minY && selectionX <= maxX && selectionY <= maxY){
+    //     //         int x, y;
+    //     //         (x, y) = CoordinatesToIndeces(selectionX, selectionY);
+    //     //         if (selectedCapturedPiece == null){
+    //     //             Debug.Log("good select");
+    //     //             Debug.Log(capturedPieces[x, y]);
+    //     //             SelectCapturedPiece(x, y);
+    //     //         }
+    //     //         if (selectedCapturedPiece != null){
+    //     //             Debug.Log("good unselect");
+    //     //             UnselectCapturedPiece();
+    //     //         }
+    //     //     }
+    //     //     else if (selectionX >= 0 && selectionY >= 0 && selectionX <= C.numberRows && selectionY <= C.numberRows){
+    //     //         Debug.Log("good board");
+    //     //         Debug.Log(selectedCapturedPiece);
+    //     //         if (selectedCapturedPiece != null){
+    //     //             Debug.Log("good drop");
+    //     //             DropCapturedPiece(selectionX, selectionY);
+    //     //         }
+    //     //     }
+    //     //     else{
+    //     //         if (selectedCapturedPiece != null){
+    //     //             UnselectCapturedPiece();
+    //     //         }
+    //     //     }
+    //     // }
+    //     if (Input.GetMouseButtonDown (0) && player == board.currentPlayer.playerNumber){
+    //         if (selectionX >= 0 && selectionY >= 0 && selectionX <= C.numberRows && selectionY <= C.numberRows){
+    //             if (board.selectedShogiPiece == null || capturedPieces[selectionX, selectionY]){
+    //                 SelectCapturedPiece(selectionX, selectionY);
+    //             }else{
+    //                 // DropCapturedPiece(selectionX, selectionY);
+    //             }
+    //         }
+    //     }
+    // }
     private void DrawBoard(){
         // unitary vector going to the right and forward for one unit of space 8 times
         Vector3 widthLine = Vector3.right * C.captureNumberColumns;
@@ -119,7 +146,7 @@ public class CaptureBoard : MonoBehaviour
         }
     }
     public void AddPiece(ShogiPiece piece){
-        // if needed switching x and y places is exeptable depending on the order that is wanted for incoming captures
+        // if needed, switching x and y places is exceptable depending on the order that is wanted for incoming captures
         for (int y=0; y < C.captureNumberRows; y++)
             for (int x=0; x < C.captureNumberColumns; x++){
                 if (capturedPieces[x, y] == null){
@@ -145,23 +172,41 @@ public class CaptureBoard : MonoBehaviour
         center.z += (C.tileSize * y) + C.tileOffset;
         return center;
     }
-    private void SelectCapturedPiece(int x, int y){
-        if (capturedPieces[x, y] == null)
-            return;
-        if (capturedPieces[x, y] == selectedCapturedPiece){
+    public void SelectCapturedPiece(int x, int y){
+        (x, y) = CoordinatesToIndeces(x, y);
+        
+        if (capturedPieces[x, y] == board.selectedShogiPiece){
             selectedCapturedPiece = null;
             return;
         }
 
         board.selectedShogiPiece = capturedPieces[x, y];
-        Debug.Log(x + " " + y);
-        Debug.Log(selectedCapturedPiece);
         board.allowedMoves = board.selectedShogiPiece.PossibleDrops();
         BoardHighlights.Instance.HideHighlights();
         BoardHighlights.Instance.HighlightAllowedMoves(board.allowedMoves);
     }
+    public bool ExistsPiece(int x, int y){
+        (x, y) = CoordinatesToIndeces(x, y);
+        if (capturedPieces[x, y]) return true;
+        else return false;
+    }
+    private void UnselectCapturedPiece(){
+        if (selectedCapturedPiece.CurrentX != selectionX || selectedCapturedPiece.CurrentY != selectionY){
+            board.allowedMoves = new bool[C.numberRows, C.numberRows];
+            BoardHighlights.Instance.HideHighlights();
+            selectedCapturedPiece = null;
+        }
+    }
 
-    private void DropCapturedPiece(){
-        // TO DO
+    public void DropCapturedPiece(ShogiPiece piece){
+        // Debug.Log("good");
+        // if (board.allowedMoves[x, y]){
+        //     board.DropShogiPiece(selectedCapturedPiece, x, y);
+        //     capturedPieces[selectedCapturedPiece.CurrentX, selectedCapturedPiece.CurrentY] = null;
+        //     UnselectCapturedPiece();
+        // }
+        int x, y;
+        (x, y) = CoordinatesToIndeces(piece.CurrentX, piece.CurrentY);
+        capturedPieces[x, y] = null;
     }
 }
