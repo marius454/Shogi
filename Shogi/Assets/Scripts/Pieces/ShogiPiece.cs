@@ -29,7 +29,7 @@ public abstract class ShogiPiece : MonoBehaviour
     }
     public abstract void SetHeight();
     public virtual void SetNormalRotation(){
-        if (player == PlayerNumber.player1){
+        if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
             this.gameObject.transform.rotation = rotation;
         } 
@@ -42,7 +42,7 @@ public abstract class ShogiPiece : MonoBehaviour
         // TO DO
         // need to change this in a way that will flip the piece correctly to it's oppositesdie
         // might need a different one for every piece
-        if (player == PlayerNumber.player1){
+        if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
             this.gameObject.transform.rotation = rotation;
         } 
@@ -68,7 +68,7 @@ public abstract class ShogiPiece : MonoBehaviour
                     }
                 }
         }
-        // check if after this move a perpetual check will be called
+        // check if after this move a perpetual check would be called
         // TO DO
 
     }

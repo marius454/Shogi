@@ -12,11 +12,11 @@ public class Knight : ShogiPiece
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
         moves = new bool[C.numberRows,C.numberRows];
 
-        if (player == PlayerNumber.player1){
+        if (player == PlayerNumber.Player1){
             SingleMove(moves, CurrentX + 1, CurrentY + 2);
             SingleMove(moves, CurrentX - 1, CurrentY + 2);
         }
-        else if (player == PlayerNumber.player2) {
+        else if (player == PlayerNumber.Player2) {
             SingleMove(moves, CurrentX + 1, CurrentY - 2);
             SingleMove(moves, CurrentX - 1, CurrentY - 2);
         }

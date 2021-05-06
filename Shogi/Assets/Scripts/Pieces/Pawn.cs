@@ -11,7 +11,7 @@ public class Pawn : ShogiPiece
     }
     public override void SetNormalRotation()
     {
-        if (player == PlayerNumber.player1){
+        if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
             this.gameObject.transform.rotation = rotation;
         } 
@@ -23,9 +23,9 @@ public class Pawn : ShogiPiece
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
         moves = new bool[C.numberRows,C.numberRows];
 
-        if (player == PlayerNumber.player1)
+        if (player == PlayerNumber.Player1)
             SingleMove(moves, CurrentX, CurrentY + 1);
-        else if (player == PlayerNumber.player2)
+        else if (player == PlayerNumber.Player2)
             SingleMove(moves, CurrentX, CurrentY - 1);
         else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         

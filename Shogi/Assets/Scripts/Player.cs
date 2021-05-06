@@ -30,7 +30,6 @@ public class Player
     public void CalculateAttackedTiles(bool checkForSelfCheck = true){
         attackedTiles = new bool[C.numberRows, C.numberRows];
         int nrMoves = 0;
-        //Debug.Log(checkForSelfCheck);
         foreach(ShogiPiece piece in piecesInPlay){
             bool[,] moves = piece.PossibleMoves(checkForSelfCheck); 
             for (int x=0; x < C.numberRows; x++)
@@ -47,7 +46,7 @@ public class Player
         CheckIfAttackingKing();
     }
     public void CheckIfAttackingKing(){
-        // Another way to do this is checking all attacked tile for a king
+        // Check all attacked tiles for opponent King
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
                 if (attackedTiles[x, y]){
@@ -82,7 +81,7 @@ public class Player
 	}
     public void CapturePiece(ShogiPiece piece)
 	{
-		if (!piecesInPlay.Contains(piece)){
+		if (!capturedPieces.Contains(piece)){
             piece.player = this.playerNumber;
 			capturedPieces.Add(piece);
             captureBoard.AddPiece(piece);
@@ -91,7 +90,7 @@ public class Player
 
 	public void DropPiece(ShogiPiece piece)
 	{
-		if (piecesInPlay.Contains(piece)){
+		if (capturedPieces.Contains(piece)){
             capturedPieces.Remove(piece);
             captureBoard.DropCapturedPiece(piece);
         }

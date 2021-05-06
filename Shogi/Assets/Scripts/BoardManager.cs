@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using C = Constants;
 
 
@@ -26,7 +27,6 @@ public class BoardManager : MonoBehaviour
 
     
     public List<GameObject> piecePrefabs;
-    public List<float> pieceZValues;
     private List<GameObject> activePieces;
     public ShogiPiece[,] ShogiPieces{set;get;}
 
@@ -46,8 +46,8 @@ public class BoardManager : MonoBehaviour
         ComputeMouseClick();
     }
     private void InitializeGame(){
-        player1 = new Player(PlayerNumber.player1, this, GameObject.Find("CaptureBoardPlayer1").GetComponent<CaptureBoard>());
-        player2 = new Player(PlayerNumber.player2, this, GameObject.Find("CaptureBoardPlayer2").GetComponent<CaptureBoard>());
+        player1 = new Player(PlayerNumber.Player1, this, GameObject.Find("CaptureBoardPlayer1").GetComponent<CaptureBoard>());
+        player2 = new Player(PlayerNumber.Player2, this, GameObject.Find("CaptureBoardPlayer2").GetComponent<CaptureBoard>());
         selectionX = -1;
         selectionY = -1;
 
@@ -60,7 +60,6 @@ public class BoardManager : MonoBehaviour
         player1.InitializePiecesInPlay();
         player2.InitializePiecesInPlay();
     }
-
     private void UpdateSelection(){
         if (!Camera.main)
             return;
@@ -73,7 +72,7 @@ public class BoardManager : MonoBehaviour
                 selectionX = (int)hit.point.x;
             }
             else {
-                // special case for player2 capture board
+                // Special case for player2 capture board
                 selectionX = (int)hit.point.x - 1;
             }
             selectionY = (int)hit.point.z;
@@ -84,7 +83,7 @@ public class BoardManager : MonoBehaviour
         }
     }
     private void ComputeMouseClick(){
-        if (Input.GetMouseButtonDown (0)){
+        if (Input.GetMouseButtonDown (0) && !EventSystem.current.IsPointerOverGameObject()){
             Debug.Log(selectedShogiPiece + " " + selectionX + " " + selectionY);
             Debug.Log(currentPlayer.captureBoard.minX + " " + currentPlayer.captureBoard.minY + " " + currentPlayer.captureBoard.maxX + " " + currentPlayer.captureBoard.maxY);
             if (selectionX >= 0 && selectionY >= 0 && selectionX <= C.numberRows && selectionY <= C.numberRows){
@@ -116,7 +115,6 @@ public class BoardManager : MonoBehaviour
         center.z += (C.tileSize * y) + C.tileOffset;
         return center;
     }
-
     private void SpawnPiece(PieceType index, int x, int y, PlayerNumber player){
         GameObject piece = Instantiate(piecePrefabs[(int)index], GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
         piece.transform.SetParent(transform);
@@ -124,50 +122,49 @@ public class BoardManager : MonoBehaviour
         ShogiPieces[x, y].Init(x, y, player, this);
         activePieces.Add(piece);
     }
-
     private void SpawnAllShogiPieces(){
         // Kings
-        SpawnPiece(PieceType.king, 4, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.king, 4, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.king, 4, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.king, 4, 8, PlayerNumber.Player2);
 
         // Rook
-        SpawnPiece(PieceType.rook, 7, 1, PlayerNumber.player1);
-        SpawnPiece(PieceType.rook, 1, 7, PlayerNumber.player2);
+        SpawnPiece(PieceType.rook, 7, 1, PlayerNumber.Player1);
+        SpawnPiece(PieceType.rook, 1, 7, PlayerNumber.Player2);
 
         // Bishop
-        SpawnPiece(PieceType.bishop, 1, 1, PlayerNumber.player1);
-        SpawnPiece(PieceType.bishop, 7, 7, PlayerNumber.player2);
+        SpawnPiece(PieceType.bishop, 1, 1, PlayerNumber.Player1);
+        SpawnPiece(PieceType.bishop, 7, 7, PlayerNumber.Player2);
 
         // Gold generals
-        SpawnPiece(PieceType.gold, 3, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.gold, 5, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.gold, 3, 8, PlayerNumber.player2);
-        SpawnPiece(PieceType.gold, 5, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.gold, 3, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.gold, 5, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.gold, 3, 8, PlayerNumber.Player2);
+        SpawnPiece(PieceType.gold, 5, 8, PlayerNumber.Player2);
 
         // Silver generals
-        SpawnPiece(PieceType.silver, 2, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.silver, 6, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.silver, 2, 8, PlayerNumber.player2);
-        SpawnPiece(PieceType.silver, 6, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.silver, 2, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.silver, 6, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.silver, 2, 8, PlayerNumber.Player2);
+        SpawnPiece(PieceType.silver, 6, 8, PlayerNumber.Player2);
 
         // Knights
-        SpawnPiece(PieceType.knight, 1, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.knight, 7, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.knight, 1, 8, PlayerNumber.player2);
-        SpawnPiece(PieceType.knight, 7, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.knight, 1, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.knight, 7, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.knight, 1, 8, PlayerNumber.Player2);
+        SpawnPiece(PieceType.knight, 7, 8, PlayerNumber.Player2);
 
         // Lances
-        SpawnPiece(PieceType.lance, 0, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.lance, 8, 0, PlayerNumber.player1);
-        SpawnPiece(PieceType.lance, 0, 8, PlayerNumber.player2);
-        SpawnPiece(PieceType.lance, 8, 8, PlayerNumber.player2);
+        SpawnPiece(PieceType.lance, 0, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.lance, 8, 0, PlayerNumber.Player1);
+        SpawnPiece(PieceType.lance, 0, 8, PlayerNumber.Player2);
+        SpawnPiece(PieceType.lance, 8, 8, PlayerNumber.Player2);
 
         for (int i = 0; i < C.numberRows; i++){
-            SpawnPiece(PieceType.pawn, i, 2, PlayerNumber.player1);
-            SpawnPiece(PieceType.pawn, i, 6, PlayerNumber.player2);
+            SpawnPiece(PieceType.pawn, i, 2, PlayerNumber.Player1);
+            SpawnPiece(PieceType.pawn, i, 6, PlayerNumber.Player2);
         }
     }
-
+    // Currently unused
     private void DrawBoard(){
         // unitary vector going to the right and forward for one unit of space 8 times
         Vector3 widthLine = Vector3.right * C.numberRows;
@@ -184,7 +181,6 @@ public class BoardManager : MonoBehaviour
 
         // Draw the selection
         if (selectionX >= 0 && selectionY >= 0){
-            //Debug.Log(selectionX + " " + selectionY);
             Debug.DrawLine(
                 Vector3.forward * selectionY + Vector3.right * selectionX,
                 Vector3.forward * (selectionY + 1) + Vector3.right * (selectionX + 1)
@@ -196,15 +192,10 @@ public class BoardManager : MonoBehaviour
         }
     }
     private void SelectShogiPiece(int x, int y){
-
         if (ShogiPieces[x, y] == null)
             return;
         if (ShogiPieces[x, y].player != currentPlayer.playerNumber && !freeMove)
             return;
-        if (ShogiPieces[x, y] == selectedShogiPiece){
-            selectedShogiPiece = null;
-            return;
-        }
 
         selectedShogiPiece = ShogiPieces[x, y];
         if (!freeMove){
@@ -218,16 +209,6 @@ public class BoardManager : MonoBehaviour
             BoardHighlights.Instance.HideHighlights();
             BoardHighlights.Instance.HighlightAllowedMoves(selectedShogiPiece.PossibleMoves());
         }
-
-        int nrMoves = 0;
-        for (int a=0; a < C.numberRows; a++)
-            for (int b=0; b < C.numberRows; b++){
-                if (allowedMoves[a,b]){
-                    //Debug.Log("allowed tile at " + a + " " + b);
-                    nrMoves++;
-                }
-            }
-        //Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
     }
     private void MoveShogiPiece(int x, int y){
         if (allowedMoves[x,y]){
@@ -240,15 +221,6 @@ public class BoardManager : MonoBehaviour
         BoardHighlights.Instance.HideHighlights();
         selectedShogiPiece = null;
     }
-    // public void DropShogiPiece(ShogiPiece piece, int x, int y){
-    //     Debug.Log("good");
-    //     currentPlayer.DropPiece(piece);
-    //     Debug.Log(currentPlayer.piecesInPlay.Contains(piece));
-    //     currentPlayer.AddPieceInPlay(piece);
-    //     Debug.Log(currentPlayer.capturedPieces.Contains(piece));
-    //     PlacePiece(piece, x ,y);
-    //     EndTurn();
-    // }
     private void DropShogiPiece(int x, int y){
         if (allowedMoves[x,y]){
             currentPlayer.DropPiece(selectedShogiPiece);
@@ -296,24 +268,39 @@ public class BoardManager : MonoBehaviour
             opponentPlayer = player2;
         }
     }
-    private void EndGame(){
-        Debug.Log("Victory for " + currentPlayer.playerNumber);
-        // Lock The game from being played further
-    }
     private bool CheckGameOver(){
-        int nrMoves = 0;
-        for (int x=0; x < C.numberRows; x++)
-            for (int y=0; y < C.numberRows; y++){
-                if (opponentPlayer.attackedTiles[x,y]){
-                    //Debug.Log("attacking tile at " + x + " " + y);
-                    nrMoves++;
-                }
-            }
-        //Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
+        // int nrMoves = 0;
+        // for (int x=0; x < C.numberRows; x++)
+        //     for (int y=0; y < C.numberRows; y++){
+        //         if (opponentPlayer.attackedTiles[x,y]){
+        //             //Debug.Log("attacking tile at " + x + " " + y);
+        //             nrMoves++;
+        //         }
+        //     }
+        // //Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
         if (currentPlayer.isAttackingKing){
             opponentPlayer.isInCheck = true;
             if (!opponentPlayer.hasPossibleMoves) return true;
         }
         return false;
+    }
+    private void EndGame(){
+        Debug.Log("Victory for " + currentPlayer.playerNumber);
+        // Lock The game from being played further
+        GameEndScreen.Instance.ShowEndScreen(currentPlayer.playerNumber);
+    }
+    public void resetGame(){
+        DestroyAllPieces();
+        InitializeGame();
+    }
+    private void DestroyAllPieces(){
+        player1.captureBoard.DestroyAllPieces();
+        player2.captureBoard.DestroyAllPieces();
+        for (int x=0; x < C.numberRows; x++)
+            for (int y=0; y < C.numberRows; y++){
+                if (ShogiPieces[x, y]){
+                    Destroy (ShogiPieces[x, y].gameObject);
+                }
+            }
     }
 }
