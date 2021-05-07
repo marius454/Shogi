@@ -18,7 +18,12 @@ public class Lance : ShogiPiece
             OrthagonalLine(moves, DirectionOrthagonal.back);
         else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
 
-        removeIllegalMoves(moves, checkForSelfCheck);
+        RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
+    }
+    public override void RemoveIllegalDrops()
+    {
+        RemoveLastRow();
+        base.RemoveIllegalDrops();
     }
 }

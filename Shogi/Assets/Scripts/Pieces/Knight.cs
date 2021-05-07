@@ -22,8 +22,14 @@ public class Knight : ShogiPiece
         }
         else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         
-        removeIllegalMoves(moves, checkForSelfCheck);
+        RemoveIllegalMoves(moves, checkForSelfCheck);
         
         return moves;
+    }
+    public override void RemoveIllegalDrops()
+    {
+        // do not allow to drop in the last two rows
+        RemoveLastRow(true);
+        base.RemoveIllegalDrops();
     }
 }

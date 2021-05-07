@@ -84,10 +84,9 @@ public class BoardManager : MonoBehaviour
     }
     private void ComputeMouseClick(){
         if (Input.GetMouseButtonDown (0) && !EventSystem.current.IsPointerOverGameObject()){
-            Debug.Log(selectedShogiPiece + " " + selectionX + " " + selectionY);
-            Debug.Log(currentPlayer.captureBoard.minX + " " + currentPlayer.captureBoard.minY + " " + currentPlayer.captureBoard.maxX + " " + currentPlayer.captureBoard.maxY);
+            // Debug.Log(selectedShogiPiece + " " + selectionX + " " + selectionY);
+            // Debug.Log(currentPlayer.captureBoard.minX + " " + currentPlayer.captureBoard.minY + " " + currentPlayer.captureBoard.maxX + " " + currentPlayer.captureBoard.maxY);
             if (selectionX >= 0 && selectionY >= 0 && selectionX <= C.numberRows && selectionY <= C.numberRows){
-                Debug.Log("main board");
                 if (selectedShogiPiece == null || (ShogiPieces[selectionX, selectionY] != null && ShogiPieces[selectionX, selectionY].player == currentPlayer.playerNumber)){
                     SelectShogiPiece(selectionX, selectionY);
                 }else{
@@ -102,14 +101,13 @@ public class BoardManager : MonoBehaviour
             else if (selectionX >= currentPlayer.captureBoard.minX && selectionY >= currentPlayer.captureBoard.minY 
               && selectionX <= currentPlayer.captureBoard.maxX && selectionY <= currentPlayer.captureBoard.maxY)
             {
-                Debug.Log("capture board");
                 if (currentPlayer.captureBoard.ExistsPiece(selectionX, selectionY)){
                     currentPlayer.captureBoard.SelectCapturedPiece(selectionX, selectionY);
                 }
             }
         }
     }
-    private Vector3 GetTileCenter(int x, int y){
+    public Vector3 GetTileCenter(int x, int y){
         Vector3 center = Vector3.zero;
         center.x += (C.tileSize * x) + C.tileOffset;
         center.z += (C.tileSize * y) + C.tileOffset;
@@ -268,7 +266,7 @@ public class BoardManager : MonoBehaviour
             opponentPlayer = player2;
         }
     }
-    private bool CheckGameOver(){
+    public bool CheckGameOver(){
         // int nrMoves = 0;
         // for (int x=0; x < C.numberRows; x++)
         //     for (int y=0; y < C.numberRows; y++){
@@ -279,8 +277,11 @@ public class BoardManager : MonoBehaviour
         //     }
         // //Debug.Log(opponentPlayer.playerNumber + " " + nrMoves);
         if (currentPlayer.isAttackingKing){
-            opponentPlayer.isInCheck = true;
             if (!opponentPlayer.hasPossibleMoves) return true;
+            opponentPlayer.PlaceInCheck();
+        }
+        else {
+            opponentPlayer.RemoveCheck();
         }
         return false;
     }
@@ -302,5 +303,6 @@ public class BoardManager : MonoBehaviour
                     Destroy (ShogiPieces[x, y].gameObject);
                 }
             }
+        BoardHighlights.Instance.HideCheckHighlight();
     }
 }

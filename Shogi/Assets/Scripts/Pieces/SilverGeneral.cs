@@ -33,7 +33,7 @@ public class SilverGeneral : ShogiPiece
             throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         }
 
-        removeIllegalMoves(moves, checkForSelfCheck);
+        RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
 }

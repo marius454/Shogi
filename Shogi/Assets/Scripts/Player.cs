@@ -95,5 +95,14 @@ public class Player
             captureBoard.DropCapturedPiece(piece);
         }
 	}
+    public void PlaceInCheck(){
+        isInCheck = true;
+        ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
+        BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
+    }
+    public void RemoveCheck(){
+        isInCheck = false;
+        BoardHighlights.Instance.HideCheckHighlight();
+    }
 
 }

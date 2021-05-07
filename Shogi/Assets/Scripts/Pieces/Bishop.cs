@@ -25,7 +25,7 @@ public class Bishop : ShogiPiece
         // Backward right
         DiagonalLine(moves, DirectionDiagonal.backRight);
 
-        removeIllegalMoves(moves, checkForSelfCheck);
+        RemoveIllegalMoves(moves, checkForSelfCheck);
         
         return moves;
     }

@@ -25,7 +25,7 @@ public class Rook : ShogiPiece
         // Backwards
         OrthagonalLine(moves, DirectionOrthagonal.back);
 
-        removeIllegalMoves(moves, checkForSelfCheck);
+        RemoveIllegalMoves(moves, checkForSelfCheck);
         
         return moves;
     }

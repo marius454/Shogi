@@ -6,40 +6,53 @@ using C = Constants;
 public class BoardHighlights : MonoBehaviour
 {
     public static BoardHighlights Instance{set;get;}
-    public GameObject highlightPrefab;
-    private List<GameObject> highlights;
+    [SerializeField] private GameObject highlightPrefab;
+    private List<GameObject> moveHighlights;
+    private GameObject checkHighlight;
     private void Start() {
         Instance = this;
-        highlights = new List<GameObject>();
+        moveHighlights = new List<GameObject>();
     }
 
     private GameObject GetHighlightObject(){
-        // Find and return the first object that matches the condition
-        GameObject go = highlights.Find(g=> !g.activeSelf);
+        // Find and return already created Highlight to not create more than necessary.
+        GameObject go = moveHighlights.Find(g=> !g.activeSelf);
 
         if (go == null){
             go = Instantiate(highlightPrefab);
-            highlights.Add(go);
+            moveHighlights.Add(go);
         }
         
         return go;
     }
 
     public void HighlightAllowedMoves(bool[,] moves){
-        for (int i = 0; i < 9; i++){
-            for (int j = 0; j < 9; j++){
-                if (moves[i, j]){
+        for (int x = 0; x < 9; x++){
+            for (int y = 0; y < 9; y++){
+                if (moves[x, y]){
                     GameObject go = GetHighlightObject();
                     go.SetActive(true);
-                    go.transform.position = new Vector3(i + C.tileOffset, 0, j + C.tileOffset);
+                    go.transform.position = new Vector3(x + C.tileOffset, 0, y + C.tileOffset);
                 }
             }
         }
     }
-
     public void HideHighlights(){
-        foreach (GameObject go in highlights){
+        foreach (GameObject go in moveHighlights){
             go.SetActive(false);
         }
+    }
+    public void HighlightCheck(int x, int y){
+        if (!checkHighlight){
+            checkHighlight = Instantiate(highlightPrefab);
+            checkHighlight.GetComponent<Renderer>().material.color = Color.red;
+        }
+        checkHighlight.SetActive(true);
+        checkHighlight.transform.position = new Vector3(x + C.tileOffset, 0, y + C.tileOffset);
+    }
+    public void HideCheckHighlight(){
+        if (checkHighlight)
+            if(checkHighlight.activeSelf)
+                checkHighlight.SetActive(false);
     }
 }

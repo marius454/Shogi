@@ -10,6 +10,7 @@ public abstract class ShogiPiece : MonoBehaviour
     public PlayerNumber player{set;get;}
     public BoardManager board{set;get;}
     public bool[,] moves{set;get;}
+    public bool isPromoted = false;
 
     public ShogiPiece(int x, int y, PlayerNumber player, BoardManager board){
         Init(x, y, player, board);
@@ -57,7 +58,7 @@ public abstract class ShogiPiece : MonoBehaviour
         return moves;
     }
     // check if any of the possible moves are illegal, and remove them
-    public void removeIllegalMoves(bool[,] moves, bool checkForSelfCheck){
+    public void RemoveIllegalMoves(bool[,] moves, bool checkForSelfCheck){
         
         // check if after this move the players' King will be under attack
         if (checkForSelfCheck){
@@ -80,10 +81,45 @@ public abstract class ShogiPiece : MonoBehaviour
                     moves[x, y] = true;
                 }
             }
+
+        RemoveIllegalDrops();
         return moves;
     }
-    public void removeIllegalDrops(){
+    public virtual void RemoveIllegalDrops(){
         // TO DO
+        // if player is in check only allow drops that would stop the check
+        if(board.currentPlayer.isInCheck){
+            for (int x=0; x < C.numberRows; x++)
+                for (int y=0; y < C.numberRows; y++){
+                    if (moves[x,y]){
+                        if (CheckIfMoveWillCauseSelfCheck(x,y)){
+                            moves[x,y] = false;
+                        }
+                    }
+                }
+        }
+        // In subclasses:
+        // pawns and lances can't be on the last row
+        // knights cant be on the last and next to last row
+        // cant drop pawn on a row with an unpromoted pawn
+        // cant drop a pawn in place that would cause checkmate
+    }
+    public void RemoveLastRow(bool removeNextToLast = false){
+        int yLast;
+        int yNextToLast;
+        if (player == PlayerNumber.Player1){
+            yLast = C.numberRows - 1;
+            yNextToLast = C.numberRows - 2;
+        }
+        else {
+            yLast = 0;
+            yNextToLast = 1;
+        }
+        for (int x=0; x < C.numberRows; x++){
+            moves[x, yLast] = false;
+            if (removeNextToLast) moves[x, yNextToLast] = false;
+        }
+        //Debug.Log(moves[4,8] + " " + yLast);
     }
 
     public void SingleMove(bool[,] moves, int x, int y){
@@ -159,7 +195,8 @@ public abstract class ShogiPiece : MonoBehaviour
         bool wouldCauseCheck;
         
         ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
-        board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
+        if (this.CurrentX >= 0 && this.CurrentY >= 0 && this.CurrentX <= C.numberRows && this.CurrentY <= C.numberRows)
+            board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
         board.ShogiPieces[x, y] = this;
 
         Player opponentPlayer;
@@ -167,7 +204,7 @@ public abstract class ShogiPiece : MonoBehaviour
         else opponentPlayer = board.player1;
 
         opponentPlayer.CalculateAttackedTiles(false);
-        wouldCauseCheck = opponentPlayer.isAttackingKing ? true : false;
+        wouldCauseCheck = opponentPlayer.isAttackingKing;
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
         opponentPlayer.CalculateAttackedTiles(false);
 
