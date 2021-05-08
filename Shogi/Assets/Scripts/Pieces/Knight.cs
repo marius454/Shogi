@@ -6,30 +6,49 @@ using Y = PieceYValues;
 public class Knight : ShogiPiece
 {
     public Knight(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
-    public override void SetHeight(){
-        this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.Knight, gameObject.transform.position.z);
+    public override void SetNormalHeight(){
+        this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.Knight - 0.01f, gameObject.transform.position.z);
+    }
+    public override void SetPromotedHeight(){
+        this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedKnight - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
         moves = new bool[C.numberRows,C.numberRows];
 
-        if (player == PlayerNumber.Player1){
-            SingleMove(moves, CurrentX + 1, CurrentY + 2);
-            SingleMove(moves, CurrentX - 1, CurrentY + 2);
+        if (!isPromoted){
+            if (player == PlayerNumber.Player1){
+                SingleMove(moves, CurrentX + 1, CurrentY + 2);
+                SingleMove(moves, CurrentX - 1, CurrentY + 2);
+            }
+            else if (player == PlayerNumber.Player2) {
+                SingleMove(moves, CurrentX + 1, CurrentY - 2);
+                SingleMove(moves, CurrentX - 1, CurrentY - 2);
+            }
+            else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         }
-        else if (player == PlayerNumber.Player2) {
-            SingleMove(moves, CurrentX + 1, CurrentY - 2);
-            SingleMove(moves, CurrentX - 1, CurrentY - 2);
+        else{
+            GoldMove();
         }
-        else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
-        
+
         RemoveIllegalMoves(moves, checkForSelfCheck);
-        
         return moves;
     }
-    public override void RemoveIllegalDrops()
+    public override void RemoveIllegalDrops(bool checkForPawnDropMate)
     {
         // do not allow to drop in the last two rows
         RemoveLastRow(true);
-        base.RemoveIllegalDrops();
+        base.RemoveIllegalDrops(checkForPawnDropMate);
+    }
+    public override void CheckPromotion(){
+        if (player == PlayerNumber.Player1){
+            if (board.selectedShogiPiece.CurrentY >= C.numberRows - 2)
+                board.PromotePiece(this);
+            else GameUI.Instance.ShowPromotionMenu(this);
+        }
+        else{
+            if (board.selectedShogiPiece.CurrentY <= 1)
+                board.PromotePiece(this);
+            else GameUI.Instance.ShowPromotionMenu(this);
+        }
     }
 }

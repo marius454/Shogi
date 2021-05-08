@@ -6,8 +6,8 @@ using Y = PieceYValues;
 public class King : ShogiPiece
 {
     public King(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
-    public override void SetHeight(){
-        this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.King, gameObject.transform.position.z);
+    public override void SetNormalHeight(){
+        this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.King - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
         moves = new bool[C.numberRows,C.numberRows];
@@ -23,5 +23,9 @@ public class King : ShogiPiece
         RemoveIllegalMoves(moves, checkForSelfCheck);
         
         return moves;
+    }
+    public override void Promote()
+    {
+        // King cannot be promoted
     }
 }

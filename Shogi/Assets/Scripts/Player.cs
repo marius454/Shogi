@@ -27,7 +27,7 @@ public class Player
         this.board = board;
         this.playerNumber = playerNumber;
     }
-    public void CalculateAttackedTiles(bool checkForSelfCheck = true){
+    public void CalculateAttackedTiles(bool checkForSelfCheck = true, bool checkForPawnDropMate = true){
         attackedTiles = new bool[C.numberRows, C.numberRows];
         int nrMoves = 0;
         foreach(ShogiPiece piece in piecesInPlay){
@@ -35,6 +35,16 @@ public class Player
             for (int x=0; x < C.numberRows; x++)
                 for (int y=0; y < C.numberRows; y++){
                     if (moves[x,y]){
+                        attackedTiles[x,y] = true;
+                        nrMoves++;
+                    }
+                }
+        }
+        foreach(ShogiPiece piece in capturedPieces){
+            bool[,] drops = piece.PossibleDrops(checkForPawnDropMate); 
+            for (int x=0; x < C.numberRows; x++)
+                for (int y=0; y < C.numberRows; y++){
+                    if (drops[x,y]){
                         attackedTiles[x,y] = true;
                         nrMoves++;
                     }

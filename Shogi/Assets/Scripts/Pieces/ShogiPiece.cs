@@ -10,7 +10,7 @@ public abstract class ShogiPiece : MonoBehaviour
     public PlayerNumber player{set;get;}
     public BoardManager board{set;get;}
     public bool[,] moves{set;get;}
-    public bool isPromoted = false;
+    public bool isPromoted{set;get;}
 
     public ShogiPiece(int x, int y, PlayerNumber player, BoardManager board){
         Init(x, y, player, board);
@@ -18,8 +18,9 @@ public abstract class ShogiPiece : MonoBehaviour
     public void Init(int x, int y, PlayerNumber player, BoardManager board){
         this.player = player;
         this.board = board;
+        this.isPromoted = false;
         SetXY(x, y);
-        SetHeight();
+        SetNormalHeight();
         SetNormalRotation();
         moves = new bool[C.numberRows, C.numberRows];
     }
@@ -28,7 +29,8 @@ public abstract class ShogiPiece : MonoBehaviour
         CurrentX = x;
         CurrentY = y;
     }
-    public abstract void SetHeight();
+    public abstract void SetNormalHeight();
+    public virtual void SetPromotedHeight(){}
     public virtual void SetNormalRotation(){
         if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
@@ -40,15 +42,12 @@ public abstract class ShogiPiece : MonoBehaviour
         }
     }
     public virtual void SetPromotedRotation(){
-        // TO DO
-        // need to change this in a way that will flip the piece correctly to it's oppositesdie
-        // might need a different one for every piece
         if (player == PlayerNumber.Player1){
-            Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
+            Quaternion rotation = Quaternion.Euler(95.0f, 0.0f, 0.0f);
             this.gameObject.transform.rotation = rotation;
         } 
         else {
-            Quaternion rotation = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
+            Quaternion rotation = Quaternion.Euler(95.0f, 180.0f, 0.0f);
             this.gameObject.transform.rotation = rotation;
         }
     }
@@ -81,12 +80,10 @@ public abstract class ShogiPiece : MonoBehaviour
                     moves[x, y] = true;
                 }
             }
-
-        RemoveIllegalDrops();
+        RemoveIllegalDrops(checkForSelfCheck);
         return moves;
     }
-    public virtual void RemoveIllegalDrops(){
-        // TO DO
+    public virtual void RemoveIllegalDrops(bool checkForPawnDropMate){
         // if player is in check only allow drops that would stop the check
         if(board.currentPlayer.isInCheck){
             for (int x=0; x < C.numberRows; x++)
@@ -119,7 +116,6 @@ public abstract class ShogiPiece : MonoBehaviour
             moves[x, yLast] = false;
             if (removeNextToLast) moves[x, yNextToLast] = false;
         }
-        //Debug.Log(moves[4,8] + " " + yLast);
     }
 
     public void SingleMove(bool[,] moves, int x, int y){
@@ -180,6 +176,28 @@ public abstract class ShogiPiece : MonoBehaviour
             }
         }
     }
+    public void GoldMove(){
+        // Select all moves in a 3x3 square around the piece, except it's current position and the tile it cannot go
+        moves = new bool[C.numberRows,C.numberRows];
+        int a = 1;
+        if (player == PlayerNumber.Player1){
+            for (int t = -a; t <= a; t++)
+                for (int s = -a; s <= a; s++){
+                    if (!(t == 0 && s == 0) && !(t == 1 && s == -1) && !(t == -1 && s == -1))
+                        SingleMove(moves, CurrentX + t, CurrentY + s);
+                }
+        }
+        else if (player == PlayerNumber.Player2) {
+            for (int t = -a; t <= a; t++)
+                for (int s = -a; s <= a; s++){
+                    if (!(t == 0 && s == 0) && !(t == 1 && s == 1) && !(t == -1 && s == 1))
+                        SingleMove(moves, CurrentX + t, CurrentY + s);
+                }
+        }
+        else {
+            throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
+        }
+    }
     public List<ShogiPiece> GetAttackedPieces(){
         List<ShogiPiece> attackedPieces = new List<ShogiPiece>();
         for (int x=0; x < C.numberRows; x++)
@@ -203,11 +221,28 @@ public abstract class ShogiPiece : MonoBehaviour
         if (player == board.player1.playerNumber) opponentPlayer = board.player2;
         else opponentPlayer = board.player1;
 
-        opponentPlayer.CalculateAttackedTiles(false);
+        opponentPlayer.CalculateAttackedTiles(false, false);
         wouldCauseCheck = opponentPlayer.isAttackingKing;
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
-        opponentPlayer.CalculateAttackedTiles(false);
+        opponentPlayer.CalculateAttackedTiles(false, false);
 
         return wouldCauseCheck;
+    }
+    public virtual void CheckPromotion(){
+        if (player == PlayerNumber.Player1){
+            if (board.selectedShogiPiece.CurrentY >= C.numberRows - 1)
+                board.PromotePiece(this);
+            else GameUI.Instance.ShowPromotionMenu(this);
+        }
+        else{
+            if (board.selectedShogiPiece.CurrentY == 0)
+                board.PromotePiece(this);
+            else GameUI.Instance.ShowPromotionMenu(this);
+        }
+    }
+    public virtual void Promote(){
+        isPromoted = true;
+        SetPromotedHeight();
+        SetPromotedRotation();
     }
 }

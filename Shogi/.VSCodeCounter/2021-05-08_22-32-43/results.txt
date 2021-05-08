@@ -1,0 +1,47 @@
+Date : 2021-05-08 22:32:43
+Directory : c:\Bakalauras\Shogi\Assets\Scripts
+Total : 20 files,  1200 codes, 66 comments, 122 blanks, all 1388 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C#       |         20 |      1,200 |         66 |        122 |      1,388 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                   |         20 |      1,200 |         66 |        122 |      1,388 |
+| Constants                                                           |          6 |         47 |          6 |         11 |         64 |
+| Pieces                                                              |          9 |        539 |         28 |         60 |        627 |
+| UI                                                                  |          1 |         51 |          0 |          4 |         55 |
++---------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                            | language | code       | comment    | blank      | total      |
++---------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Bakalauras\Shogi\Assets\Scripts\BoardHighlights.cs               | C#       |         52 |          1 |          6 |         59 |
+| c:\Bakalauras\Shogi\Assets\Scripts\BoardManager.cs                  | C#       |        273 |         25 |         29 |        327 |
+| c:\Bakalauras\Shogi\Assets\Scripts\CaptureBoard.cs                  | C#       |        127 |          4 |          6 |        137 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Constants\Constants.cs           | C#       |         11 |          2 |          3 |         16 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Constants\DirectionDiagonal.cs   | C#       |          4 |          1 |          1 |          6 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Constants\DirectionOrthagonal.cs | C#       |          4 |          1 |          1 |          6 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Constants\PieceType.cs           | C#       |          4 |          0 |          1 |          5 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Constants\PieceYValues.cs        | C#       |         20 |          2 |          4 |         26 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Constants\PlayerNumber.cs        | C#       |          4 |          0 |          1 |          5 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\Bishop.cs                 | C#       |         30 |          4 |          5 |         39 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\GoldGeneral.cs            | C#       |         19 |          1 |          4 |         24 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\King.cs                   | C#       |         25 |          2 |          5 |         32 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\Knight.cs                 | C#       |         50 |          1 |          4 |         55 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\Lance.cs                  | C#       |         34 |          0 |          4 |         38 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\Pawn.cs                   | C#       |         89 |          4 |         10 |        103 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\Rook.cs                   | C#       |         30 |          4 |          5 |         39 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\ShogiPiece.cs             | C#       |        220 |         11 |         18 |        249 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Pieces\SilverGeneral.cs          | C#       |         42 |          1 |          5 |         48 |
+| c:\Bakalauras\Shogi\Assets\Scripts\Player.cs                        | C#       |        111 |          2 |          6 |        119 |
+| c:\Bakalauras\Shogi\Assets\Scripts\UI\GameUI.cs                     | C#       |         51 |          0 |          4 |         55 |
+| Total                                                               |          |      1,200 |         66 |        122 |      1,388 |
++---------------------------------------------------------------------+----------+------------+------------+------------+------------+

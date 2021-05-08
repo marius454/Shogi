@@ -94,7 +94,7 @@ public class CaptureBoard : MonoBehaviour
                         piece.transform.position = GetTileCenter (maxX - x, minY + y);
                         piece.SetXY(maxX - x, minY + y);
                     }
-                    piece.SetHeight();
+                    piece.SetNormalHeight();
                     piece.SetNormalRotation();
                     capturedPieces[x, y] = piece;
                     return;
