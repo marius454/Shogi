@@ -33,13 +33,13 @@ public class Knight : ShogiPiece
         RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
-    public override void RemoveIllegalDrops(bool checkForPawnDropMate)
+    public override void RemoveIllegalDrops(bool checkForSelfCheck = true)
     {
         // do not allow to drop in the last two rows
-        RemoveLastRow(true);
-        base.RemoveIllegalDrops(checkForPawnDropMate);
+        RemoveDropsLastRows(true);
+        base.RemoveIllegalDrops(checkForSelfCheck);
     }
-    public override void CheckPromotion(){
+    public override void CheckForPromotion(){
         if (player == PlayerNumber.Player1){
             if (board.selectedShogiPiece.CurrentY >= C.numberRows - 2)
                 board.PromotePiece(this);

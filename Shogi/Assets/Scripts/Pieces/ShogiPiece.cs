@@ -10,6 +10,7 @@ public abstract class ShogiPiece : MonoBehaviour
     public PlayerNumber player{set;get;}
     public BoardManager board{set;get;}
     public bool[,] moves{set;get;}
+    public bool[,] drops{set;get;}
     public bool isPromoted{set;get;}
 
     public ShogiPiece(int x, int y, PlayerNumber player, BoardManager board){
@@ -73,27 +74,29 @@ public abstract class ShogiPiece : MonoBehaviour
 
     }
     public virtual bool[,] PossibleDrops(bool checkForSelfCheck = true){
-        moves = new bool[C.numberRows, C.numberRows];
+        drops = new bool[C.numberRows, C.numberRows];
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
                 if (board.ShogiPieces[x, y] == null){
-                    moves[x, y] = true;
+                    drops[x, y] = true;
                 }
             }
         RemoveIllegalDrops(checkForSelfCheck);
-        return moves;
+        return drops;
     }
-    public virtual void RemoveIllegalDrops(bool checkForPawnDropMate){
+    public virtual void RemoveIllegalDrops(bool checkForSelfCheck){
         // if player is in check only allow drops that would stop the check
         if(board.currentPlayer.isInCheck){
-            for (int x=0; x < C.numberRows; x++)
-                for (int y=0; y < C.numberRows; y++){
-                    if (moves[x,y]){
-                        if (CheckIfMoveWillCauseSelfCheck(x,y)){
-                            moves[x,y] = false;
+            if (checkForSelfCheck){
+                for (int x=0; x < C.numberRows; x++)
+                    for (int y=0; y < C.numberRows; y++){
+                        if (drops[x,y]){
+                            if (CheckIfDropWillCauseSelfCheck(x,y)){
+                                drops[x,y] = false;
+                            }
                         }
                     }
-                }
+            }
         }
         // In subclasses:
         // pawns and lances can't be on the last row
@@ -101,7 +104,7 @@ public abstract class ShogiPiece : MonoBehaviour
         // cant drop pawn on a row with an unpromoted pawn
         // cant drop a pawn in place that would cause checkmate
     }
-    public void RemoveLastRow(bool removeNextToLast = false){
+    public void RemoveDropsLastRows(bool removeNextToLast = false){
         int yLast;
         int yNextToLast;
         if (player == PlayerNumber.Player1){
@@ -113,8 +116,8 @@ public abstract class ShogiPiece : MonoBehaviour
             yNextToLast = 1;
         }
         for (int x=0; x < C.numberRows; x++){
-            moves[x, yLast] = false;
-            if (removeNextToLast) moves[x, yNextToLast] = false;
+            drops[x, yLast] = false;
+            if (removeNextToLast) drops[x, yNextToLast] = false;
         }
     }
 
@@ -211,24 +214,49 @@ public abstract class ShogiPiece : MonoBehaviour
 
     private bool CheckIfMoveWillCauseSelfCheck(int x, int y){
         bool wouldCauseCheck;
+        ShogiPiece tempCapture = null;
+
+        Player opponentPlayer;
+        if (player == PlayerNumber.Player1) opponentPlayer = board.player2;
+        else opponentPlayer = board.player1;
         
         ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
         if (this.CurrentX >= 0 && this.CurrentY >= 0 && this.CurrentX <= C.numberRows && this.CurrentY <= C.numberRows)
             board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
+        if (board.ShogiPieces[x, y]){
+            tempCapture = board.ShogiPieces[x, y];
+            opponentPlayer.RemovePieceInPlay(board.ShogiPieces[x, y]);
+        }
         board.ShogiPieces[x, y] = this;
-
-        Player opponentPlayer;
-        if (player == board.player1.playerNumber) opponentPlayer = board.player2;
-        else opponentPlayer = board.player1;
 
         opponentPlayer.CalculateAttackedTiles(false, false);
         wouldCauseCheck = opponentPlayer.isAttackingKing;
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
+
+        if (tempCapture){
+            board.ShogiPieces[x, y] = tempCapture;
+            opponentPlayer.AddPieceInPlay(tempCapture);
+        }
         opponentPlayer.CalculateAttackedTiles(false, false);
+
 
         return wouldCauseCheck;
     }
-    public virtual void CheckPromotion(){
+    private bool CheckIfDropWillCauseSelfCheck(int x, int y){
+        bool wouldCauseCheckMate;
+        board.ShogiPieces[x,y] = this;
+
+        board.currentPlayer.AddPieceInPlay(this);
+        board.opponentPlayer.CalculateAttackedTiles(false, false);
+
+        wouldCauseCheckMate = board.opponentPlayer.isAttackingKing;
+        board.currentPlayer.RemovePieceInPlay(this);
+        board.ShogiPieces[x, y] = null;
+
+        board.opponentPlayer.CalculateAttackedTiles(false, false);
+        return wouldCauseCheckMate;
+    }
+    public virtual void CheckForPromotion(){
         if (player == PlayerNumber.Player1){
             if (board.selectedShogiPiece.CurrentY >= C.numberRows - 1)
                 board.PromotePiece(this);

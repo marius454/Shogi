@@ -27,7 +27,7 @@ public class BoardManager : MonoBehaviour
 
     
     public List<GameObject> piecePrefabs;
-    private List<GameObject> activePieces;
+    //private List<GameObject> activePieceObjects;
     public ShogiPiece[,] ShogiPieces{set;get;}
 
     
@@ -42,8 +42,33 @@ public class BoardManager : MonoBehaviour
     // Update is called once per frame
     private void Update(){
         UpdateSelection();
-        // DrawBoard();
+        MarkSelectedPiece();
+        MarkCheckedKing();
         ComputeMouseClick();
+    }
+    private void MarkSelectedPiece(){
+        if (selectedShogiPiece){
+            BoardHighlights.Instance.HighlightSelection(selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY);
+
+        }
+        else {
+            BoardHighlights.Instance.HideSelectionHighlight();
+        }
+    }
+    private void MarkCheckedKing(){
+        if (player1.isAttackingKing){
+            player2.PlaceInCheck();
+        }
+        else {
+            player2.RemoveCheck();
+        }
+
+        if (player2.isAttackingKing){
+            player1.PlaceInCheck();
+        }
+        else {
+            player1.RemoveCheck();
+        }
     }
     private void InitializeGame(){
         player1 = new Player(PlayerNumber.Player1, this, GameObject.Find("CaptureBoardPlayer1").GetComponent<CaptureBoard>());
@@ -51,7 +76,7 @@ public class BoardManager : MonoBehaviour
         selectionX = -1;
         selectionY = -1;
 
-        activePieces = new List<GameObject>();
+        //activePieceObjects = new List<GameObject>();
         ShogiPieces = new ShogiPiece[C.numberRows, C.numberRows];
         currentPlayer = player1;
         opponentPlayer = player2;
@@ -116,7 +141,7 @@ public class BoardManager : MonoBehaviour
         piece.transform.SetParent(transform);
         ShogiPieces[x, y] = piece.GetComponent<ShogiPiece>();
         ShogiPieces[x, y].Init(x, y, player, this);
-        activePieces.Add(piece);
+        //activePieceObjects.Add(piece);
     }
     private void SpawnAllShogiPieces(){
         // Kings
@@ -161,32 +186,7 @@ public class BoardManager : MonoBehaviour
         }
     }
     // Currently unused
-    private void DrawBoard(){
-        // unitary vector going to the right and forward for one unit of space 8 times
-        Vector3 widthLine = Vector3.right * C.numberRows;
-        Vector3 heightLine = Vector3.forward * C.numberRows;
-
-        for (int i = 0; i <= C.numberRows; i++){
-            Vector3 startRow = Vector3.forward * i;
-            Debug.DrawLine(startRow, startRow + widthLine);
-            for (int j = 0; j <= C.numberRows; j++){
-                Vector3 startCol = Vector3.right * j;
-                Debug.DrawLine(startCol, startCol + heightLine);
-            }
-        }
-
-        // Draw the selection
-        if (selectionX >= 0 && selectionY >= 0){
-            Debug.DrawLine(
-                Vector3.forward * selectionY + Vector3.right * selectionX,
-                Vector3.forward * (selectionY + 1) + Vector3.right * (selectionX + 1)
-            );
-            Debug.DrawLine(
-                Vector3.forward * (selectionY + 1) + Vector3.right * selectionX,
-                Vector3.forward * selectionY + Vector3.right * (selectionX + 1)
-            );
-        }
-    }
+    
     private void SelectShogiPiece(int x, int y){
         if (ShogiPieces[x, y] == null)
             return;
@@ -209,10 +209,10 @@ public class BoardManager : MonoBehaviour
     private void MoveShogiPiece(int x, int y){
         if (allowedMoves[x,y]){
             // Capture piece if possible
-            CapturePiece(x, y);
+            CapturePieceIfPossible(x, y);
             ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
             PlacePiece(selectedShogiPiece, x, y);
-            CheckPromotion();
+            CheckForPromotion();
             EndTurn();
         }
         BoardHighlights.Instance.HideHighlights();
@@ -227,10 +227,10 @@ public class BoardManager : MonoBehaviour
         }
         BoardHighlights.Instance.HideHighlights();
     }
-    private void CapturePiece(int x, int y){
+    private void CapturePieceIfPossible(int x, int y){
         ShogiPiece targetPiece = ShogiPieces[x,y];
         if (targetPiece != null && (targetPiece.player != currentPlayer.playerNumber || freeMove)){
-            activePieces.Remove(targetPiece.gameObject);
+            //activePieceObjects.Remove(targetPiece.gameObject);
             opponentPlayer.RemovePieceInPlay(targetPiece);
             currentPlayer.CapturePiece(targetPiece);
             ShogiPieces[x, y] = null;
@@ -246,8 +246,9 @@ public class BoardManager : MonoBehaviour
         opponentPlayer.CalculateAttackedTiles();
     }
     private void EndTurn(){
+        selectedShogiPiece = null;
         // Check win condition
-        if (CheckGameOver()){
+        if (CheckIfGameOver()){
             EndGame();
         }
         else if (!freeMove){
@@ -264,13 +265,9 @@ public class BoardManager : MonoBehaviour
             opponentPlayer = player2;
         }
     }
-    public bool CheckGameOver(){
+    public bool CheckIfGameOver(){
         if (currentPlayer.isAttackingKing){
             if (!opponentPlayer.hasPossibleMoves) return true;
-            opponentPlayer.PlaceInCheck();
-        }
-        else {
-            opponentPlayer.RemoveCheck();
         }
         return false;
     }
@@ -282,6 +279,7 @@ public class BoardManager : MonoBehaviour
     public void ResetGame(){
         DestroyAllPieces();
         InitializeGame();
+        BoardHighlights.Instance.HideAllHighlights();
     }
     private void DestroyAllPieces(){
         player1.captureBoard.DestroyAllPieces();
@@ -294,9 +292,9 @@ public class BoardManager : MonoBehaviour
             }
         BoardHighlights.Instance.HideCheckHighlight();
     }
-    private void CheckPromotion(){
+    private void CheckForPromotion(){
         // If the game is over before the promotion then just end the game
-        if (CheckGameOver()){
+        if (CheckIfGameOver()){
             return;
         }
 
@@ -306,11 +304,11 @@ public class BoardManager : MonoBehaviour
         if (!selectedShogiPiece.isPromoted && !freeMove){
             if (currentPlayer == player1){
                 if (selectedShogiPiece.CurrentY >= C.numberRows - 3)
-                    selectedShogiPiece.CheckPromotion();
+                    selectedShogiPiece.CheckForPromotion();
             }
             else{
                 if (selectedShogiPiece.CurrentY <= 2)
-                    selectedShogiPiece.CheckPromotion();
+                    selectedShogiPiece.CheckForPromotion();
             }
         }
     }
@@ -319,7 +317,7 @@ public class BoardManager : MonoBehaviour
 
         currentPlayer.CalculateAttackedTiles();
         opponentPlayer.CalculateAttackedTiles();
-        if (CheckGameOver()){
+        if (CheckIfGameOver()){
             EndGame();
         }
     }

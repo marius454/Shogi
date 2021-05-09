@@ -27,7 +27,7 @@ public class Player
         this.board = board;
         this.playerNumber = playerNumber;
     }
-    public void CalculateAttackedTiles(bool checkForSelfCheck = true, bool checkForPawnDropMate = true){
+    public void CalculateAttackedTiles(bool checkForSelfCheck = true, bool checkDrops = true){
         attackedTiles = new bool[C.numberRows, C.numberRows];
         int nrMoves = 0;
         foreach(ShogiPiece piece in piecesInPlay){
@@ -40,19 +40,22 @@ public class Player
                     }
                 }
         }
-        foreach(ShogiPiece piece in capturedPieces){
-            bool[,] drops = piece.PossibleDrops(checkForPawnDropMate); 
+        if (checkDrops){
+            foreach(ShogiPiece piece in capturedPieces){
+            bool[,] drops = piece.PossibleDrops(checkForSelfCheck); 
             for (int x=0; x < C.numberRows; x++)
                 for (int y=0; y < C.numberRows; y++){
                     if (drops[x,y]){
-                        attackedTiles[x,y] = true;
                         nrMoves++;
                     }
                 }
+            }
         }
+        
         if (nrMoves == 0){
             hasPossibleMoves = false;
         }
+        else hasPossibleMoves = true;
         CheckIfAttackingKing();
     }
     public void CheckIfAttackingKing(){
@@ -106,13 +109,17 @@ public class Player
         }
 	}
     public void PlaceInCheck(){
-        isInCheck = true;
-        ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
-        BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
+        if (!isInCheck){
+            isInCheck = true;
+            ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
+            BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
+        }
     }
     public void RemoveCheck(){
-        isInCheck = false;
-        BoardHighlights.Instance.HideCheckHighlight();
+        if (isInCheck){
+            isInCheck = false;
+            BoardHighlights.Instance.HideCheckHighlight();
+        }
     }
 
 }

@@ -51,9 +51,9 @@ public class Pawn : ShogiPiece
         RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
-    public override void RemoveIllegalDrops(bool checkForPawnDropMate){
+    public override void RemoveIllegalDrops(bool checkForSelfCheck = true){
         // pawn cant be on the last row
-        RemoveLastRow();
+        RemoveDropsLastRows();
 
         // cant drop pawn on a row with an unpromoted pawn
         for (int x=0; x < C.numberRows; x++)
@@ -61,42 +61,61 @@ public class Pawn : ShogiPiece
                 if (board.ShogiPieces[x, y]) {
                     if (board.ShogiPieces[x, y].GetType() == typeof(Pawn) && !board.ShogiPieces[x, y].isPromoted){
                         for (int Y=0; Y < C.numberRows; Y++){
-                            moves[x, Y] = false;
+                            drops[x, Y] = false;
                         }
                     }
                 }
-                // cant drop a pawn in place that would cause checkmate
-                if (checkForPawnDropMate){
-                    int pawnMove;
-                    if (player == PlayerNumber.Player1 && moves[x, y]) pawnMove = 1;
-                    else pawnMove = -1;
-                    if (moves[x, y])
-                        if (board.ShogiPieces[x, y+pawnMove] && board.ShogiPieces[x, y+pawnMove].GetType() == typeof(King) && board.ShogiPieces[x, y+pawnMove].player == PlayerNumber.Player2)
-                            if (CheckIfDropWillCauseCheckmate(x, y)){
-                                moves[x, y] = false;
-                            }
-                }
+                // Can't drop a pawn in place that would cause checkmate
+                int pawnMove;
+                if (player == PlayerNumber.Player1 && drops[x, y]) pawnMove = 1;
+                else pawnMove = -1;
+                if (drops[x, y])
+                    if (board.ShogiPieces[x, y+pawnMove] && board.ShogiPieces[x, y+pawnMove].GetType() == typeof(King) && board.ShogiPieces[x, y+pawnMove].player == board.opponentPlayer.playerNumber)
+                        if (CheckIfDropWillCauseCheckmate(x, y)){
+                            drops[x, y] = false;
+                        }
             }
-        base.RemoveIllegalDrops(checkForPawnDropMate);
+        base.RemoveIllegalDrops(checkForSelfCheck);
     }
     private bool CheckIfDropWillCauseCheckmate(int x, int y){
+
+        // I forgot the reason, but it does not work with "this" but works with a new pawn object
+        // bool wouldCauseCheckMate;
+        // board.ShogiPieces[x,y] = this;
+
+        // board.currentPlayer.AddPieceInPlay(this);
+        // board.currentPlayer.isAttackingKing = true;
+        // // board.opponentPlayer.PlaceInCheck();
+        // board.opponentPlayer.CalculateAttackedTiles(true, false);
+
+        // wouldCauseCheckMate = !board.opponentPlayer.hasPossibleMoves;
+        // board.currentPlayer.RemovePieceInPlay(this);
+        // board.currentPlayer.isAttackingKing = false;
+        // // board.opponentPlayer.RemoveCheck();
+        // board.ShogiPieces[x, y] = null;
+
+        // board.opponentPlayer.CalculateAttackedTiles(true, false);
+        // return wouldCauseCheckMate;
+        
         bool wouldCauseCheckMate;
 
-        GameObject clone = Instantiate(board.piecePrefabs[(int)player], board.GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
+        GameObject clone = Instantiate(board.piecePrefabs[(int)PieceType.pawn], board.GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
         board.ShogiPieces[x, y] = clone.GetComponent<ShogiPiece>();
         board.ShogiPieces[x, y].Init(x, y, player, board);
 
         board.currentPlayer.AddPieceInPlay(clone.GetComponent<ShogiPiece>());
+        board.currentPlayer.isAttackingKing = true;
+        board.opponentPlayer.PlaceInCheck();
         board.opponentPlayer.CalculateAttackedTiles(true, false);
 
         wouldCauseCheckMate = !board.opponentPlayer.hasPossibleMoves;
         board.currentPlayer.RemovePieceInPlay(clone.GetComponent<ShogiPiece>());
+        board.currentPlayer.isAttackingKing = false;
+        board.opponentPlayer.RemoveCheck();
         board.ShogiPieces[x, y] = null;
         Destroy (clone);
 
         board.opponentPlayer.CalculateAttackedTiles(true, false);
-        // RemoveLastRow();
-
         return wouldCauseCheckMate;
     }
 }

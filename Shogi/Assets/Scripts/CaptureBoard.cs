@@ -37,9 +37,9 @@ public class CaptureBoard : MonoBehaviour
         this.minX = minX;
         this.minY = minY;
     }
-    private void Update(){
-        DrawBoard();
-    }
+    // private void Update(){
+    //     DrawBoard();
+    // }
     private (int x, int y) CoordinatesToIndeces(int x, int y){
         if (player == PlayerNumber.Player1){
             x = x - minX;
@@ -51,36 +51,7 @@ public class CaptureBoard : MonoBehaviour
         } 
         return (x, y);
     }
-    // Drawing a representation of the board to for easier debugging
-    private void DrawBoard(){
-        Vector3 widthLine = Vector3.right * C.captureNumberColumns;
-        Vector3 heightLine = Vector3.forward * C.captureNumberRows;
-        Vector3 startPoint;
-
-        if (player == PlayerNumber.Player1) startPoint = new Vector3(C.numberRows + 1, 0, 0);
-        else startPoint = new Vector3(-1 - C.captureNumberColumns, 0, C.numberRows - C.captureNumberRows);
-
-        for (int i = 0; i <= C.captureNumberRows; i++){
-            Vector3 startRow = startPoint + (Vector3.forward * i);
-            Debug.DrawLine(startRow, startRow + widthLine);
-            for (int j = 0; j <= C.captureNumberColumns; j++){
-                Vector3 startCol = startPoint + (Vector3.right * j);
-                Debug.DrawLine(startCol, startCol + heightLine);
-            }
-        }
-
-        // Draw the selection
-        if (selectionX >= minX && selectionY >= minY && selectionX <= maxX && selectionY <= maxY){
-            Debug.DrawLine(
-                Vector3.forward * selectionY + Vector3.right * selectionX,
-                Vector3.forward * (selectionY + 1) + Vector3.right * (selectionX + 1)
-            );
-            Debug.DrawLine(
-                Vector3.forward * (selectionY + 1) + Vector3.right * selectionX,
-                Vector3.forward * selectionY + Vector3.right * (selectionX + 1)
-            );
-        }
-    }
+    
     public void AddPiece(ShogiPiece piece){
         // If needed, switching x and y places is exceptable depending on the order that is wanted for incoming captures
         for (int y=0; y < C.captureNumberRows; y++)

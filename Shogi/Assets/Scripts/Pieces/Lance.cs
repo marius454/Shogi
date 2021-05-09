@@ -29,9 +29,9 @@ public class Lance : ShogiPiece
         RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
-    public override void RemoveIllegalDrops(bool checkForPawnDropMate)
+    public override void RemoveIllegalDrops(bool checkForSelfCheck = true)
     {
-        RemoveLastRow();
-        base.RemoveIllegalDrops(checkForPawnDropMate);
+        RemoveDropsLastRows();
+        base.RemoveIllegalDrops(checkForSelfCheck);
     }
 }
