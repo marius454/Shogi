@@ -6,7 +6,7 @@ using Y = PieceYValues;
 public class King : ShogiPiece
 {
     public King(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
-    public override void SetNormalHeight(){
+    protected override void SetNormalHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.King - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
@@ -27,5 +27,9 @@ public class King : ShogiPiece
     public override void Promote()
     {
         // King cannot be promoted
+    }
+    public override void Unpromote()
+    {
+        // King will never be promoted to be unpromoted
     }
 }

@@ -65,7 +65,7 @@ public class BoardHighlights : MonoBehaviour
     public void HighlightSelection(int x, int y){
         if (!selectionHighlight){
             selectionHighlight = Instantiate(highlightPrefab);
-            selectionHighlight.GetComponent<Renderer>().material.color = Color.black;
+            selectionHighlight.GetComponent<Renderer>().material.color = new Color(0.3f, 0.3f, 0.3f, 1f);
             allHighlights.Add(selectionHighlight);
         }
         selectionHighlight.SetActive(true);

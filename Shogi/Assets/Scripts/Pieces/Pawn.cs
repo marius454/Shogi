@@ -6,13 +6,13 @@ using Y = PieceYValues;
 public class Pawn : ShogiPiece
 {
     public Pawn(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
-    public override void SetNormalHeight(){
+    protected override void SetNormalHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.Pawn - 0.01f, gameObject.transform.position.z);
     }
-    public override void SetPromotedHeight(){
+    protected override void SetPromotedHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedPawn - 0.01f, gameObject.transform.position.z);
     }
-    public override void SetNormalRotation()
+    protected override void SetNormalRotation()
     {
         if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
@@ -23,7 +23,7 @@ public class Pawn : ShogiPiece
             this.gameObject.transform.rotation = rotation;
         }
     }
-    public override void SetPromotedRotation()
+    protected override void SetPromotedRotation()
     {
         if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(85.0f, 180.0f, 0.0f);
@@ -78,27 +78,9 @@ public class Pawn : ShogiPiece
         base.RemoveIllegalDrops(checkForSelfCheck);
     }
     private bool CheckIfDropWillCauseCheckmate(int x, int y){
-
-        // I forgot the reason, but it does not work with "this" but works with a new pawn object
-        // bool wouldCauseCheckMate;
-        // board.ShogiPieces[x,y] = this;
-
-        // board.currentPlayer.AddPieceInPlay(this);
-        // board.currentPlayer.isAttackingKing = true;
-        // // board.opponentPlayer.PlaceInCheck();
-        // board.opponentPlayer.CalculateAttackedTiles(true, false);
-
-        // wouldCauseCheckMate = !board.opponentPlayer.hasPossibleMoves;
-        // board.currentPlayer.RemovePieceInPlay(this);
-        // board.currentPlayer.isAttackingKing = false;
-        // // board.opponentPlayer.RemoveCheck();
-        // board.ShogiPieces[x, y] = null;
-
-        // board.opponentPlayer.CalculateAttackedTiles(true, false);
-        // return wouldCauseCheckMate;
-        
         bool wouldCauseCheckMate;
 
+        // I forgot the reason, but it does not work with "this" but works with a new pawn object
         GameObject clone = Instantiate(board.piecePrefabs[(int)PieceType.pawn], board.GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
         board.ShogiPieces[x, y] = clone.GetComponent<ShogiPiece>();
         board.ShogiPieces[x, y].Init(x, y, player, board);

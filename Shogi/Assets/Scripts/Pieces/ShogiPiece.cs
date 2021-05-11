@@ -21,7 +21,7 @@ public abstract class ShogiPiece : MonoBehaviour
         this.board = board;
         this.isPromoted = false;
         SetXY(x, y);
-        SetNormalHeight();
+        SetHeight();
         SetNormalRotation();
         moves = new bool[C.numberRows, C.numberRows];
     }
@@ -30,9 +30,25 @@ public abstract class ShogiPiece : MonoBehaviour
         CurrentX = x;
         CurrentY = y;
     }
-    public abstract void SetNormalHeight();
-    public virtual void SetPromotedHeight(){}
-    public virtual void SetNormalRotation(){
+    public void SetHeight(){
+        if (isPromoted){
+            SetPromotedHeight();
+        }
+        else {
+            SetNormalHeight();
+        }
+    }
+    protected abstract void SetNormalHeight();
+    protected virtual void SetPromotedHeight(){}
+    public void SetRotation(){
+        if (isPromoted){
+            SetPromotedRotation();
+        }
+        else {
+            SetNormalRotation();
+        }
+    }
+    protected virtual void SetNormalRotation(){
         if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(-90.0f, 180.0f, 0.0f);
             this.gameObject.transform.rotation = rotation;
@@ -42,7 +58,7 @@ public abstract class ShogiPiece : MonoBehaviour
             this.gameObject.transform.rotation = rotation;
         }
     }
-    public virtual void SetPromotedRotation(){
+    protected virtual void SetPromotedRotation(){
         if (player == PlayerNumber.Player1){
             Quaternion rotation = Quaternion.Euler(95.0f, 0.0f, 0.0f);
             this.gameObject.transform.rotation = rotation;
@@ -270,7 +286,12 @@ public abstract class ShogiPiece : MonoBehaviour
     }
     public virtual void Promote(){
         isPromoted = true;
-        SetPromotedHeight();
-        SetPromotedRotation();
+        SetHeight();
+        SetRotation();
+    }
+    public virtual void Unpromote(){
+        isPromoted = false;
+        SetHeight();
+        SetRotation();
     }
 }

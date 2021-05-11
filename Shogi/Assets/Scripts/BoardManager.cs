@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using C = Constants;
 
 
-public class BoardManager : MonoBehaviour
+public abstract class BoardManager : MonoBehaviour
 {
     // Decide whether to allow free movement for dubugging
     public bool freeMove;
@@ -18,33 +18,28 @@ public class BoardManager : MonoBehaviour
     public Player currentPlayer;
     public Player opponentPlayer;
     
-    
     public bool[,] allowedMoves{set;get;}
     public ShogiPiece selectedShogiPiece{set;get;}
 
     private int selectionX;
     private int selectionY;
 
-    
     public List<GameObject> piecePrefabs;
     //private List<GameObject> activePieceObjects;
     public ShogiPiece[,] ShogiPieces{set;get;}
 
-    
-
     // Start is called before the first frame update
     private void Start(){
-        // Make game cap out at 60 fps for less stress on the computer
-        Application.targetFrameRate = 60;
         Instance = this;
-        InitializeGame();
     }
     // Update is called once per frame
     private void Update(){
-        UpdateSelection();
-        MarkSelectedPiece();
-        MarkCheckedKing();
-        ComputeMouseClick();
+        if (GameController.Instance.gameStarted){
+            UpdateSelection();
+            MarkSelectedPiece();
+            MarkCheckedKing();
+            ComputeMouseClick();
+        }
     }
     private void MarkSelectedPiece(){
         if (selectedShogiPiece){
@@ -70,7 +65,7 @@ public class BoardManager : MonoBehaviour
             player1.RemoveCheck();
         }
     }
-    private void InitializeGame(){
+    public void InitializeGame(){
         player1 = new Player(PlayerNumber.Player1, this, GameObject.Find("CaptureBoardPlayer1").GetComponent<CaptureBoard>());
         player2 = new Player(PlayerNumber.Player2, this, GameObject.Find("CaptureBoardPlayer2").GetComponent<CaptureBoard>());
         selectionX = -1;
@@ -82,6 +77,7 @@ public class BoardManager : MonoBehaviour
         opponentPlayer = player2;
 
         SpawnAllShogiPieces();
+        // SpawnPiece(PieceType.king, 4, 4, PlayerNumber.Player1);
         player1.InitializePiecesInPlay();
         player2.InitializePiecesInPlay();
     }
@@ -184,9 +180,7 @@ public class BoardManager : MonoBehaviour
             SpawnPiece(PieceType.pawn, i, 2, PlayerNumber.Player1);
             SpawnPiece(PieceType.pawn, i, 6, PlayerNumber.Player2);
         }
-    }
-    // Currently unused
-    
+    }    
     private void SelectShogiPiece(int x, int y){
         if (ShogiPieces[x, y] == null)
             return;
@@ -239,7 +233,7 @@ public class BoardManager : MonoBehaviour
     private void PlacePiece(ShogiPiece piece, int x, int y){
         piece.transform.position = GetTileCenter (x, y);
         piece.SetXY(x, y);
-        piece.SetNormalHeight();
+        piece.SetHeight();
         ShogiPieces[x, y] = piece;
 
         currentPlayer.CalculateAttackedTiles();

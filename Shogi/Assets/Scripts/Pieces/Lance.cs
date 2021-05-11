@@ -6,10 +6,10 @@ using Y = PieceYValues;
 public class Lance : ShogiPiece
 {
     public Lance(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
-    public override void SetNormalHeight(){
+    protected override void SetNormalHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.Lance - 0.01f, gameObject.transform.position.z);
     }
-    public override void SetPromotedHeight(){
+    protected override void SetPromotedHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedLance - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
