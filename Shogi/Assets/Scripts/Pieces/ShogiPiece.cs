@@ -232,7 +232,7 @@ public abstract class ShogiPiece : MonoBehaviour
         bool wouldCauseCheck;
         ShogiPiece tempCapture = null;
 
-        Player opponentPlayer;
+        ShogiPlayer opponentPlayer;
         if (player == PlayerNumber.Player1) opponentPlayer = board.player2;
         else opponentPlayer = board.player1;
         
@@ -276,12 +276,20 @@ public abstract class ShogiPiece : MonoBehaviour
         if (player == PlayerNumber.Player1){
             if (board.selectedShogiPiece.CurrentY >= C.numberRows - 1)
                 board.PromotePiece(this);
-            else GameUI.Instance.ShowPromotionMenu(this);
+            else {
+                if (board.player1.playerCamera)
+                    board.player1.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowPromotionMenu(this);
+                else GameUI.Instance.ShowPromotionMenu(this);
+            }
         }
         else{
             if (board.selectedShogiPiece.CurrentY == 0)
                 board.PromotePiece(this);
-            else GameUI.Instance.ShowPromotionMenu(this);
+            else {
+                if (board.player2.playerCamera)
+                    board.player2.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowPromotionMenu(this);
+                else GameUI.Instance.ShowPromotionMenu(this);
+            }
         }
     }
     public virtual void Promote(){

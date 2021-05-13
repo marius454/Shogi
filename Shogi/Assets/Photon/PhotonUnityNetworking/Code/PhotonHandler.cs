@@ -237,9 +237,9 @@ namespace Photon.Pun
         }
 
 
-        public void OnPlayerPropertiesUpdate(PhotonPlayer targetPlayer, Hashtable changedProps) { }
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) { }
 
-        public void OnMasterClientSwitched(PhotonPlayer newMasterClient)
+        public void OnMasterClientSwitched(Player newMasterClient)
         {
             var views = PhotonNetwork.PhotonViewCollection;
             foreach (var view in views)
@@ -303,7 +303,7 @@ namespace Photon.Pun
         }
 
 
-        public void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
+        public void OnPlayerEnteredRoom(Player newPlayer)
         {
 
             bool isRejoiningMaster = newPlayer.IsMasterClient;
@@ -352,7 +352,7 @@ namespace Photon.Pun
 
         }
 
-        public void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
+        public void OnPlayerLeftRoom(Player otherPlayer)
         {
             var views = PhotonNetwork.PhotonViewCollection;
 

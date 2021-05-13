@@ -37,7 +37,7 @@ namespace Photon.Pun.Demo.Cockpit
 
         public LayoutElement LayoutElement;
 
-        PhotonPlayer _player;
+        Player _player;
 
         public bool isInactiveCache;
 
@@ -48,7 +48,7 @@ namespace Photon.Pun.Demo.Cockpit
             UpdateInfo();
         }
 
-        public void AddToList(PhotonPlayer info, bool animate = false)
+        public void AddToList(Player info, bool animate = false)
         {
             //Debug.Log("AddToList " + info.ToStringFull());
 

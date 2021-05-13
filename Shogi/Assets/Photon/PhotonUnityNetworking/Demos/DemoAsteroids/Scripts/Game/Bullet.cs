@@ -5,7 +5,7 @@ namespace Photon.Pun.Demo.Asteroids
 {
     public class Bullet : MonoBehaviour
     {
-        public PhotonPlayer Owner { get; private set; }
+        public Player Owner { get; private set; }
 
         public void Start()
         {
@@ -17,7 +17,7 @@ namespace Photon.Pun.Demo.Asteroids
             Destroy(gameObject);
         }
 
-        public void InitializeBullet(PhotonPlayer owner, Vector3 originalDirection, float lag)
+        public void InitializeBullet(Player owner, Vector3 originalDirection, float lag)
         {
             Owner = owner;
 

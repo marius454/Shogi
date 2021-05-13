@@ -6,12 +6,17 @@ using Photon.Realtime;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    public static NetworkManager Instance {set; get;}
+    //public static NetworkManager Instance {set; get;}
     private bool connectionAttempted = false;
+    private void Start(){
+        //Instance = this;
+    }
+    private void Awake(){
+        //PhotonNetwork.AutomaticallySyncScene = true;
+    }
     private void Update(){
         if (connectionAttempted){
             GameUI.Instance.SetNetworkText(PhotonNetwork.NetworkClientState.ToString());
-            Debug.Log("Not crashed");
         }
     }
     public void Connect(){
@@ -32,14 +37,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         Debug.LogError($"Joining random room failed - {message}. Creating new room");
-        PhotonNetwork.CreateRoom(null);
+        PhotonNetwork.CreateRoom(null, new RoomOptions{
+            MaxPlayers = 2,
+        });
     }
     public override void OnJoinedRoom()
     {
         Debug.LogError($"Player {PhotonNetwork.LocalPlayer.ActorNumber} joined room");
+        GameController.Instance.TryToStartGame();
     }
-    public override void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
+    public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         Debug.LogError($"Player {newPlayer.ActorNumber} joined room");
+    }
+    public bool IsRoomFull(){
+        return PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers;
     }
 }

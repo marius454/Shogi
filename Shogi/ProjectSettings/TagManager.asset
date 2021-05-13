@@ -13,10 +13,10 @@ TagManager:
   - UI
   - CapturePlanePlayer1
   - CapturePlanePlayer2
-  - 
-  - 
-  - 
-  - 
+  - Player1UI
+  - Player2UI
+  - Player1Highlights
+  - Player2Highlights
   - 
   - 
   - 

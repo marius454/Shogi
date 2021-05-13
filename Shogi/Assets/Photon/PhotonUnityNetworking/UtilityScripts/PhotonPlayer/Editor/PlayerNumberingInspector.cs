@@ -42,7 +42,7 @@ namespace Photon.Pun.UtilityScripts
 				EditorGUILayout.LabelField("Player Index", "Player ID");
 				if (PlayerNumbering.SortedPlayers != null)
 				{
-					foreach(PhotonPlayer punPlayer in PlayerNumbering.SortedPlayers)
+					foreach(Player punPlayer in PlayerNumbering.SortedPlayers)
 					{
 						GUI.enabled = punPlayer.ActorNumber > 0;
 						EditorGUILayout.LabelField("Player " +punPlayer.GetPlayerNumber() + (punPlayer.IsLocal?" - You -":""), punPlayer.ActorNumber == 0?"n/a":punPlayer.ToStringFull());

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using C = Constants;
 
-public class Player
+public class ShogiPlayer
 {
     public PlayerNumber playerNumber{set;get;}
     private BoardManager board{set;get;}
@@ -15,8 +15,9 @@ public class Player
     public bool isAttackingKing{set; get;}
     // to set this check both attacked tiles and whether are legal drops available
     public bool hasPossibleMoves{set; get;}
+    public GameObject playerCamera{set; get;}
 
-    public Player (PlayerNumber playerNumber, BoardManager board, CaptureBoard captureBoard){
+    public ShogiPlayer (PlayerNumber playerNumber, BoardManager board, CaptureBoard captureBoard){
         piecesInPlay = new List<ShogiPiece>();
         capturedPieces = new List<ShogiPiece>();
         attackedTiles = new bool[C.numberRows, C.numberRows];
@@ -50,6 +51,7 @@ public class Player
                     }
                 }
             }
+            
         }
         
         if (nrMoves == 0){
@@ -111,9 +113,9 @@ public class Player
     public void PlaceInCheck(){
         if (!isInCheck){
             isInCheck = true;
-            ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
-            BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
         }
+        ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
+        BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
     }
     public void RemoveCheck(){
         if (isInCheck){
@@ -121,5 +123,10 @@ public class Player
             BoardHighlights.Instance.HideCheckHighlight();
         }
     }
-
+    #region Multiplayer
+    public void SetupCamera(GameObject camera){
+        playerCamera = camera;
+        playerCamera.SetActive(true);
+    }
+    #endregion
 }

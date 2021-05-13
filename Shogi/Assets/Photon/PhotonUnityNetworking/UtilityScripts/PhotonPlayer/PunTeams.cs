@@ -41,7 +41,7 @@ namespace Photon.Pun.UtilityScripts
         /// <summary>The main list of teams with their player-lists. Automatically kept up to date.</summary>
         /// <remarks>Note that this is static. Can be accessed by PunTeam.PlayersPerTeam. You should not modify this.</remarks>
         [Obsolete("use PhotonTeamsManager.Instance.TryGetTeamMembers instead")]
-        public static Dictionary<Team, List<PhotonPlayer>> PlayersPerTeam;
+        public static Dictionary<Team, List<Player>> PlayersPerTeam;
 
         /// <summary>Defines the player custom property name to use for team affinity of "this" player.</summary>
         [Obsolete("do not use this. PhotonTeamsManager.TeamPlayerProp is used internally instead.")]
@@ -52,11 +52,11 @@ namespace Photon.Pun.UtilityScripts
 
         public void Start()
         {
-            PlayersPerTeam = new Dictionary<Team, List<PhotonPlayer>>();
+            PlayersPerTeam = new Dictionary<Team, List<Player>>();
             Array enumVals = Enum.GetValues(typeof(Team));
             foreach (var enumVal in enumVals)
             {
-                PlayersPerTeam[(Team)enumVal] = new List<PhotonPlayer>();
+                PlayersPerTeam[(Team)enumVal] = new List<Player>();
             }
         }
 
@@ -81,17 +81,17 @@ namespace Photon.Pun.UtilityScripts
 
         /// <summary>Refreshes the team lists. It could be a non-team related property change, too.</summary>
         /// <remarks>Called by PUN. See enum MonoBehaviourPunCallbacks for an explanation.</remarks>
-        public override void OnPlayerPropertiesUpdate(PhotonPlayer targetPlayer, Hashtable changedProps)
+        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
             this.UpdateTeams();
         }
 
-        public override void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
+        public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             this.UpdateTeams();
         }
 
-        public override void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
+        public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             this.UpdateTeams();
         }
@@ -109,7 +109,7 @@ namespace Photon.Pun.UtilityScripts
 
             for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
             {
-                PhotonPlayer player = PhotonNetwork.PlayerList[i];
+                Player player = PhotonNetwork.PlayerList[i];
                 Team playerTeam = player.GetTeam();
                 PlayersPerTeam[playerTeam].Add(player);
             }
@@ -122,7 +122,7 @@ namespace Photon.Pun.UtilityScripts
         /// <summary>Extension for Player class to wrap up access to the player's custom property.</summary>
         /// <returns>PunTeam.Team.none if no team was found (yet).</returns>
         [Obsolete("Use player.GetPhotonTeam")]
-        public static PunTeams.Team GetTeam(this PhotonPlayer player)
+        public static PunTeams.Team GetTeam(this Player player)
         {
             object teamId;
             if (player.CustomProperties.TryGetValue(PunTeams.TeamPlayerProp, out teamId))
@@ -138,7 +138,7 @@ namespace Photon.Pun.UtilityScripts
         /// <param name="player"></param>
         /// <param name="team"></param>
         [Obsolete("Use player.JoinTeam")]
-        public static void SetTeam(this PhotonPlayer player, PunTeams.Team team)
+        public static void SetTeam(this Player player, PunTeams.Team team)
         {
             if (!PhotonNetwork.IsConnectedAndReady)
             {

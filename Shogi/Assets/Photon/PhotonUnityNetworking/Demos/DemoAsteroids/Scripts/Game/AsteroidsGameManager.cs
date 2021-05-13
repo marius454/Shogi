@@ -123,7 +123,7 @@ namespace Photon.Pun.Demo.Asteroids
             PhotonNetwork.Disconnect();
         }
 
-        public override void OnMasterClientSwitched(PhotonPlayer newMasterClient)
+        public override void OnMasterClientSwitched(Player newMasterClient)
         {
             if (PhotonNetwork.LocalPlayer.ActorNumber == newMasterClient.ActorNumber)
             {
@@ -131,12 +131,12 @@ namespace Photon.Pun.Demo.Asteroids
             }
         }
 
-        public override void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
+        public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             CheckEndOfGame();
         }
 
-        public override void OnPlayerPropertiesUpdate(PhotonPlayer targetPlayer, Hashtable changedProps)
+        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
             if (changedProps.ContainsKey(AsteroidsGame.PLAYER_LIVES))
             {
@@ -201,7 +201,7 @@ namespace Photon.Pun.Demo.Asteroids
 
         private bool CheckAllPlayerLoadedLevel()
         {
-            foreach (PhotonPlayer p in PhotonNetwork.PlayerList)
+            foreach (Player p in PhotonNetwork.PlayerList)
             {
                 object playerLoadedLevel;
 
@@ -223,7 +223,7 @@ namespace Photon.Pun.Demo.Asteroids
         {
             bool allDestroyed = true;
 
-            foreach (PhotonPlayer p in PhotonNetwork.PlayerList)
+            foreach (Player p in PhotonNetwork.PlayerList)
             {
                 object lives;
                 if (p.CustomProperties.TryGetValue(AsteroidsGame.PLAYER_LIVES, out lives))
@@ -246,7 +246,7 @@ namespace Photon.Pun.Demo.Asteroids
                 string winner = "";
                 int score = -1;
 
-                foreach (PhotonPlayer p in PhotonNetwork.PlayerList)
+                foreach (Player p in PhotonNetwork.PlayerList)
                 {
                     if (p.GetScore() > score)
                     {

@@ -52,7 +52,7 @@ namespace Photon.Pun.Demo.Cockpit
 
             RefreshCount();
 
-            foreach (KeyValuePair<int, PhotonPlayer> _entry in PhotonNetwork.CurrentRoom.Players)
+            foreach (KeyValuePair<int, Player> _entry in PhotonNetwork.CurrentRoom.Players)
             {
                 if (playerCellList.ContainsKey(_entry.Key))
                 {
@@ -67,12 +67,12 @@ namespace Photon.Pun.Demo.Cockpit
             }
         }
 
-        public void SelectPlayer(PhotonPlayer player)
+        public void SelectPlayer(Player player)
         {
             PlayerDetailManager.SetPlayerTarget(player);
         }
 
-        public override void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
+        public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             //Debug.Log("PlayerListView:OnPlayerEnteredRoom:" + newPlayer);
 
@@ -93,15 +93,15 @@ namespace Photon.Pun.Demo.Cockpit
             StartCoroutine("UpdateUIPing");
         }
 
-        public override void OnMasterClientSwitched(PhotonPlayer newMasterClient)
+        public override void OnMasterClientSwitched(Player newMasterClient)
         {
-            foreach (KeyValuePair<int, PhotonPlayer> _entry in PhotonNetwork.CurrentRoom.Players)
+            foreach (KeyValuePair<int, Player> _entry in PhotonNetwork.CurrentRoom.Players)
             {
                 playerCellList[_entry.Key].RefreshInfo(null);
             }
         }
 
-        public override void OnPlayerPropertiesUpdate(PhotonPlayer target, ExitGames.Client.Photon.Hashtable changedProps)
+        public override void OnPlayerPropertiesUpdate(Player target, ExitGames.Client.Photon.Hashtable changedProps)
         {
             if (playerCellList.ContainsKey(target.ActorNumber))
             {
@@ -115,7 +115,7 @@ namespace Photon.Pun.Demo.Cockpit
             StartCoroutine("UpdateUIPing");
         }
 
-        public override void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
+        public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             //Debug.Log("OnPlayerLeftRoom isinactive " + otherPlayer.IsInactive);
 

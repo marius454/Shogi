@@ -5,22 +5,22 @@ using C = Constants;
 
 public class CaptureBoard : MonoBehaviour
 {
-    [SerializeField] private PlayerNumber player;
-    public BoardManager board{set;get;}
+    [SerializeField] protected PlayerNumber player;
+    // protected BoardManager board;
     public ShogiPiece[,] capturedPieces{set;get;}
-    private int selectionX;
-    private int selectionY;
-    private int layerMask;
+    protected int selectionX;
+    protected int selectionY;
+    protected int layerMask;
     // Ribos bus naudingos transformuojant absoliucias koordinates i masyvo koordinates
     public int maxX;
     public int maxY;
     public int minX;
     public int minY;
-    private void Start(){
+    private void Awake(){
+        // board = BoardManager.Instance;
         Init();
     }
-    private void Init(){
-        board = BoardManager.Instance;
+    protected void Init(){
         capturedPieces = new ShogiPiece[C.captureNumberColumns, C.captureNumberRows];
         if (player == PlayerNumber.Player1){
             layerMask = LayerMask.GetMask("CapturePlanePlayer1");
@@ -31,16 +31,13 @@ public class CaptureBoard : MonoBehaviour
             SetBoardLimits(-2, C.numberRows - 1, -1 - C.captureNumberColumns, C.numberRows - C.captureNumberRows);
         } 
     }
-    private void SetBoardLimits(int maxX, int maxY, int minX, int minY){
+    protected void SetBoardLimits(int maxX, int maxY, int minX, int minY){
         this.maxX = maxX;
         this.maxY = maxY;
         this.minX = minX;
         this.minY = minY;
     }
-    // private void Update(){
-    //     DrawBoard();
-    // }
-    private (int x, int y) CoordinatesToIndeces(int x, int y){
+    public (int x, int y) CoordinatesToIndeces(int x, int y){
         if (player == PlayerNumber.Player1){
             x = x - minX;
             y = maxY - y;
@@ -71,20 +68,21 @@ public class CaptureBoard : MonoBehaviour
                 }
             }
     }
-    private Vector3 GetTileCenter(int x, int y){
+    protected Vector3 GetTileCenter(int x, int y){
         Vector3 center = Vector3.zero;
         center.x += (C.tileSize * x) + C.tileOffset;
         center.z += (C.tileSize * y) + C.tileOffset;
         return center;
     }
-    public void SelectCapturedPiece(int x, int y){
-        (x, y) = CoordinatesToIndeces(x, y);
-
-        board.selectedShogiPiece = capturedPieces[x, y];
-        board.allowedMoves = board.selectedShogiPiece.PossibleDrops();
-        BoardHighlights.Instance.HideHighlights();
-        BoardHighlights.Instance.HighlightAllowedMoves(board.allowedMoves);
-    }
+    // public virtual void SelectCapturedPiece(int x, int y){
+    //     OnCapturedPieceSelect(x, y);
+    // }
+    // protected void OnCapturedPieceSelect(int x, int y){
+    //     (x, y) = CoordinatesToIndeces(x, y);
+        
+    //     board.selectedShogiPiece = capturedPieces[x, y];
+    //     board.allowedMoves = board.selectedShogiPiece.PossibleDrops();
+    // }
     public bool ExistsPiece(int x, int y){
         (x, y) = CoordinatesToIndeces(x, y);
         if (capturedPieces[x, y]) return true;

@@ -593,7 +593,7 @@ namespace Photon.Realtime
 
 
         /// <summary>The local player is never null but not valid unless the client is in a room, too. The ID will be -1 outside of rooms.</summary>
-        public PhotonPlayer LocalPlayer { get; internal set; }
+        public Player LocalPlayer { get; internal set; }
 
         /// <summary>
         /// The nickname of the player (synced with others). Same as client.LocalPlayer.NickName.
@@ -2045,7 +2045,7 @@ namespace Photon.Realtime
             bool res = this.LoadBalancingPeer.OpSetPropertiesOfActor(actorNr, actorProperties, expectedProperties, webFlags);
             if (res && !this.CurrentRoom.BroadcastPropertiesChangeToAll && (expectedProperties == null || expectedProperties.Count == 0))
             {
-                PhotonPlayer target = this.CurrentRoom.GetPlayer(actorNr);
+                Player target = this.CurrentRoom.GetPlayer(actorNr);
                 if (target != null)
                 {
                     target.InternalCacheProperties(actorProperties);
@@ -2225,7 +2225,7 @@ namespace Photon.Realtime
                 {
                     // we have a single entry in the actorProperties with one user's name
                     // targets MUST exist before you set properties
-                    PhotonPlayer target = this.CurrentRoom.GetPlayer(targetActorNr);
+                    Player target = this.CurrentRoom.GetPlayer(targetActorNr);
                     if (target != null)
                     {
                         Hashtable props = this.ReadoutPropertiesForActorNr(actorProperties, targetActorNr);
@@ -2240,7 +2240,7 @@ namespace Photon.Realtime
                     int actorNr;
                     Hashtable props;
                     string newName;
-                    PhotonPlayer target;
+                    Player target;
 
                     foreach (object key in actorProperties.Keys)
                     {
@@ -2365,7 +2365,7 @@ namespace Photon.Realtime
             {
                 foreach (int actorNumber in actorsInGame)
                 {
-                    PhotonPlayer target = this.CurrentRoom.GetPlayer(actorNumber);
+                    Player target = this.CurrentRoom.GetPlayer(actorNumber);
                     if (target == null)
                     {
                         this.CurrentRoom.StorePlayer(this.CreatePlayer(string.Empty, actorNumber, false, null));
@@ -2382,9 +2382,9 @@ namespace Photon.Realtime
         /// <param name="isLocal">Sets the distinction if the player to be created is your player or if its assigned to someone else.</param>
         /// <param name="actorProperties">The custom properties for this new player</param>
         /// <returns>The newly created player</returns>
-        protected internal virtual PhotonPlayer CreatePlayer(string actorName, int actorNumber, bool isLocal, Hashtable actorProperties)
+        protected internal virtual Player CreatePlayer(string actorName, int actorNumber, bool isLocal, Hashtable actorProperties)
         {
-            PhotonPlayer newPlayer = new PhotonPlayer(actorName, actorNumber, isLocal, actorProperties);
+            Player newPlayer = new Player(actorName, actorNumber, isLocal, actorProperties);
             return newPlayer;
         }
 
@@ -3159,7 +3159,7 @@ namespace Photon.Realtime
         public virtual void OnEvent(EventData photonEvent)
         {
             int actorNr = photonEvent.Sender;
-            PhotonPlayer originatingPlayer = (this.CurrentRoom != null) ? this.CurrentRoom.GetPlayer(actorNr) : null;
+            Player originatingPlayer = (this.CurrentRoom != null) ? this.CurrentRoom.GetPlayer(actorNr) : null;
 
             switch (photonEvent.Code)
             {
@@ -3844,7 +3844,7 @@ namespace Photon.Realtime
         /// If your game starts with a certain number of players, this callback can be useful to check the
         /// Room.playerCount and find out if you can start.
         /// </remarks>
-        void OnPlayerEnteredRoom(PhotonPlayer newPlayer);
+        void OnPlayerEnteredRoom(Player newPlayer);
 
         /// <summary>
         /// Called when a remote player left the room or became inactive. Check otherPlayer.IsInactive.
@@ -3859,7 +3859,7 @@ namespace Photon.Realtime
         /// If the player is not just inactive, it gets removed from the Room.Players dictionary, before
         /// the callback is called.
         /// </remarks>
-        void OnPlayerLeftRoom(PhotonPlayer otherPlayer);
+        void OnPlayerLeftRoom(Player otherPlayer);
 
 
         /// <summary>
@@ -3880,7 +3880,7 @@ namespace Photon.Realtime
         /// </remarks>
         /// <param name="targetPlayer">Contains Player that changed.</param>
         /// <param name="changedProps">Contains the properties that changed.</param>
-        void OnPlayerPropertiesUpdate(PhotonPlayer targetPlayer, Hashtable changedProps);
+        void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps);
 
         /// <summary>
         /// Called after switching to a new MasterClient when the current one leaves.
@@ -3889,7 +3889,7 @@ namespace Photon.Realtime
         /// This is not called when this client enters a room.
         /// The former MasterClient is still in the player list when this method get called.
         /// </remarks>
-        void OnMasterClientSwitched(PhotonPlayer newMasterClient);
+        void OnMasterClientSwitched(Player newMasterClient);
     }
 
 
@@ -4216,7 +4216,7 @@ namespace Photon.Realtime
             this.client = client;
         }
 
-        public void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
+        public void OnPlayerEnteredRoom(Player newPlayer)
         {
             this.client.UpdateCallbackTargets();
 
@@ -4226,7 +4226,7 @@ namespace Photon.Realtime
             }
         }
 
-        public void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
+        public void OnPlayerLeftRoom(Player otherPlayer)
         {
             this.client.UpdateCallbackTargets();
 
@@ -4246,7 +4246,7 @@ namespace Photon.Realtime
             }
         }
 
-        public void OnPlayerPropertiesUpdate(PhotonPlayer targetPlayer, Hashtable changedProp)
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProp)
         {
             this.client.UpdateCallbackTargets();
 
@@ -4256,7 +4256,7 @@ namespace Photon.Realtime
             }
         }
 
-        public void OnMasterClientSwitched(PhotonPlayer newMasterClient)
+        public void OnMasterClientSwitched(Player newMasterClient)
         {
             this.client.UpdateCallbackTargets();
 

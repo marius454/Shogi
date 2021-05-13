@@ -79,7 +79,7 @@ namespace Photon.Pun.Demo.Asteroids
 
         private void OnPlayerNumberingChanged()
         {
-            foreach (PhotonPlayer p in PhotonNetwork.PlayerList)
+            foreach (Player p in PhotonNetwork.PlayerList)
             {
                 if (p.ActorNumber == ownerId)
                 {

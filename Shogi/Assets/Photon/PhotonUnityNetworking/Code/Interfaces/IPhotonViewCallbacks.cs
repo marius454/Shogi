@@ -32,7 +32,7 @@
         /// </summary>
         /// <param name="newOwner"></param>
         /// <param name="previousOwner"></param>
-        void OnOwnerChange(PhotonPlayer newOwner, PhotonPlayer previousOwner);
+        void OnOwnerChange(Player newOwner, Player previousOwner);
     }
 
     /// <summary>
@@ -45,6 +45,6 @@
         /// </summary>
         /// <param name="newOwner"></param>
         /// <param name="previousOwner"></param>
-        void OnControllerChange(PhotonPlayer newController, PhotonPlayer previousController);
+        void OnControllerChange(Player newController, Player previousController);
     }
 }

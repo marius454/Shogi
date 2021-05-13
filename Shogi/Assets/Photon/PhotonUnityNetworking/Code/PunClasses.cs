@@ -154,7 +154,7 @@ namespace Photon.Pun
         /// This is not called when this client enters a room.
         /// The former MasterClient is still in the player list when this method get called.
         /// </remarks>
-        public virtual void OnMasterClientSwitched(PhotonPlayer newMasterClient)
+        public virtual void OnMasterClientSwitched(Player newMasterClient)
         {
         }
 
@@ -271,7 +271,7 @@ namespace Photon.Pun
         /// If your game starts with a certain number of players, this callback can be useful to check the
         /// Room.playerCount and find out if you can start.
         /// </remarks>
-        public virtual void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
+        public virtual void OnPlayerEnteredRoom(Player newPlayer)
         {
         }
 
@@ -288,7 +288,7 @@ namespace Photon.Pun
         /// If the player is not just inactive, it gets removed from the Room.Players dictionary, before
         /// the callback is called.
         /// </remarks>
-        public virtual void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
+        public virtual void OnPlayerLeftRoom(Player otherPlayer)
         {
         }
 
@@ -338,7 +338,7 @@ namespace Photon.Pun
         ///
         /// <param name="targetPlayer">Contains Player that changed.</param>
         /// <param name="changedProps">Contains the properties that changed.</param>
-        public virtual void OnPlayerPropertiesUpdate(PhotonPlayer targetPlayer, Hashtable changedProps)
+        public virtual void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
         }
 
@@ -429,10 +429,10 @@ namespace Photon.Pun
     {
         private readonly int timeInt;
         /// <summary>The sender of a message / event. May be null.</summary>
-        public readonly PhotonPlayer Sender;
+        public readonly Player Sender;
         public readonly PhotonView photonView;
 
-        public PhotonMessageInfo(PhotonPlayer player, int timestamp, PhotonView view)
+        public PhotonMessageInfo(Player player, int timestamp, PhotonView view)
         {
             this.Sender = player;
             this.timeInt = timestamp;
@@ -743,7 +743,7 @@ namespace Photon.Pun
         /// <summary>
         /// Will read or write the value, depending on the stream's IsWriting value.
         /// </summary>
-        public void Serialize(ref PhotonPlayer obj)
+        public void Serialize(ref Player obj)
         {
             if (this.IsWriting)
             {
@@ -753,7 +753,7 @@ namespace Photon.Pun
             {
                 if (this.readData.Length > this.currentItem)
                 {
-                    obj = (PhotonPlayer) this.readData[this.currentItem];
+                    obj = (Player) this.readData[this.currentItem];
                     this.currentItem++;
                 }
             }

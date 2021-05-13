@@ -167,7 +167,7 @@ namespace Photon.Pun.Demo.Procedural
         /// Gets called whenever the current MasterClient has left the room and a new one is selected.
         /// If the local client is the new MasterClient, we make the UI controls available for him.
         /// </summary>
-        public override void OnMasterClientSwitched(PhotonPlayer newMasterClient)
+        public override void OnMasterClientSwitched(Player newMasterClient)
         {
             seedInputField.interactable = newMasterClient.IsLocal;
             worldSizeDropdown.interactable = newMasterClient.IsLocal;

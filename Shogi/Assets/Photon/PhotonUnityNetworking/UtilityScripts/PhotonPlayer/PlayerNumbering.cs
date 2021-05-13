@@ -38,7 +38,7 @@ namespace Photon.Pun.UtilityScripts
         /// </summary>
         public static PlayerNumbering instance;
 
-        public static PhotonPlayer[] SortedPlayers;
+        public static Player[] SortedPlayers;
 
         /// <summary>
         /// OnPlayerNumberingChanged delegate. Use
@@ -96,17 +96,17 @@ namespace Photon.Pun.UtilityScripts
             PhotonNetwork.LocalPlayer.CustomProperties.Remove(PlayerNumbering.RoomPlayerIndexedProp);
         }
 
-        public override void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
+        public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             this.RefreshData();
         }
 
-        public override void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
+        public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             this.RefreshData();
         }
 
-        public override void OnPlayerPropertiesUpdate(PhotonPlayer targetPlayer, Hashtable changedProps)
+        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
             if (changedProps != null && changedProps.ContainsKey(PlayerNumbering.RoomPlayerIndexedProp))
             {
@@ -142,10 +142,10 @@ namespace Photon.Pun.UtilityScripts
 
 
             HashSet<int> usedInts = new HashSet<int>();
-            PhotonPlayer[] sorted = PhotonNetwork.PlayerList.OrderBy((p) => p.ActorNumber).ToArray();
+            Player[] sorted = PhotonNetwork.PlayerList.OrderBy((p) => p.ActorNumber).ToArray();
 
             string allPlayers = "all players: ";
-            foreach (PhotonPlayer player in sorted)
+            foreach (Player player in sorted)
             {
                 allPlayers += player.ActorNumber + "=pNr:"+player.GetPlayerNumber()+", ";
 
@@ -206,7 +206,7 @@ namespace Photon.Pun.UtilityScripts
 		/// Make sure you use the delegate 'OnPlayerNumberingChanged' to knoiw when you can query the PlayerNumber. Numbering can changes over time or not be yet assigned during the initial phase ( when player creates a room for example)
 		/// </summary>
         /// <returns>persistent index in room. -1 for no indexing</returns>
-        public static int GetPlayerNumber(this PhotonPlayer player)
+        public static int GetPlayerNumber(this Player player)
         {
 			if (player == null) {
 				return -1;
@@ -234,7 +234,7 @@ namespace Photon.Pun.UtilityScripts
 		/// </summary>
 		/// <param name="player">Player.</param>
 		/// <param name="playerNumber">Player number.</param>
-        public static void SetPlayerNumber(this PhotonPlayer player, int playerNumber)
+        public static void SetPlayerNumber(this Player player, int playerNumber)
         {
 			if (player == null) {
 				return;

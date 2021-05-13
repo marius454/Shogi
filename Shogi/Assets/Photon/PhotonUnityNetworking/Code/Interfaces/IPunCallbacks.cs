@@ -58,7 +58,7 @@ namespace Photon.Pun
         /// </remarks>
         /// <param name="targetView">PhotonView for which ownership gets requested.</param>
         /// <param name="requestingPlayer">Player who requests ownership.</param>
-        void OnOwnershipRequest(PhotonView targetView, PhotonPlayer requestingPlayer);
+        void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer);
 
         /// <summary>
         /// Called when ownership of a PhotonView is transfered to another player.
@@ -75,7 +75,7 @@ namespace Photon.Pun
         /// <example>void OnOwnershipTransfered(object[] viewAndPlayers) {} //</example>
         /// <param name="targetView">PhotonView for which ownership changed.</param>
         /// <param name="previousOwner">Player who was the previous owner (or null, if none).</param>
-        void OnOwnershipTransfered(PhotonView targetView, PhotonPlayer previousOwner);
+        void OnOwnershipTransfered(PhotonView targetView, Player previousOwner);
         
         /// <summary>
         /// Called when an Ownership Request fails for objects with "takeover" setting.
@@ -86,7 +86,7 @@ namespace Photon.Pun
         /// </remarks>
         /// <param name="targetView"></param>
         /// <param name="senderOfFailedRequest"></param>
-        void OnOwnershipTransferFailed(PhotonView targetView, PhotonPlayer senderOfFailedRequest);
+        void OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest);
     }
 
     /// \ingroup callbacks

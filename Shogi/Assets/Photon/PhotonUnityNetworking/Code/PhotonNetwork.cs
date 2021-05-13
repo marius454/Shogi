@@ -38,10 +38,10 @@ namespace Photon.Pun
         public Quaternion rotation;
         public Vector3 position;
         public string prefabName;
-        public PhotonPlayer creator;
+        public Player creator;
         public int timestamp;
 
-        public InstantiateParameters(string prefabName, Vector3 position, Quaternion rotation, byte @group, object[] data, byte objLevelPrefix, int[] viewIDs, PhotonPlayer creator, int timestamp)
+        public InstantiateParameters(string prefabName, Vector3 position, Quaternion rotation, byte @group, object[] data, byte objLevelPrefix, int[] viewIDs, Player creator, int timestamp)
         {
             this.prefabName = prefabName;
             this.position = position;
@@ -329,7 +329,7 @@ namespace Photon.Pun
         /// Useful (e.g.) to set the Custom Player Properties or the NickName for this client anytime.
         /// When the client joins a room, the Custom Properties and other values are synced.
         /// </remarks>
-        public static PhotonPlayer LocalPlayer
+        public static Player LocalPlayer
         {
             get
             {
@@ -367,7 +367,7 @@ namespace Photon.Pun
         /// <summary>
         /// A sorted copy of the players-list of the current room. This is using Linq, so better cache this value. Update when players join / leave.
         /// </summary>
-        public static PhotonPlayer[] PlayerList
+        public static Player[] PlayerList
         {
             get
             {
@@ -377,14 +377,14 @@ namespace Photon.Pun
                     // TODO: implement more effectively. maybe cache?!
                     return room.Players.Values.OrderBy((x) => x.ActorNumber).ToArray();
                 }
-                return new PhotonPlayer[0];
+                return new Player[0];
             }
         }
 
         /// <summary>
         /// A sorted copy of the players-list of the current room, excluding this client. This is using Linq, so better cache this value. Update when players join / leave.
         /// </summary>
-        public static PhotonPlayer[] PlayerListOthers
+        public static Player[] PlayerListOthers
         {
             get
             {
@@ -394,7 +394,7 @@ namespace Photon.Pun
                     // TODO: implement more effectively. maybe cache?!
                     return room.Players.Values.OrderBy((x) => x.ActorNumber).Where(x => !x.IsLocal).ToArray();
                 }
-                return new PhotonPlayer[0];
+                return new Player[0];
             }
         }
 
@@ -825,7 +825,7 @@ namespace Photon.Pun
         ///
         /// With OfflineMode == true, this always returns the PhotonNetwork.player.
         /// </remarks>
-        public static PhotonPlayer MasterClient
+        public static Player MasterClient
         {
             get
             {
@@ -1473,7 +1473,7 @@ namespace Photon.Pun
         /// <summary>Request a client to disconnect (KICK). Only the master client can do this</summary>
         /// <remarks>Only the target player gets this event. That player will disconnect automatically, which is what the others will notice, too.</remarks>
         /// <param name="kickPlayer">The Player to kick.</param>
-        public static bool CloseConnection(PhotonPlayer kickPlayer)
+        public static bool CloseConnection(Player kickPlayer)
         {
             if (!VerifyCanUseNetwork())
             {
@@ -1532,7 +1532,7 @@ namespace Photon.Pun
         /// </remarks>
         /// <param name="masterClientPlayer">The player to become the next Master Client.</param>
         /// <returns>False when this operation couldn't be done. Must be in a room (not in OfflineMode).</returns>
-        public static bool SetMasterClient(PhotonPlayer masterClientPlayer)
+        public static bool SetMasterClient(Player masterClientPlayer)
         {
             if (!InRoom || !VerifyCanUseNetwork() || OfflineMode)
             {
@@ -2412,7 +2412,7 @@ namespace Photon.Pun
             return null;
         }
 
-        private static GameObject NetworkInstantiate(Hashtable networkEvent, PhotonPlayer creator)
+        private static GameObject NetworkInstantiate(Hashtable networkEvent, Player creator)
         {
 
             // some values always present:
@@ -2705,7 +2705,7 @@ namespace Photon.Pun
         /// Objects loaded with a scene are ignored, no matter if they have PhotonView components.
         /// </remarks>
         /// <returns>Nothing. Check error debug log for any issues.</returns>
-        public static void DestroyPlayerObjects(PhotonPlayer targetPlayer)
+        public static void DestroyPlayerObjects(Player targetPlayer)
         {
             if (targetPlayer == null)
             {
@@ -2784,7 +2784,7 @@ namespace Photon.Pun
         /// network lag will determine if those get buffered or cleared like the rest.
         /// </remarks>
         /// <param name="targetPlayer">This player's buffered RPCs get removed from server buffer.</param>
-        public static void RemoveRPCs(PhotonPlayer targetPlayer)
+        public static void RemoveRPCs(Player targetPlayer)
         {
             if (!VerifyCanUseNetwork())
             {
@@ -2855,7 +2855,7 @@ namespace Photon.Pun
         /// <summary>
         /// Internal to send an RPC on given PhotonView. Do not call this directly but use: PhotonView.RPC!
         /// </summary>
-        internal static void RPC(PhotonView view, string methodName, PhotonPlayer targetPlayer, bool encrypt, params object[] parameters)
+        internal static void RPC(PhotonView view, string methodName, Player targetPlayer, bool encrypt, params object[] parameters)
         {
             if (!VerifyCanUseNetwork())
             {

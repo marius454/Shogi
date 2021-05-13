@@ -85,9 +85,9 @@ namespace Photon.Pun
                 EditorGUILayout.LabelField("IsMine:", this.m_Target.IsMine.ToString() + masterClientHint);
                 Room room = PhotonNetwork.CurrentRoom;
                 int cretrId = this.m_Target.CreatorActorNr;
-                PhotonPlayer cretr = (room != null) ? room.GetPlayer(cretrId) : null;
-                PhotonPlayer owner = this.m_Target.Owner;
-                PhotonPlayer ctrlr = this.m_Target.Controller;
+                Player cretr = (room != null) ? room.GetPlayer(cretrId) : null;
+                Player owner = this.m_Target.Owner;
+                Player ctrlr = this.m_Target.Controller;
                 EditorGUILayout.LabelField("Controller:", (ctrlr != null ? ("[" + ctrlr.ActorNumber + "] '" + ctrlr.NickName + "' " + (ctrlr.IsMasterClient ? " (master)" : "")) : "[0] <null>"));
                 EditorGUILayout.LabelField("Owner:", (owner != null ? ("[" + owner.ActorNumber + "] '" + owner.NickName + "' " + (owner.IsMasterClient ? " (master)" : "")) : "[0] <null>"));
                 EditorGUILayout.LabelField("Creator:", (cretr != null ? ("[" +cretrId + "] '" + cretr.NickName + "' " + (cretr.IsMasterClient ? " (master)" : "")) : "[0] <null>"));

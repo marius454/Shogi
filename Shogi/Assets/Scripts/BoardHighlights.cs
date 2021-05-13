@@ -8,7 +8,6 @@ public class BoardHighlights : MonoBehaviour
     public static BoardHighlights Instance{set;get;}
     [SerializeField] private GameObject highlightPrefab;
     private List<GameObject> allHighlights;
-
     private List<GameObject> moveHighlights;
     private GameObject checkHighlight;
     private GameObject selectionHighlight;
@@ -32,6 +31,7 @@ public class BoardHighlights : MonoBehaviour
     }
 
     public void HighlightAllowedMoves(bool[,] moves){
+        HideHighlights();
         for (int x = 0; x < 9; x++){
             for (int y = 0; y < 9; y++){
                 if (moves[x, y]){

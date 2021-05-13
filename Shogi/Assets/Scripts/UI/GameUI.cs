@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using Photon.Pun;
 
 public class GameUI : MonoBehaviour
 {
     public static GameUI Instance{set;get;}
-    private void Start(){
+    private void Awake(){
         ShowMainMenu();
         Instance = this;
     }
@@ -99,9 +98,8 @@ public class GameUI : MonoBehaviour
     #region IngameUI
     [SerializeField] private GameObject ingameUI;
     public void ShowIngameUI(){
-        if (!ingameUI.activeSelf){
-            ingameUI.SetActive(true);
-        }
+        HideAllUI();
+        ingameUI.SetActive(true);
     }
     private void HideIngameUI(){
         if (ingameUI.activeSelf){

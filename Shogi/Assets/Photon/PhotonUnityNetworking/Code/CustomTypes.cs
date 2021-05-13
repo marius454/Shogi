@@ -24,7 +24,7 @@ namespace Photon.Pun
         /// <summary>Register de/serializer methods for PUN specific types. Makes the type usable in RaiseEvent, RPC and sync updates of PhotonViews.</summary>
         internal static void Register()
         {
-            PhotonPeer.RegisterType(typeof(PhotonPlayer), (byte) 'P', SerializePhotonPlayer, DeserializePhotonPlayer);
+            PhotonPeer.RegisterType(typeof(Player), (byte) 'P', SerializePhotonPlayer, DeserializePhotonPlayer);
         }
 
 
@@ -34,7 +34,7 @@ namespace Photon.Pun
 
         private static short SerializePhotonPlayer(StreamBuffer outStream, object customobject)
         {
-            int ID = ((PhotonPlayer) customobject).ActorNumber;
+            int ID = ((Player) customobject).ActorNumber;
 
             lock (memPlayer)
             {
@@ -58,7 +58,7 @@ namespace Photon.Pun
 
             if (PhotonNetwork.CurrentRoom != null)
             {
-                PhotonPlayer player = PhotonNetwork.CurrentRoom.GetPlayer(ID);
+                Player player = PhotonNetwork.CurrentRoom.GetPlayer(ID);
                 return player;
             }
             return null;
