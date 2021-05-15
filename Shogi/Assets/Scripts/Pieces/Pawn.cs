@@ -48,7 +48,7 @@ public class Pawn : ShogiPiece
             GoldMove();
         }
         
-        RemoveIllegalMoves(moves, checkForSelfCheck);
+        moves = RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
     public override void RemoveIllegalDrops(bool checkForSelfCheck = true){
@@ -59,7 +59,7 @@ public class Pawn : ShogiPiece
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
                 if (board.ShogiPieces[x, y]) {
-                    if (board.ShogiPieces[x, y].GetType() == typeof(Pawn) && !board.ShogiPieces[x, y].isPromoted){
+                    if (board.ShogiPieces[x, y].GetType() == typeof(Pawn) && !board.ShogiPieces[x, y].isPromoted && board.ShogiPieces[x, y].player == player){
                         for (int Y=0; Y < C.numberRows; Y++){
                             drops[x, Y] = false;
                         }
@@ -85,19 +85,19 @@ public class Pawn : ShogiPiece
         board.ShogiPieces[x, y] = clone.GetComponent<ShogiPiece>();
         board.ShogiPieces[x, y].Init(x, y, player, board);
 
-        board.currentPlayer.AddPieceInPlay(clone.GetComponent<ShogiPiece>());
-        board.currentPlayer.isAttackingKing = true;
-        board.opponentPlayer.PlaceInCheck();
-        board.opponentPlayer.CalculateAttackedTiles(true, false);
+        currentPlayer.AddPieceInPlay(clone.GetComponent<ShogiPiece>());
+        currentPlayer.isAttackingKing = true;
+        opponentPlayer.PlaceInCheck();
+        opponentPlayer.CalculateAttackedTiles(true, false);
 
-        wouldCauseCheckMate = !board.opponentPlayer.hasPossibleMoves;
-        board.currentPlayer.RemovePieceInPlay(clone.GetComponent<ShogiPiece>());
-        board.currentPlayer.isAttackingKing = false;
-        board.opponentPlayer.RemoveCheck();
+        wouldCauseCheckMate = !opponentPlayer.hasPossibleMoves;
+        currentPlayer.RemovePieceInPlay(clone.GetComponent<ShogiPiece>());
+        currentPlayer.isAttackingKing = false;
+        opponentPlayer.RemoveCheck();
         board.ShogiPieces[x, y] = null;
         Destroy (clone);
 
-        board.opponentPlayer.CalculateAttackedTiles(true, false);
+        opponentPlayer.CalculateAttackedTiles(true, false);
         return wouldCauseCheckMate;
     }
 }

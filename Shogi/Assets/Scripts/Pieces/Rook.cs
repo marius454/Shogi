@@ -32,7 +32,7 @@ public class Rook : ShogiPiece
             SingleMove(moves, CurrentX - 1, CurrentY - 1);
         }
 
-        RemoveIllegalMoves(moves, checkForSelfCheck);
+        moves = RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
 }

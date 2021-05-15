@@ -191,4 +191,20 @@ public class MPBoardManager : BoardManager
     {
         OnPiecePromote(x, y);
     }
+
+    public override void EndGame(string message = "placeholder")
+    {
+        Debug.Log("Victory for " + currentPlayer.playerNumber);
+        // Lock The game from being played further
+        string endMessage;
+        
+        if (message != "placeholder"){
+            endMessage = message;
+        }
+        else {
+            if (localPlayer.hasPossibleMoves) endMessage = "Victory";
+            else endMessage = "Defeat";
+        }
+        localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowEndScreen(endMessage);
+    }
 }

@@ -32,7 +32,7 @@ public class Bishop : ShogiPiece
             SingleMove(moves, CurrentX - 1, CurrentY);
         }
 
-        RemoveIllegalMoves(moves, checkForSelfCheck);
+        moves = RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
 }

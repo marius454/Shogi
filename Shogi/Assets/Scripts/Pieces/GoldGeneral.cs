@@ -12,7 +12,7 @@ public class GoldGeneral : ShogiPiece
     
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
         GoldMove();
-        RemoveIllegalMoves(moves, checkForSelfCheck);
+        moves = RemoveIllegalMoves(moves, checkForSelfCheck);
         
         return moves;
     }

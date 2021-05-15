@@ -6,6 +6,7 @@ using C = Constants;
 public class ShogiPlayer
 {
     public PlayerNumber playerNumber{set;get;}
+    public int nrMoves;
     private BoardManager board{set;get;}
     public bool[,] attackedTiles{set;get;}
     public List<ShogiPiece> piecesInPlay{set;get;}
@@ -13,6 +14,7 @@ public class ShogiPlayer
     public CaptureBoard captureBoard{set;get;}
     public bool isInCheck{set; get;}
     public bool isAttackingKing{set; get;}
+    public int nrOfChecksInARow{set; get;}
     // to set this check both attacked tiles and whether are legal drops available
     public bool hasPossibleMoves{set; get;}
     public GameObject playerCamera{set; get;}
@@ -24,13 +26,14 @@ public class ShogiPlayer
         hasPossibleMoves = true;
         isAttackingKing = false;
         isInCheck = false;
+        nrOfChecksInARow = 0;
         this.captureBoard = captureBoard;
         this.board = board;
         this.playerNumber = playerNumber;
     }
     public void CalculateAttackedTiles(bool checkForSelfCheck = true, bool checkDrops = true){
         attackedTiles = new bool[C.numberRows, C.numberRows];
-        int nrMoves = 0;
+        nrMoves = 0;
         foreach(ShogiPiece piece in piecesInPlay){
             bool[,] moves = piece.PossibleMoves(checkForSelfCheck); 
             for (int x=0; x < C.numberRows; x++)
@@ -47,13 +50,12 @@ public class ShogiPlayer
             for (int x=0; x < C.numberRows; x++)
                 for (int y=0; y < C.numberRows; y++){
                     if (drops[x,y]){
+                        attackedTiles[x,y] = true;
                         nrMoves++;
                     }
                 }
             }
-            
         }
-        
         if (nrMoves == 0){
             hasPossibleMoves = false;
         }
@@ -98,6 +100,7 @@ public class ShogiPlayer
 	{
 		if (!capturedPieces.Contains(piece)){
             piece.player = this.playerNumber;
+            piece.SetOpponents();
 			capturedPieces.Add(piece);
             captureBoard.AddPiece(piece);
         }

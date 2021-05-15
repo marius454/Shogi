@@ -8,12 +8,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
     //public static NetworkManager Instance {set; get;}
     private bool connectionAttempted = false;
-    private void Start(){
-        //Instance = this;
-    }
-    private void Awake(){
-        //PhotonNetwork.AutomaticallySyncScene = true;
-    }
+    // private void Start(){
+    //     //Instance = this;
+    // }
+    // private void Awake(){
+    //     //PhotonNetwork.AutomaticallySyncScene = true;
+    // }
     private void Update(){
         if (connectionAttempted){
             GameUI.Instance.SetNetworkText(PhotonNetwork.NetworkClientState.ToString());
@@ -28,7 +28,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             PhotonNetwork.ConnectUsingSettings();
         }
     }
+    public void Disconnect(){
+        if (PhotonNetwork.IsConnected){
+            PhotonNetwork.Disconnect();
+        }
+    }
+    public bool IsRoomFull(){
+        return PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers;
+    }
+    
 
+    #region Photon Callbacks
     public override void OnConnectedToMaster()
     {
         Debug.LogError("Connected to the server looking for random match");
@@ -50,7 +60,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.LogError($"Player {newPlayer.ActorNumber} joined room");
     }
-    public bool IsRoomFull(){
-        return PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers;
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.LogError("You disconnected from the network");
+        if (BoardManager.Instance)
+            BoardManager.Instance.EndGame("Defeat by resignation");
     }
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        Debug.LogError("The other player left the room");
+        if (BoardManager.Instance)
+            BoardManager.Instance.EndGame("Victory by resignation");
+    }
+
+    #endregion
 }

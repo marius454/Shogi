@@ -20,7 +20,7 @@ public class King : ShogiPiece
                     SingleMove(moves, CurrentX + t, CurrentY + s);
             }
 
-        RemoveIllegalMoves(moves, checkForSelfCheck);
+        moves = RemoveIllegalMoves(moves, checkForSelfCheck);
         
         return moves;
     }

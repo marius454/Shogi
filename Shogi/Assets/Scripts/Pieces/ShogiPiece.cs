@@ -9,6 +9,8 @@ public abstract class ShogiPiece : MonoBehaviour
     public int CurrentY {set;get;}
     public PlayerNumber player{set;get;}
     public BoardManager board{set;get;}
+    protected ShogiPlayer currentPlayer{set;get;}
+    protected ShogiPlayer opponentPlayer{set;get;}
     public bool[,] moves{set;get;}
     public bool[,] drops{set;get;}
     public bool isPromoted{set;get;}
@@ -24,6 +26,18 @@ public abstract class ShogiPiece : MonoBehaviour
         SetHeight();
         SetNormalRotation();
         moves = new bool[C.numberRows, C.numberRows];
+        SetOpponents();
+    }
+    public void SetOpponents()
+    {
+        if (player == PlayerNumber.Player1){
+            currentPlayer = board.player1;
+            opponentPlayer = board.player2;
+        }
+        else{
+            currentPlayer = board.player2;
+            opponentPlayer = board.player1;
+        }
     }
 
     public void SetXY (int x, int y){
@@ -74,17 +88,31 @@ public abstract class ShogiPiece : MonoBehaviour
         return moves;
     }
     // check if any of the possible moves are illegal, and remove them
-    public void RemoveIllegalMoves(bool[,] moves, bool checkForSelfCheck){
-        
+    public bool[,] RemoveIllegalMoves(bool[,] moves, bool checkForSelfCheck){
+        // if (this.CurrentX == 4 && this.CurrentY == 2){
+        //     if (moves[4, 3] == true){
+        //         Debug.Log("good");
+        //     }
+        //     else Debug.Log("bad");
+        // }
         // check if after this move the players' King will be under attack
         if (checkForSelfCheck){
             for (int x=0; x < C.numberRows; x++)
                 for (int y=0; y < C.numberRows; y++){
                     if (moves[x,y]){
                         if(CheckIfMoveWillCauseSelfCheck(x, y)) moves[x, y] = false;
+                        if(CheckIfMoveWillCausePerpetualCheck(x, y)) moves[x, y] = false;
                     }
                 }
         }
+        // if (this.CurrentX == 4 && this.CurrentY == 2){
+        //     if (moves[4, 3] == true){
+        //         Debug.Log("good");
+        //     }
+        //     else Debug.Log("bad");
+        // }
+        
+        return moves;
         // check if after this move a perpetual check would be called
         // TO DO
 
@@ -102,7 +130,7 @@ public abstract class ShogiPiece : MonoBehaviour
     }
     public virtual void RemoveIllegalDrops(bool checkForSelfCheck){
         // if player is in check only allow drops that would stop the check
-        if(board.currentPlayer.isInCheck){
+        if(opponentPlayer.isAttackingKing){
             if (checkForSelfCheck){
                 for (int x=0; x < C.numberRows; x++)
                     for (int y=0; y < C.numberRows; y++){
@@ -136,7 +164,6 @@ public abstract class ShogiPiece : MonoBehaviour
             if (removeNextToLast) drops[x, yNextToLast] = false;
         }
     }
-
     public void SingleMove(bool[,] moves, int x, int y){
         ShogiPiece potentialTile;
         
@@ -227,18 +254,12 @@ public abstract class ShogiPiece : MonoBehaviour
             }
         return attackedPieces;
     }
-
     private bool CheckIfMoveWillCauseSelfCheck(int x, int y){
-        bool wouldCauseCheck;
+        bool wouldCauseSelfCheck = false;
         ShogiPiece tempCapture = null;
-
-        ShogiPlayer opponentPlayer;
-        if (player == PlayerNumber.Player1) opponentPlayer = board.player2;
-        else opponentPlayer = board.player1;
         
         ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
-        if (this.CurrentX >= 0 && this.CurrentY >= 0 && this.CurrentX <= C.numberRows && this.CurrentY <= C.numberRows)
-            board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
+        board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
         if (board.ShogiPieces[x, y]){
             tempCapture = board.ShogiPieces[x, y];
             opponentPlayer.RemovePieceInPlay(board.ShogiPieces[x, y]);
@@ -246,7 +267,7 @@ public abstract class ShogiPiece : MonoBehaviour
         board.ShogiPieces[x, y] = this;
 
         opponentPlayer.CalculateAttackedTiles(false, false);
-        wouldCauseCheck = opponentPlayer.isAttackingKing;
+        wouldCauseSelfCheck = opponentPlayer.isAttackingKing;
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
 
         if (tempCapture){
@@ -255,23 +276,78 @@ public abstract class ShogiPiece : MonoBehaviour
         }
         opponentPlayer.CalculateAttackedTiles(false, false);
 
+        return wouldCauseSelfCheck;
+    }
+    private bool CheckIfMoveWillCausePerpetualCheck(int x, int y){
+        bool wouldCauseSelfCheck = false;
+        ShogiPiece tempCapture = null;
+        
+        ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
+        board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
+        if (board.ShogiPieces[x, y]){
+            tempCapture = board.ShogiPieces[x, y];
+            opponentPlayer.RemovePieceInPlay(board.ShogiPieces[x, y]);
+        }
+        board.ShogiPieces[x, y] = this;
+        int tempX, tempY;
+        tempX = CurrentX; tempY = CurrentY;
+        this.SetXY(x, y);
 
-        return wouldCauseCheck;
+
+        currentPlayer.CalculateAttackedTiles(false, false);
+        if (currentPlayer.nrOfChecksInARow >= 3){
+            Debug.Log(currentPlayer.nrOfChecksInARow + " " + currentPlayer.isAttackingKing + " " + currentPlayer.playerNumber + " " + x + " " + y);
+            if(currentPlayer.isAttackingKing)
+                wouldCauseSelfCheck = true;
+        }
+            
+
+        board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
+        this.SetXY(tempX, tempY);
+
+        if (tempCapture){
+            board.ShogiPieces[x, y] = tempCapture;
+            opponentPlayer.AddPieceInPlay(tempCapture);
+        }
+        currentPlayer.CalculateAttackedTiles(false, false);
+
+        return wouldCauseSelfCheck;
+
+        // bool wouldCausePerpetualCheck = false;
+        // ShogiPiece tempCapture = null;
+        
+        // ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
+        // board.ShogiPieces[this.CurrentX, this.CurrentY] = null;
+        // board.ShogiPieces[x, y] = this;
+
+        // currentPlayer.CalculateAttackedTiles(false, false);
+        // if (currentPlayer.isAttackingKing)
+        //     if (currentPlayer.nrOfChecksInARow + 1 >= 4)
+        //         wouldCausePerpetualCheck = true;
+        // Debug.Log(currentPlayer.playerNumber + " " + currentPlayer.nrOfChecksInARow + " " + wouldCausePerpetualCheck);
+        // board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
+
+        // if (tempCapture){
+        //     board.ShogiPieces[x, y] = tempCapture;
+        // }
+
+        // return wouldCausePerpetualCheck;
     }
     private bool CheckIfDropWillCauseSelfCheck(int x, int y){
-        bool wouldCauseCheckMate;
+        bool wouldCauseSelfCheck = false;
         board.ShogiPieces[x,y] = this;
 
-        board.currentPlayer.AddPieceInPlay(this);
-        board.opponentPlayer.CalculateAttackedTiles(false, false);
+        currentPlayer.AddPieceInPlay(this);
+        opponentPlayer.CalculateAttackedTiles(false, false);
 
-        wouldCauseCheckMate = board.opponentPlayer.isAttackingKing;
-        board.currentPlayer.RemovePieceInPlay(this);
+        wouldCauseSelfCheck = opponentPlayer.isAttackingKing;
+        currentPlayer.RemovePieceInPlay(this);
         board.ShogiPieces[x, y] = null;
 
-        board.opponentPlayer.CalculateAttackedTiles(false, false);
-        return wouldCauseCheckMate;
+        opponentPlayer.CalculateAttackedTiles(false, false);
+        return wouldCauseSelfCheck;
     }
+
     public virtual void CheckForPromotion(){
         if (player == PlayerNumber.Player1){
             if (board.selectedShogiPiece.CurrentY >= C.numberRows - 1)

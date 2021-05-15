@@ -26,7 +26,7 @@ public class Lance : ShogiPiece
             GoldMove();
         }
 
-        RemoveIllegalMoves(moves, checkForSelfCheck);
+        moves = RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }
     public override void RemoveIllegalDrops(bool checkForSelfCheck = true)

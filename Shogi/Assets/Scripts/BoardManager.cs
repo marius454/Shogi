@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ public class BoardManager : MonoBehaviour
     public List<GameObject> piecePrefabs;
     //private List<GameObject> activePieceObjects;
     public ShogiPiece[,] ShogiPieces{set;get;}
+    public List<(ShogiPiece[,] state, int repetitions)> gameStates{set; get;}
 
     // Start is called before the first frame update
     private void Awake(){
@@ -83,15 +85,14 @@ public class BoardManager : MonoBehaviour
 
         //activePieceObjects = new List<GameObject>();
         ShogiPieces = new ShogiPiece[C.numberRows, C.numberRows];
+        gameStates = new List<(ShogiPiece[,] state, int repetitions)>();
         currentPlayer = player1;
         opponentPlayer = player2;
 
-        
-        Debug.LogError("player1 " + player1);
-        Debug.LogError("player2 " + player2);
-
         SpawnAllShogiPieces();
-        // SpawnPiece(PieceType.king, 4, 4, PlayerNumber.Player1);
+        // SpawnPiece(PieceType.rook, 4, 4, PlayerNumber.Player1);
+        // ShogiPieces[4, 4].Promote();
+
         player1.InitializePiecesInPlay();
         player2.InitializePiecesInPlay();
     }
@@ -221,7 +222,7 @@ public class BoardManager : MonoBehaviour
             CapturePieceIfPossible(x, y);
             ShogiPieces[selectedShogiPiece.CurrentX, selectedShogiPiece.CurrentY] = null;
             PlacePiece(selectedShogiPiece, x, y);
-            CheckForPromotion();
+            //CheckForPromotion();
             EndTurn();
         }
         // BoardHighlights.Instance.HideHighlights();
@@ -268,7 +269,13 @@ public class BoardManager : MonoBehaviour
         ShogiPieces[x, y] = piece;
 
         currentPlayer.CalculateAttackedTiles();
+        if (currentPlayer.isAttackingKing) currentPlayer.nrOfChecksInARow ++;
+        else currentPlayer.nrOfChecksInARow = 0;
+        Debug.Log(currentPlayer.playerNumber + " " + currentPlayer.nrOfChecksInARow);
+        // Debug.Log(currentPlayer.playerNumber + " " + currentPlayer.hasPossibleMoves + " " + currentPlayer.nrMoves);
         opponentPlayer.CalculateAttackedTiles();
+        // Debug.Log(currentPlayer.playerNumber + " " + currentPlayer.hasPossibleMoves + " " + currentPlayer.nrMoves);
+        // Debug.Log(opponentPlayer.playerNumber + " " + opponentPlayer.hasPossibleMoves + " " + opponentPlayer.nrMoves);
     }
     protected void EndTurn(){
         selectedShogiPiece = null;
@@ -276,10 +283,30 @@ public class BoardManager : MonoBehaviour
         if (CheckIfGameOver()){
             EndGame();
         }
+        else if (CheckForRepetitionDraw()){
+            EndGame("Repetition Draw");
+        }
         else if (!freeMove){
             ChangePlayer();
         }
     }
+
+    private bool CheckForRepetitionDraw()
+    {
+        for (int i = 0; i < gameStates.Count(); i++){
+            bool isEqual = gameStates[i].state.Rank == ShogiPieces.Rank &&
+                Enumerable.Range(0, gameStates[i].state.Rank).All(dimension => gameStates[i].state.GetLength(dimension) == ShogiPieces.GetLength(dimension)) &&
+                gameStates[i].state.Cast<ShogiPiece>().SequenceEqual(ShogiPieces.Cast<ShogiPiece>());
+            if (isEqual){
+                gameStates[i] = (ShogiPieces.Clone() as ShogiPiece[,], gameStates[i].repetitions + 1);
+                if (gameStates[i].repetitions >= 4) return true;
+                else return false;
+            } 
+        }
+        gameStates.Add((ShogiPieces.Clone() as ShogiPiece[,], 1));
+        return false;
+    }
+
     protected void ChangePlayer(){
         if (currentPlayer == player1){
             currentPlayer = player2;
@@ -291,15 +318,20 @@ public class BoardManager : MonoBehaviour
         }
     }
     public bool CheckIfGameOver(){
-        if (currentPlayer.isAttackingKing){
-            if (!opponentPlayer.hasPossibleMoves) return true;
-        }
+        if (!opponentPlayer.hasPossibleMoves) return true;
+        if (!currentPlayer.hasPossibleMoves) return true;
         return false;
     }
-    protected void EndGame(){
+    public virtual void EndGame(string message = "placeholder"){
         Debug.Log("Victory for " + currentPlayer.playerNumber);
         // Lock The game from being played further
-        GameUI.Instance.ShowEndScreen(currentPlayer.playerNumber);
+        if (message != "placeholder"){
+            GameUI.Instance.ShowEndScreen(message);
+        }
+        else{
+            if (!opponentPlayer.hasPossibleMoves) GameUI.Instance.ShowEndScreen(currentPlayer.playerNumber);
+            if (!currentPlayer.hasPossibleMoves) GameUI.Instance.ShowEndScreen(currentPlayer.playerNumber);
+        }
     }
     public void ResetGame(){
         DestroyAllPieces();
@@ -344,6 +376,9 @@ public class BoardManager : MonoBehaviour
         ShogiPieces[x, y].Promote();
 
         currentPlayer.CalculateAttackedTiles();
+        if (CheckIfGameOver()){
+            EndGame();
+        }
         opponentPlayer.CalculateAttackedTiles();
         if (CheckIfGameOver()){
             EndGame();
