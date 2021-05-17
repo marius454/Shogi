@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using C = Constants;
 using Y = PieceYValues;
@@ -31,5 +32,156 @@ public class King : ShogiPiece
     public override void Unpromote()
     {
         // King will never be promoted to be unpromoted
+    }
+
+    public override bool IsAttacked(){
+        bool[,] possibleLocations = new bool[C.numberRows, C.numberRows];
+        // bool result = false;
+        int a = 1;
+
+        // Mark all possible locations from where an enemy piece might attack and check if the the piece in that location has a move that can attack
+        if (player == PlayerNumber.Player1){
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardLeft, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardRight, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            DiagonalLine(possibleLocations, DirectionDiagonal.backLeft, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            DiagonalLine(possibleLocations, DirectionDiagonal.backRight, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.forward, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.left, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.right, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.back, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            // result = isAttacked;
+
+            for (int s = a; s >= -a; s--)
+                for (int t = a; t >= -a; t--){
+                    if (!(t == 0 && s == 0)){
+                        SingleMove(possibleLocations, CurrentX + t, CurrentY + s);
+                        if (CurrentX + t >= 0 && CurrentY + s >= 0 && CurrentX + t < C.numberRows && CurrentY + s < C.numberRows){
+                            if (CheckForAttacker(possibleLocations[CurrentX + t, CurrentY + s], board.ShogiPieces[CurrentX + t, CurrentY + s], t, s)){
+                                return true;
+                                // result = true;
+                                // attackers.Add(board.ShogiPieces[CurrentX + t, CurrentY + s]);
+                            }
+                        }
+                    }
+                }
+        }
+        else{
+            DiagonalLine(possibleLocations, DirectionDiagonal.backLeft, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            DiagonalLine(possibleLocations, DirectionDiagonal.backRight, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardLeft, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardRight, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.back, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.right, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.left, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.forward, true);
+            if (isAttacked) {isAttacked = false; return true;}
+            // result = isAttacked;
+
+            for (int s = -a; s <= a; s++)
+                for (int t = -a; t <= a; t++){
+                    if (!(t == 0 && s == 0)){
+                        SingleMove(possibleLocations, CurrentX + t, CurrentY + s);
+                        if (CurrentX + t >= 0 && CurrentY + s >= 0 && CurrentX + t < C.numberRows && CurrentY + s < C.numberRows){
+                            if (CheckForAttacker(possibleLocations[CurrentX + t, CurrentY + s], board.ShogiPieces[CurrentX + t, CurrentY + s], t, s)){
+                                return true;
+                                // result = true;
+                                // attackers.Add(board.ShogiPieces[CurrentX + t, CurrentY + s]);
+                            }
+                        }
+                    }
+                }
+        }
+        int y = 2;
+        if (player == PlayerNumber.Player2) y = -2;
+        if (CurrentX - 1 >= 0 && CurrentY + y >= 0 && CurrentX - 1 < C.numberRows && CurrentY + y < C.numberRows){
+            SingleMove(possibleLocations, CurrentX - 1, CurrentY + y);
+            if (CheckForAttacker(possibleLocations[CurrentX - 1, CurrentY + y], board.ShogiPieces[CurrentX - 1, CurrentY + y], -1, y)){
+                return true;
+                // result = true;
+                // attackers.Add(board.ShogiPieces[CurrentX - 1, CurrentY + y]);
+            }
+        }
+        if (CurrentX + 1 >= 0 && CurrentY + y >= 0 && CurrentX + 1 < C.numberRows && CurrentY + y < C.numberRows){
+        SingleMove(possibleLocations, CurrentX + 1, CurrentY + y);
+            if (CheckForAttacker(possibleLocations[CurrentX + 1, CurrentY + y], board.ShogiPieces[CurrentX + 1, CurrentY + y], 1, y)){
+                return true;
+                // result = true;
+                // attackers.Add(board.ShogiPieces[CurrentX + 1, CurrentY + y]);
+            }
+        }
+
+        // BoardHighlights.Instance.HighlightAllowedMoves(possibleLocations);
+
+        // foreach (ShogiPiece piece in attackers){
+        //     Debug.Log(piece + " " + piece.CurrentX + " " + piece.CurrentY);
+        // }
+
+        // return result;
+        return false;
+    }
+    private bool CheckForAttacker(bool isPossibleLocation, ShogiPiece piece, int t, int s){
+        if (!isPossibleLocation) return false;
+        if (piece == null) return false;
+
+        if (s != 2 && s != -2){
+            if ((piece.GetType() == typeof(Rook) && piece.isPromoted) 
+             || (piece.GetType() == typeof(Bishop) && piece.isPromoted)
+             || (piece.GetType() == typeof(King)))
+                return true;
+        }
+        if (player == PlayerNumber.Player2){
+            t = -t;
+            s = -s;
+        }
+        if ((t==-1 && s==1) || (t==1 && s==1)){
+            if ((piece.GetType() == typeof(Pawn) && piece.isPromoted) 
+                || (piece.GetType() == typeof(Knight) && piece.isPromoted)
+                || (piece.GetType() == typeof(Lance) && piece.isPromoted)
+                || (piece.GetType() == typeof(SilverGeneral))
+                || (piece.GetType() == typeof(GoldGeneral)))
+                    return true;
+        }
+        else if ((t==0 && s==1)){
+            if ((piece.GetType() == typeof(Pawn)) 
+                || (piece.GetType() == typeof(Knight) && piece.isPromoted)
+                || (piece.GetType() == typeof(Lance))
+                || (piece.GetType() == typeof(SilverGeneral))
+                || (piece.GetType() == typeof(GoldGeneral)))
+                    return true;
+        }
+        else if ((t==-1 && s==0) || (t==0 && s==-1) || (t==1 && s==0)){
+            if ((piece.GetType() == typeof(Pawn) && piece.isPromoted) 
+                || (piece.GetType() == typeof(Knight) && piece.isPromoted)
+                || (piece.GetType() == typeof(Lance) && piece.isPromoted)
+                || (piece.GetType() == typeof(SilverGeneral) && piece.isPromoted)
+                || (piece.GetType() == typeof(GoldGeneral)))
+                    return true;
+        }
+        else if ((t==-1 && s==-1) || (t==1 && s==-1)){
+            if (piece.GetType() == typeof(SilverGeneral) && !piece.isPromoted)
+                    return true;
+        }
+        else if ((t==-1 && s==2) || (t==1 && s==2)){
+            if (piece.GetType() == typeof(Knight) && !piece.isPromoted)
+                    return true;
+        }
+        return false;
     }
 }

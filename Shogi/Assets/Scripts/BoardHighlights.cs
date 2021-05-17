@@ -31,7 +31,7 @@ public class BoardHighlights : MonoBehaviour
     }
 
     public void HighlightAllowedMoves(bool[,] moves){
-        HideHighlights();
+        HideMoveHighlights();
         for (int x = 0; x < 9; x++){
             for (int y = 0; y < 9; y++){
                 if (moves[x, y]){
@@ -42,7 +42,7 @@ public class BoardHighlights : MonoBehaviour
             }
         }
     }
-    public void HideHighlights(){
+    public void HideMoveHighlights(){
         foreach (GameObject go in moveHighlights){
             go.SetActive(false);
         }

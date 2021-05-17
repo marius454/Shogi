@@ -39,7 +39,7 @@ public class MPBoardManager : BoardManager
             BoardHighlights.Instance.HighlightAllowedMoves(possibleMovesForSelectedPiece);
         }
         else {
-            BoardHighlights.Instance.HideHighlights();
+            BoardHighlights.Instance.HideMoveHighlights();
         }
     }
     public void SetupCamera(GameObject camera1, GameObject camera2){
@@ -55,7 +55,7 @@ public class MPBoardManager : BoardManager
                     SelectShogiPiece(selectionX, selectionY);
                 }else{
                     if (localPlayer.capturedPieces.Contains(pieceSelectedByPlayer)){
-                        DropShogiPiece(selectionX, selectionY); // still needs to be changed with RPC
+                        DropShogiPiece(selectionX, selectionY);
                     }
                     else{
                         MoveShogiPiece(selectionX, selectionY);
@@ -136,6 +136,13 @@ public class MPBoardManager : BoardManager
     private void RPC_SelectCapturedPiece(int x, int y)
     {
         OnCapturedPieceSelect(x, y);
+    }
+    protected override void OnCapturedPieceSelect(int x, int y)
+    {
+        base.OnCapturedPieceSelect(x, y);
+
+        player1.CheckIfKingIsBeingAttacked();
+        player2.CheckIfKingIsBeingAttacked();
     }
 
     protected override void DropShogiPiece(int x, int y)

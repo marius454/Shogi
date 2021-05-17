@@ -65,7 +65,11 @@ public class Pawn : ShogiPiece
                         }
                     }
                 }
-                // Can't drop a pawn in place that would cause checkmate
+            }
+        base.RemoveIllegalDrops(checkForSelfCheck);
+        // Can't drop a pawn in place that would cause checkmate
+        for (int x=0; x < C.numberRows; x++)
+            for (int y=0; y < C.numberRows; y++){
                 int pawnMove;
                 if (player == PlayerNumber.Player1 && drops[x, y]) pawnMove = 1;
                 else pawnMove = -1;
@@ -75,12 +79,12 @@ public class Pawn : ShogiPiece
                             drops[x, y] = false;
                         }
             }
-        base.RemoveIllegalDrops(checkForSelfCheck);
+        
     }
     private bool CheckIfDropWillCauseCheckmate(int x, int y){
-        bool wouldCauseCheckMate;
+        bool wouldCauseCheckMate = false;
 
-        // I forgot the reason, but it does not work with "this" but works with a new pawn object
+        //I forgot the reason, but it does not work with "this" but works with a new pawn object
         GameObject clone = Instantiate(board.piecePrefabs[(int)PieceType.pawn], board.GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
         board.ShogiPieces[x, y] = clone.GetComponent<ShogiPiece>();
         board.ShogiPieces[x, y].Init(x, y, player, board);
@@ -88,6 +92,11 @@ public class Pawn : ShogiPiece
         currentPlayer.AddPieceInPlay(clone.GetComponent<ShogiPiece>());
         currentPlayer.isAttackingKing = true;
         opponentPlayer.PlaceInCheck();
+
+        bool tempHasPossibleMoves = opponentPlayer.hasPossibleMoves;
+        bool[,] tempAttackedTile = opponentPlayer.attackedTiles.Clone() as bool[,];
+        int tempNrMoves = opponentPlayer.nrMoves;
+        bool tempIsAttackingKing = opponentPlayer.isAttackingKing;
         opponentPlayer.CalculateAttackedTiles(true, false);
 
         wouldCauseCheckMate = !opponentPlayer.hasPossibleMoves;
@@ -97,7 +106,8 @@ public class Pawn : ShogiPiece
         board.ShogiPieces[x, y] = null;
         Destroy (clone);
 
-        opponentPlayer.CalculateAttackedTiles(true, false);
+        // opponentPlayer.CalculateAttackedTiles(true, false);
+        opponentPlayer.RebuildAfterAttackedTileCalculation(tempHasPossibleMoves, tempAttackedTile, tempNrMoves, tempIsAttackingKing);
         return wouldCauseCheckMate;
     }
 }

@@ -11,6 +11,7 @@ public class ShogiPlayer
     public bool[,] attackedTiles{set;get;}
     public List<ShogiPiece> piecesInPlay{set;get;}
     public List<ShogiPiece> capturedPieces{set;get;}
+    private ShogiPiece king{set;get;}
     public CaptureBoard captureBoard{set;get;}
     public bool isInCheck{set; get;}
     public bool isAttackingKing{set; get;}
@@ -77,11 +78,22 @@ public class ShogiPlayer
             }
         isAttackingKing = false;
     }
+    public void RebuildAfterAttackedTileCalculation(bool hasPossibleMoves, bool[,] attackedTiles, int nrMoves, bool isAttackingKing){
+        this.hasPossibleMoves = hasPossibleMoves;
+        this.attackedTiles = attackedTiles.Clone() as bool[,];
+        this.nrMoves = nrMoves;
+        this.isAttackingKing = isAttackingKing;
+    }
+    public void CheckIfKingIsBeingAttacked(){
+        if (king.IsAttacked()) PlaceInCheck();
+        else RemoveCheck();
+    }
     public void InitializePiecesInPlay(){
         piecesInPlay = new List<ShogiPiece>();
         foreach (ShogiPiece piece in board.ShogiPieces){
             if (piece && piece.player == playerNumber){
                 piecesInPlay.Add(piece);
+                if (piece.GetType() == typeof(King)) king = piece;
             }
         }
     }
@@ -114,10 +126,11 @@ public class ShogiPlayer
         }
 	}
     public void PlaceInCheck(){
+        // Debug.Log("why");
         if (!isInCheck){
             isInCheck = true;
         }
-        ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
+        // ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
         BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
     }
     public void RemoveCheck(){
