@@ -10,6 +10,7 @@ public class BoardHighlights : MonoBehaviour
     private List<GameObject> allHighlights;
     private List<GameObject> moveHighlights;
     private GameObject checkHighlight;
+    private GameObject lastMoveHighlight;
     private GameObject selectionHighlight;
     private void Start() {
         Instance = this;
@@ -60,6 +61,22 @@ public class BoardHighlights : MonoBehaviour
         if (checkHighlight)
             if(checkHighlight.activeSelf)
                 checkHighlight.SetActive(false);
+    }
+
+    public void HighlightLastMove(int x, int y){
+        HideLastMoveHighlight();
+        if (!lastMoveHighlight){
+            lastMoveHighlight = Instantiate(highlightPrefab);
+            lastMoveHighlight.GetComponent<Renderer>().material.color = new Color(0f, 0.6f, 0f, 1f);
+            allHighlights.Add(lastMoveHighlight);
+        }
+        lastMoveHighlight.SetActive(true);
+        lastMoveHighlight.transform.position = new Vector3(x + C.tileOffset, 0, y + C.tileOffset);
+    }
+    public void HideLastMoveHighlight(){
+        if (lastMoveHighlight)
+            if(lastMoveHighlight.activeSelf)
+                lastMoveHighlight.SetActive(false);
     }
 
     public void HighlightSelection(int x, int y){

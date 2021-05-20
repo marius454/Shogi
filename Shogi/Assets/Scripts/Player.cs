@@ -11,18 +11,21 @@ public class ShogiPlayer
     public bool[,] attackedTiles{set;get;}
     public List<ShogiPiece> piecesInPlay{set;get;}
     public List<ShogiPiece> capturedPieces{set;get;}
-    private ShogiPiece king{set;get;}
+    public List<ShogiPiece> allPieces{set;get;}
+    public ShogiPiece king{set;get;}
     public CaptureBoard captureBoard{set;get;}
     public bool isInCheck{set; get;}
     public bool isAttackingKing{set; get;}
     public int nrOfChecksInARow{set; get;}
     // to set this check both attacked tiles and whether are legal drops available
     public bool hasPossibleMoves{set; get;}
+    public List<Move> possibleMoves {set; get;}
     public GameObject playerCamera{set; get;}
 
     public ShogiPlayer (PlayerNumber playerNumber, BoardManager board, CaptureBoard captureBoard){
         piecesInPlay = new List<ShogiPiece>();
         capturedPieces = new List<ShogiPiece>();
+        allPieces = new List<ShogiPiece>();
         attackedTiles = new bool[C.numberRows, C.numberRows];
         hasPossibleMoves = true;
         isAttackingKing = false;
@@ -32,8 +35,9 @@ public class ShogiPlayer
         this.board = board;
         this.playerNumber = playerNumber;
     }
-    public void CalculateAttackedTiles(bool checkForSelfCheck = true, bool checkDrops = true){
+    public void CalculatePossibleMoves(bool checkForSelfCheck = true, bool checkDrops = true){
         attackedTiles = new bool[C.numberRows, C.numberRows];
+        possibleMoves = new List<Move>();
         nrMoves = 0;
         foreach(ShogiPiece piece in piecesInPlay){
             bool[,] moves = piece.PossibleMoves(checkForSelfCheck); 
@@ -41,6 +45,11 @@ public class ShogiPlayer
                 for (int y=0; y < C.numberRows; y++){
                     if (moves[x,y]){
                         attackedTiles[x,y] = true;
+                        possibleMoves.Add(new Move{pieceX = piece.CurrentX, pieceY = piece.CurrentY, 
+                                        targetX = x, targetY = y, promote = false});
+                        if (piece.CheckIfCouldBePromoted(y))
+                            possibleMoves.Add(new Move{pieceX = piece.CurrentX, pieceY = piece.CurrentY, 
+                                                targetX = x, targetY = y, promote = true});
                         nrMoves++;
                     }
                 }
@@ -51,7 +60,8 @@ public class ShogiPlayer
             for (int x=0; x < C.numberRows; x++)
                 for (int y=0; y < C.numberRows; y++){
                     if (drops[x,y]){
-                        attackedTiles[x,y] = true;
+                        possibleMoves.Add(new Move{pieceX = piece.CurrentX, pieceY = piece.CurrentY, 
+                                            targetX = x, targetY = y, promote = false});
                         nrMoves++;
                     }
                 }
@@ -89,24 +99,39 @@ public class ShogiPlayer
         else RemoveCheck();
     }
     public void InitializePiecesInPlay(){
-        piecesInPlay = new List<ShogiPiece>();
+        allPieces.Clear(); // Needs to be done better so that InitializeCapturedPieces also gets this when needed
+        piecesInPlay.Clear();
         foreach (ShogiPiece piece in board.ShogiPieces){
             if (piece && piece.player == playerNumber){
                 piecesInPlay.Add(piece);
-                if (piece.GetType() == typeof(King)) king = piece;
+                allPieces.Add(piece);
+                if (piece is King) king = piece;
+            }
+        }
+    }
+    public void InitializeCapturedPieces(){
+        capturedPieces.Clear();
+        foreach (ShogiPiece piece in captureBoard.capturedPieces){
+            if (piece && piece.player == playerNumber){
+                capturedPieces.Add(piece);
+                allPieces.Add(piece);
             }
         }
     }
     public void AddPieceInPlay(ShogiPiece piece)
 	{
-		if (!piecesInPlay.Contains(piece)){}
-			piecesInPlay.Add(piece);
+		if (!piecesInPlay.Contains(piece)){
+            piecesInPlay.Add(piece);
+            allPieces.Add(piece);
+        }
 	}
 
 	public void RemovePieceInPlay(ShogiPiece piece)
 	{
-		if (piecesInPlay.Contains(piece))
-			piecesInPlay.Remove(piece);
+		if (piecesInPlay.Contains(piece)){
+            piecesInPlay.Remove(piece);
+            allPieces.Remove(piece);
+        }
 	}
     public void CapturePiece(ShogiPiece piece)
 	{
@@ -114,6 +139,7 @@ public class ShogiPlayer
             piece.player = this.playerNumber;
             piece.SetOpponents();
 			capturedPieces.Add(piece);
+            allPieces.Add(piece);
             captureBoard.AddPiece(piece);
         }
 	}
@@ -122,9 +148,15 @@ public class ShogiPlayer
 	{
 		if (capturedPieces.Contains(piece)){
             capturedPieces.Remove(piece);
+            allPieces.Remove(piece);
             captureBoard.DropCapturedPiece(piece);
         }
 	}
+    public void DestroyAllPieces(){
+        captureBoard.DestroyAllPieces();
+        piecesInPlay.Clear();
+        capturedPieces.Clear();
+    }
     public void PlaceInCheck(){
         // Debug.Log("why");
         if (!isInCheck){

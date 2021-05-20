@@ -5,7 +5,7 @@ using Y = PieceYValues;
 
 public class GoldGeneral : ShogiPiece
 {
-    public GoldGeneral(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
+    public GoldGeneral(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board) : base(x, y, player, pieceType, board){}
     protected override void SetNormalHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.GoldGeneral - 0.01f, gameObject.transform.position.z);
     }
@@ -16,12 +16,19 @@ public class GoldGeneral : ShogiPiece
         
         return moves;
     }
+    public override void CheckForPromotion(){
+        // Golden general cannot be promoted
+    }
     public override void Promote()
     {
         // Golden general cannot be promoted
     }
     public override void Unpromote()
     {
-        // King will never be promoted to be unpromoted
+        // Golden general will never be promoted to be unpromoted
+    }
+    public override bool CheckIfCouldBePromoted(int y){
+        // Golden general cannot be promoted
+        return false;
     }
 }

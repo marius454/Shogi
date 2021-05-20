@@ -1,4 +1,5 @@
 public enum PlayerNumber
 {
-    Player1, Player2
+    Player1, 
+    Player2,
 }

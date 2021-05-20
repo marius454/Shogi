@@ -12,7 +12,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     //     //Instance = this;
     // }
     // private void Awake(){
-    //     //PhotonNetwork.AutomaticallySyncScene = true;
+    //     PhotonNetwork.AutomaticallySyncScene = true;
     // }
     private void Update(){
         if (connectionAttempted){

@@ -114,6 +114,7 @@ public class MPBoardManager : BoardManager
                     SelectCapturedPiece(pieceSelectedByPlayer.CurrentX, pieceSelectedByPlayer.CurrentY);
             }
         }
+        Debug.Log("current player - " + currentPlayer.playerNumber + " local player - " + localPlayer.playerNumber);
     }
     protected override void SelectCapturedPiece(int x, int y){
         int i, j;
@@ -141,8 +142,8 @@ public class MPBoardManager : BoardManager
     {
         base.OnCapturedPieceSelect(x, y);
 
-        player1.CheckIfKingIsBeingAttacked();
-        player2.CheckIfKingIsBeingAttacked();
+        // player1.CheckIfKingIsBeingAttacked();
+        // player2.CheckIfKingIsBeingAttacked();
     }
 
     protected override void DropShogiPiece(int x, int y)
@@ -175,15 +176,29 @@ public class MPBoardManager : BoardManager
             return;
         }
 
-        if (!selectedShogiPiece.isPromoted && selectedShogiPiece.player == localPlayer.playerNumber){
-            if (localPlayer == player1){
-                if (selectedShogiPiece.CurrentY >= C.numberRows - 3)
-                    selectedShogiPiece.CheckForPromotion();
+        bool willCheckForPromotion = false;
+        if (!selectedShogiPiece.isPromoted){
+            if (currentPlayer == player1){
+                if (selectedShogiPiece.CurrentY >= C.numberRows - 3){
+                    if (!(selectedShogiPiece is King) && !(selectedShogiPiece is GoldGeneral))
+                        willCheckForPromotion = true;
+                    if (selectedShogiPiece.player == localPlayer.playerNumber)
+                        selectedShogiPiece.CheckForPromotion();
+                    else localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowOpponentPromotionMenu(selectedShogiPiece);
+                }
             }
             else{
-                if (selectedShogiPiece.CurrentY <= 2)
-                    selectedShogiPiece.CheckForPromotion();
+                if (selectedShogiPiece.CurrentY <= 2){
+                    if (!(selectedShogiPiece is King) && !(selectedShogiPiece is GoldGeneral))
+                        willCheckForPromotion = true;
+                    if (selectedShogiPiece.player == localPlayer.playerNumber)
+                        selectedShogiPiece.CheckForPromotion();
+                    else localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowOpponentPromotionMenu(selectedShogiPiece);
+                }
             }
+        }
+        if (!willCheckForPromotion){
+            EndTurn();
         }
     }
     public override void PromotePiece(ShogiPiece piece)
@@ -213,5 +228,15 @@ public class MPBoardManager : BoardManager
             else endMessage = "Defeat";
         }
         localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowEndScreen(endMessage);
+    }
+
+    public override void EndTurnAfterPromotion()
+    {
+        photonView.RPC(nameof(RPC_EndTurnAfterPromotion), RpcTarget.AllBuffered, new object[] {});
+    }
+    [PunRPC]
+    private void RPC_EndTurnAfterPromotion(){
+        localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().HidePromotionMenu();
+        OnTurnEnd();
     }
 }

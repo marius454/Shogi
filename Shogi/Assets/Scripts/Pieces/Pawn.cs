@@ -5,7 +5,7 @@ using Y = PieceYValues;
 
 public class Pawn : ShogiPiece
 {
-    public Pawn(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
+    public Pawn(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board) : base(x, y, player, pieceType, board){}
     protected override void SetNormalHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.Pawn - 0.01f, gameObject.transform.position.z);
     }
@@ -87,7 +87,7 @@ public class Pawn : ShogiPiece
         //I forgot the reason, but it does not work with "this" but works with a new pawn object
         GameObject clone = Instantiate(board.piecePrefabs[(int)PieceType.pawn], board.GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
         board.ShogiPieces[x, y] = clone.GetComponent<ShogiPiece>();
-        board.ShogiPieces[x, y].Init(x, y, player, board);
+        board.ShogiPieces[x, y].Init(x, y, player, PieceType.pawn, board);
 
         currentPlayer.AddPieceInPlay(clone.GetComponent<ShogiPiece>());
         currentPlayer.isAttackingKing = true;
@@ -97,7 +97,7 @@ public class Pawn : ShogiPiece
         bool[,] tempAttackedTile = opponentPlayer.attackedTiles.Clone() as bool[,];
         int tempNrMoves = opponentPlayer.nrMoves;
         bool tempIsAttackingKing = opponentPlayer.isAttackingKing;
-        opponentPlayer.CalculateAttackedTiles(true, false);
+        opponentPlayer.CalculatePossibleMoves(true, false);
 
         wouldCauseCheckMate = !opponentPlayer.hasPossibleMoves;
         currentPlayer.RemovePieceInPlay(clone.GetComponent<ShogiPiece>());
@@ -109,5 +109,40 @@ public class Pawn : ShogiPiece
         // opponentPlayer.CalculateAttackedTiles(true, false);
         opponentPlayer.RebuildAfterAttackedTileCalculation(tempHasPossibleMoves, tempAttackedTile, tempNrMoves, tempIsAttackingKing);
         return wouldCauseCheckMate;
+    }
+
+    public override void CheckForPromotion(){
+        if (!isPromoted){
+            if (player == PlayerNumber.Player1){
+                if (CurrentY >= C.numberRows - 1){
+                    board.PromotePiece(this);
+                    board.EndTurn();
+                } 
+                else GameUI.Instance.ShowPromotionMenu(this);
+            }
+            else{
+                if (CurrentY <= 0){
+                    board.PromotePiece(this);
+                    board.EndTurn();
+                } 
+                else GameUI.Instance.ShowPromotionMenu(this);
+            }
+        }
+    }
+    public override bool CheckIfCouldBePromoted(int y){
+        if (player == PlayerNumber.Player1){
+            if (y >= C.numberRows - 3) {
+                if (y >= C.numberRows - 1) return false;
+                return true;
+            }
+            return false;
+        }
+        else{
+            if (y <= 2) {
+                if (y <= 0) return false;
+                return true;
+            }
+            return false;
+        }
     }
 }

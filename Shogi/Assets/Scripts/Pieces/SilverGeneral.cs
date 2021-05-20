@@ -5,7 +5,7 @@ using Y = PieceYValues;
 
 public class SilverGeneral : ShogiPiece
 {
-    public SilverGeneral(int x, int y, PlayerNumber player, BoardManager board) : base(x, y, player, board){}
+    public SilverGeneral(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board) : base(x, y, player, pieceType, board){}
     protected override void SetNormalHeight(){
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.SilverGeneral - 0.01f, gameObject.transform.position.z);
     }

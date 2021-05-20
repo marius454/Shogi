@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject networkManager;
     [SerializeField] private GameObject singleplayerBoard;
     [SerializeField] private GameObject multiplayerBoard;
+    [SerializeField] private GameObject AIBoard;
     [SerializeField] private GameObject singleplayerCamera;
     [SerializeField] private GameObject player1Camera;
     [SerializeField] private GameObject player2Camera;
@@ -19,7 +20,7 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         // Make game cap out at 60 fps for less stress on the computer
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 5;
         Instance = this;
         gameStarted = false;
         singleplayerCamera.GetComponent<Camera>().enabled = true;
@@ -36,7 +37,7 @@ public class GameController : MonoBehaviour
     }
     public void StartSingleplayerGame(){
         singleplayerBoard.SetActive(true);
-        multiplayerBoard.SetActive(false);
+        //multiplayerBoard.SetActive(false);
         // SPBoardManager.Instance.InitializeGame();
         singleplayerBoard.transform.Find("ShogiBoard").GetComponent<SPBoardManager>().InitializeGame();
         gameStarted = true;
@@ -65,10 +66,11 @@ public class GameController : MonoBehaviour
         //MPBoardManager.Instance.SetupCamera(player1Camera, player2Camera);
     }
     public void StartAIGame(){
-        // TO DO
-    }
-    public void QuitGame(){
-        // TO DO
+        AIBoard.SetActive(true);
+        singleplayerBoard.SetActive(false);
+        AIBoard.transform.Find("ShogiBoard").GetComponent<AIBoardManager>().InitializeGame();
+        gameStarted = true;
+        SetupSinglePlayerCamera();
     }
     public void QuitMatch(){
         singleplayerBoard.SetActive(true);

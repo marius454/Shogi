@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
@@ -36,7 +37,9 @@ public class GameUI : MonoBehaviour
         ShowNetworkConnectionMenu();
     }
     public void SelectVsAIGame(){
-        // TO DO
+        HideMainMenu();
+        ShowIngameUI();
+        GameController.Instance.StartAIGame();
     }
     public void QuitGame(){
         Application.Quit();
@@ -74,16 +77,31 @@ public class GameUI : MonoBehaviour
     [SerializeField] private GameObject promotionMenu;
     private ShogiPiece tempPiece;
     public void ShowPromotionMenu(ShogiPiece piece){
+        // if (promotionMenu){
+        //     promotionMenu.SetActive(true);
+        //     GameObject promotionText = promotionMenu.transform.Find("PromotionText").gameObject;
+        //     promotionText.GetComponent<TextMeshProUGUI>().text = "Do you wish to promote this " + piece.GetType() + "?";
+        //     tempPiece = piece;
+        // }
+    }
+    public void ShowOpponentPromotionMenu(ShogiPiece piece){
         if (promotionMenu){
             promotionMenu.SetActive(true);
+            promotionMenu.GetComponent<Image>().enabled = false;
             GameObject promotionText = promotionMenu.transform.Find("PromotionText").gameObject;
-            promotionText.GetComponent<TextMeshProUGUI>().text = "Do you wish to promote this " + piece.GetType() + "?";
-            tempPiece = piece;
+            promotionText.GetComponent<TextMeshProUGUI>().text = "Opponent is deciding whether to promote their " + piece.GetType();
+            promotionMenu.transform.Find("PromoteButton").gameObject.SetActive(false);
+            promotionMenu.transform.Find("DontPromoteButton").gameObject.SetActive(false);
         }
     }
-    private void HidePromotionMenu(){
+    public void HidePromotionMenu(){
         if (promotionMenu)
             if (promotionMenu.activeSelf){
+                promotionMenu.GetComponent<Image>().enabled = true;
+                if (promotionMenu.transform.Find("PromoteButton").gameObject.activeSelf)
+                    promotionMenu.transform.Find("PromoteButton").gameObject.SetActive(true);
+                if (promotionMenu.transform.Find("DontPromoteButton").gameObject.activeSelf)
+                    promotionMenu.transform.Find("DontPromoteButton").gameObject.SetActive(true);
                 promotionMenu.SetActive(false);
             }
     }
@@ -91,10 +109,12 @@ public class GameUI : MonoBehaviour
         BoardManager.Instance.PromotePiece(tempPiece);
         HidePromotionMenu();
         tempPiece = null;
+        BoardManager.Instance.EndTurnAfterPromotion();
     }
     public void DontPromotePiece(){
         HidePromotionMenu();
         tempPiece = null;
+        BoardManager.Instance.EndTurnAfterPromotion();
     }
 
     #endregion

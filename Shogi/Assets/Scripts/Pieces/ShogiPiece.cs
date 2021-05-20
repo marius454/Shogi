@@ -5,9 +5,11 @@ using C = Constants;
 
 public abstract class ShogiPiece : MonoBehaviour
 {
+    public int id {set;get;}
     public int CurrentX {set;get;}
     public int CurrentY {set;get;}
     public PlayerNumber player{set;get;}
+    public PieceType pieceType{set;get;}
     public BoardManager board{set;get;}
     protected ShogiPlayer currentPlayer{set;get;}
     protected ShogiPlayer opponentPlayer{set;get;}
@@ -16,18 +18,22 @@ public abstract class ShogiPiece : MonoBehaviour
     public bool isPromoted{set;get;}
     public bool isAttacked = false;
 
-    public ShogiPiece(int x, int y, PlayerNumber player, BoardManager board){
-        Init(x, y, player, board);
+    public ShogiPiece(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board){
+        Init(x, y, player, pieceType, board);
     }
-    public void Init(int x, int y, PlayerNumber player, BoardManager board){
+    public void Init(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board){
         this.player = player;
+        this.pieceType = pieceType;
         this.board = board;
         this.isPromoted = false;
         SetXY(x, y);
-        SetHeight();
+        // SetHeight();
         SetNormalRotation();
         moves = new bool[C.numberRows, C.numberRows];
         SetOpponents();
+    }
+    public void SetID(int id){
+        this.id = id;
     }
     public void SetOpponents()
     {
@@ -43,6 +49,8 @@ public abstract class ShogiPiece : MonoBehaviour
     public void SetXY (int x, int y){
         CurrentX = x;
         CurrentY = y;
+        this.gameObject.transform.position = board.GetTileCenter(x, y);
+        SetHeight();
     }
     public void SetHeight(){
         if (isPromoted){
@@ -82,7 +90,13 @@ public abstract class ShogiPiece : MonoBehaviour
             this.gameObject.transform.rotation = rotation;
         }
     }
-
+    public void ChangeSides(){
+        if (player == PlayerNumber.Player1){
+            player = PlayerNumber.Player2;
+        }
+        else player = PlayerNumber.Player1;
+        SetOpponents();
+    }
     public virtual bool[,] PossibleMoves(bool checkForSelfCheck = true){
         moves = new bool[C.numberRows, C.numberRows];
         return moves;
@@ -303,7 +317,7 @@ public abstract class ShogiPiece : MonoBehaviour
         // currentPlayer.CalculateAttackedTiles(false, false);
         opponentPlayer.CheckIfKingIsBeingAttacked();
         if (currentPlayer.nrOfChecksInARow >= 3){
-            Debug.Log(currentPlayer.nrOfChecksInARow + " " + currentPlayer.isAttackingKing + " " + currentPlayer.playerNumber + " " + x + " " + y);
+            // Debug.Log(currentPlayer.nrOfChecksInARow + " " + currentPlayer.isAttackingKing + " " + currentPlayer.playerNumber + " " + x + " " + y);
             if(opponentPlayer.isInCheck)
                 wouldCauseSelfCheck = true;
         }
@@ -332,22 +346,20 @@ public abstract class ShogiPiece : MonoBehaviour
     }
 
     public virtual void CheckForPromotion(){
-        if (player == PlayerNumber.Player1){
-            if (board.selectedShogiPiece.CurrentY >= C.numberRows - 1)
-                board.PromotePiece(this);
-            else {
-                if (board.player1.playerCamera)
-                    board.player1.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowPromotionMenu(this);
-                else GameUI.Instance.ShowPromotionMenu(this);
+        if (!isPromoted){
+            if (player == PlayerNumber.Player1){
+                if (CurrentY >= C.numberRows - 3) {
+                    if (board.player1.playerCamera)
+                        board.player1.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowPromotionMenu(this);
+                    else GameUI.Instance.ShowPromotionMenu(this);
+                }
             }
-        }
-        else{
-            if (board.selectedShogiPiece.CurrentY == 0)
-                board.PromotePiece(this);
-            else {
-                if (board.player2.playerCamera)
-                    board.player2.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowPromotionMenu(this);
-                else GameUI.Instance.ShowPromotionMenu(this);
+            else{
+                if (CurrentY <= 2) {
+                    if (board.player2.playerCamera)
+                        board.player2.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowPromotionMenu(this);
+                    else GameUI.Instance.ShowPromotionMenu(this);
+                }
             }
         }
     }
@@ -364,5 +376,19 @@ public abstract class ShogiPiece : MonoBehaviour
     public virtual bool IsAttacked(){
         // only applicable to king piece
         return false;
+    }
+    public virtual bool CheckIfCouldBePromoted(int y){
+        if (player == PlayerNumber.Player1){
+            if (y >= C.numberRows - 3) {
+                return true;
+            }
+            return false;
+        }
+        else{
+            if (y <= 2) {
+                return true;
+            }
+            return false;
+        }
     }
 }
