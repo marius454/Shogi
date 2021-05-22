@@ -71,7 +71,7 @@ public class MPBoardManager : BoardManager
             }
         }
     }
-    protected override void SelectShogiPiece(int x, int y){
+    protected override void SelectShogiPiece(int x, int y, bool isSimulated = false){
         if (ShogiPieces[x, y] == null)
             return;
         if (ShogiPieces[x, y].player != localPlayer.playerNumber)
@@ -90,18 +90,18 @@ public class MPBoardManager : BoardManager
         OnShogiPieceSelect(x, y);
     }
 
-    protected override void MoveShogiPiece(int x, int y)
+    protected override void MoveShogiPiece(int x, int y, bool isSimulated = false)
     {
         pieceSelectedByPlayer = null;
         if (currentPlayer != localPlayer) return;
-        photonView.RPC(nameof(RPC_MoveShogiPiece), RpcTarget.AllBuffered, new object[] { x, y });
+        photonView.RPC(nameof(RPC_MoveShogiPiece), RpcTarget.All, new object[] { x, y });
     }
     [PunRPC]
     private void RPC_MoveShogiPiece(int x, int y)
     {
         OnShogiPieceMove(x, y);
     }
-    protected override void OnShogiPieceMove(int x, int y)
+    protected override void OnShogiPieceMove(int x, int y, bool isSimulated = false)
     {
         base.OnShogiPieceMove(x, y);
         if (pieceSelectedByPlayer){
@@ -114,7 +114,7 @@ public class MPBoardManager : BoardManager
                     SelectCapturedPiece(pieceSelectedByPlayer.CurrentX, pieceSelectedByPlayer.CurrentY);
             }
         }
-        Debug.Log("current player - " + currentPlayer.playerNumber + " local player - " + localPlayer.playerNumber);
+        // Debug.Log("current player - " + currentPlayer.playerNumber + " local player - " + localPlayer.playerNumber);
     }
     protected override void SelectCapturedPiece(int x, int y){
         int i, j;
@@ -146,7 +146,7 @@ public class MPBoardManager : BoardManager
         // player2.CheckIfKingIsBeingAttacked();
     }
 
-    protected override void DropShogiPiece(int x, int y)
+    protected override void DropShogiPiece(int x, int y, bool isSimulated = false)
     {
         pieceSelectedByPlayer = null;
         if (currentPlayer != localPlayer) return;
@@ -157,7 +157,7 @@ public class MPBoardManager : BoardManager
     {
         OnShogiPieceDrop(x, y);
     }
-    protected override void OnShogiPieceDrop(int x, int y)
+    protected override void OnShogiPieceDrop(int x, int y, bool isSimulated = false)
     {
         base.OnShogiPieceDrop(x, y);
         if (pieceSelectedByPlayer){
@@ -171,7 +171,7 @@ public class MPBoardManager : BoardManager
             }
         }
     }
-    protected override void CheckForPromotion(){
+    protected override void CheckForPromotion(bool isSimulated = false){
         if (CheckIfGameOver()){
             return;
         }
@@ -201,7 +201,7 @@ public class MPBoardManager : BoardManager
             EndTurn();
         }
     }
-    public override void PromotePiece(ShogiPiece piece)
+    public override void PromotePiece(ShogiPiece piece, bool isSimulated)
     {
         int x, y;
         x = piece.CurrentX;

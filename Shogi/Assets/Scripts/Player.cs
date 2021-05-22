@@ -46,10 +46,10 @@ public class ShogiPlayer
                     if (moves[x,y]){
                         attackedTiles[x,y] = true;
                         possibleMoves.Add(new Move{pieceX = piece.CurrentX, pieceY = piece.CurrentY, 
-                                        targetX = x, targetY = y, promote = false});
+                                targetX = x, targetY = y, promote = false});
                         if (piece.CheckIfCouldBePromoted(y))
                             possibleMoves.Add(new Move{pieceX = piece.CurrentX, pieceY = piece.CurrentY, 
-                                                targetX = x, targetY = y, promote = true});
+                                targetX = x, targetY = y, promote = true});
                         nrMoves++;
                     }
                 }
@@ -133,14 +133,14 @@ public class ShogiPlayer
             allPieces.Remove(piece);
         }
 	}
-    public void CapturePiece(ShogiPiece piece)
+    public void CapturePiece(ShogiPiece piece, bool isSimulated = false)
 	{
 		if (!capturedPieces.Contains(piece)){
             piece.player = this.playerNumber;
             piece.SetOpponents();
 			capturedPieces.Add(piece);
             allPieces.Add(piece);
-            captureBoard.AddPiece(piece);
+            captureBoard.AddPiece(piece, isSimulated);
         }
 	}
 
@@ -158,17 +158,15 @@ public class ShogiPlayer
         capturedPieces.Clear();
     }
     public void PlaceInCheck(){
-        // Debug.Log("why");
         if (!isInCheck){
             isInCheck = true;
         }
-        // ShogiPiece king = piecesInPlay.Find(g=> g.GetType() == typeof(King));
-        BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
+        // BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
     }
     public void RemoveCheck(){
         if (isInCheck){
             isInCheck = false;
-            BoardHighlights.Instance.HideCheckHighlight();
+            // BoardHighlights.Instance.HideCheckHighlight();
         }
     }
     #region Multiplayer

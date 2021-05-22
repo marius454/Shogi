@@ -6,14 +6,7 @@ using Photon.Realtime;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    //public static NetworkManager Instance {set; get;}
     private bool connectionAttempted = false;
-    // private void Start(){
-    //     //Instance = this;
-    // }
-    // private void Awake(){
-    //     PhotonNetwork.AutomaticallySyncScene = true;
-    // }
     private void Update(){
         if (connectionAttempted){
             GameUI.Instance.SetNetworkText(PhotonNetwork.NetworkClientState.ToString());
@@ -38,7 +31,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
     
 
-    #region Photon Callbacks
+    
     public override void OnConnectedToMaster()
     {
         Debug.LogError("Connected to the server looking for random match");
@@ -72,6 +65,4 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (BoardManager.Instance)
             BoardManager.Instance.EndGame("Victory by resignation");
     }
-
-    #endregion
 }

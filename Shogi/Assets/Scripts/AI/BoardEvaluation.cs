@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using C = Constants;
+using System.Threading.Tasks;
 
 public static class BoardEvaluation
 {
@@ -22,8 +23,9 @@ public static class BoardEvaluation
     private const float baseKingProtectedTileValue = 2f;
     #endregion
 
-    private static List<List<BoardState>> boardStates;
-    
+    public static List<List<BoardState>> boardStates;
+    private static int selectedDebth;
+
 
     private static void SaveState(AIBoardManager board, int currentDebth){
         boardStates[currentDebth].Add(new BoardState(board));
@@ -135,7 +137,6 @@ public static class BoardEvaluation
                             score += baseKingProtectedTileValue;
                     }
             }
-
         return score;
     }
     private static bool[,] GetAttacketTiles(ShogiPlayer player, bool includeKing = true){
@@ -153,46 +154,67 @@ public static class BoardEvaluation
         return attackedTiles;
     }
 
-    public static Move MiniMax(AIBoardManager board, ShogiPlayer player){
-        // Put board in a certain possition then evaluate that position
-        float currentScore = EvaluatePosition(board, player);
-        float tempScore = currentScore;
-        float maxScore = -100000f;
-
-        Move bestMove = board.RandomMove(board.AIPlayer);
-        Move tempMove = new Move{pieceX = 0, pieceY = 0, targetX = 0, targetY = 0, promote = false};
-
-        // This will have to be done every time start testing a new possible move
+    public static Move GetAIMove(int debth, bool maximizing, AIBoardManager board, ShogiPlayer player){
+        selectedDebth = debth;
+        
         boardStates = new List<List<BoardState>>();
-        // This will have to be done every time we go deeper into the tree
-        boardStates.Add(new List<BoardState>());
-        // This will have to be done every time a move in the current debth is done
+        for (int i = 0; i < debth; i++){
+            boardStates.Add(new List<BoardState>());
+        }
+        SimulatedBoard simBoard = new SimulatedBoard(board);
+        List<Move> simulatedMoves = simBoard.GetAllMoves(player.playerNumber);
         SaveState(board, 0);
-
-        List<Move> possibleMoves = player.possibleMoves;
-        // foreach ((int pieceX, int pieceY, int targetX, int targetY, bool promote) move in player.possibleMoves){
-        //     possibleMoves.Add((move.pieceX, move.pieceY, move.targetX, move.targetY, move.promote));
-        // }
-
-        foreach (Move move in possibleMoves){
-            board.DoMove(move);
-            tempScore = EvaluatePosition(board, player);
-            if (tempScore > maxScore){
-                    maxScore = tempScore;
-                    tempMove = move;
-                }
-            board.RestoreGameState(boardStates[0][boardStates[0].Count - 1]);
-        }
-        if (maxScore > currentScore){
-            bestMove = tempMove;
-        }
+        Move bestMove = MiniMax(debth, maximizing, board, player);
 
         return bestMove;
+    }
 
-        // bool tempHasPossibleMoves = player.hasPossibleMoves;
-        // bool[,] tempAttackedTile = player.attackedTiles.Clone() as bool[,];
-        // int tempNrMoves = player.nrMoves;
-        // bool tempIsAttackingKing = player.isAttackingKing;
-        //player.CalculatePossibleMoves(true, false);
+    public static Move MiniMax(int debth, bool maximize, AIBoardManager board, ShogiPlayer player){
+        if (board.gameOver){
+            board.AiThread.Abort();
+        }
+        float currentScore;
+        currentScore = EvaluatePosition(board, player);
+        
+        if (debth == 0) return new Move{pieceX = -1, pieceY = -1, targetX = -1, targetY = -1, promote = false, score = currentScore};
+
+        float tempScore = currentScore;
+        Move bestMove = board.RandomMove(player);
+        player.CalculatePossibleMoves();
+        List<Move> possibleMoves = player.possibleMoves;
+       
+
+        Debug.Log("AI debth " + debth);
+
+        if (maximize){
+            float maxScore = -100000f;
+            foreach (Move move in possibleMoves){
+                board.DoMove(move, true);
+                if (debth > 1) SaveState(board, selectedDebth - debth + 1);
+                tempScore = MiniMax(debth-1, false, board, player).score;
+                board.RestoreGameState(boardStates[selectedDebth - debth][boardStates[selectedDebth - debth].Count - 1], false);
+                if (tempScore > maxScore){
+                    maxScore = tempScore;
+                    bestMove = move;
+                }
+            }
+            bestMove.score = maxScore;
+            return bestMove;
+        }
+        else{
+            float minScore = 100000f;
+            foreach (Move move in possibleMoves){
+                board.DoMove(move, true);
+                if (debth > 1) SaveState(board, selectedDebth - debth + 1);
+                tempScore = MiniMax(debth-1, false, board, player).score;
+                board.RestoreGameState(boardStates[selectedDebth - debth][boardStates[selectedDebth - debth].Count - 1], false);
+                if (tempScore < minScore){
+                    minScore = tempScore;
+                    bestMove = move;
+                }
+            }
+            bestMove.score = minScore;
+            return bestMove;
+        }
     }
 }

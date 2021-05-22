@@ -7,7 +7,7 @@ public class SPBoardManager : BoardManager
     private void Awake(){
         Instance = this;
     }
-    protected override void SelectShogiPiece(int x, int y){
+    protected override void SelectShogiPiece(int x, int y, bool isSimulated = false){
         if (ShogiPieces[x, y] == null)
             return;
         if (ShogiPieces[x, y].player != currentPlayer.playerNumber && !freeMove)

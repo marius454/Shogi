@@ -40,7 +40,6 @@ public class SilverGeneral : ShogiPiece
             GoldMove();
         }
         
-
         moves = RemoveIllegalMoves(moves, checkForSelfCheck);
         return moves;
     }

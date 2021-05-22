@@ -28,11 +28,11 @@ public class King : ShogiPiece
     public override void CheckForPromotion(){
         // King cannot be promoted
     }
-    public override void Promote()
+    public override void Promote(bool changePosition = true)
     {
         // King cannot be promoted
     }
-    public override void Unpromote()
+    public override void Unpromote(bool changePosition = true)
     {
         // King will never be promoted to be unpromoted
     }
@@ -43,7 +43,6 @@ public class King : ShogiPiece
 
     public override bool IsAttacked(){
         bool[,] possibleLocations = new bool[C.numberRows, C.numberRows];
-        // bool result = false;
         int a = 1;
 
         // Mark all possible locations from where an enemy piece might attack and check if the the piece in that location has a move that can attack
@@ -65,7 +64,6 @@ public class King : ShogiPiece
             if (isAttacked) {isAttacked = false; return true;}
             OrthagonalLine(possibleLocations, DirectionOrthagonal.back, true);
             if (isAttacked) {isAttacked = false; return true;}
-            // result = isAttacked;
 
             for (int s = a; s >= -a; s--)
                 for (int t = a; t >= -a; t--){
@@ -74,8 +72,6 @@ public class King : ShogiPiece
                         if (CurrentX + t >= 0 && CurrentY + s >= 0 && CurrentX + t < C.numberRows && CurrentY + s < C.numberRows){
                             if (CheckForAttacker(possibleLocations[CurrentX + t, CurrentY + s], board.ShogiPieces[CurrentX + t, CurrentY + s], t, s)){
                                 return true;
-                                // result = true;
-                                // attackers.Add(board.ShogiPieces[CurrentX + t, CurrentY + s]);
                             }
                         }
                     }
@@ -99,7 +95,6 @@ public class King : ShogiPiece
             if (isAttacked) {isAttacked = false; return true;}
             OrthagonalLine(possibleLocations, DirectionOrthagonal.forward, true);
             if (isAttacked) {isAttacked = false; return true;}
-            // result = isAttacked;
 
             for (int s = -a; s <= a; s++)
                 for (int t = -a; t <= a; t++){
@@ -108,8 +103,6 @@ public class King : ShogiPiece
                         if (CurrentX + t >= 0 && CurrentY + s >= 0 && CurrentX + t < C.numberRows && CurrentY + s < C.numberRows){
                             if (CheckForAttacker(possibleLocations[CurrentX + t, CurrentY + s], board.ShogiPieces[CurrentX + t, CurrentY + s], t, s)){
                                 return true;
-                                // result = true;
-                                // attackers.Add(board.ShogiPieces[CurrentX + t, CurrentY + s]);
                             }
                         }
                     }
@@ -121,26 +114,14 @@ public class King : ShogiPiece
             SingleMove(possibleLocations, CurrentX - 1, CurrentY + y);
             if (CheckForAttacker(possibleLocations[CurrentX - 1, CurrentY + y], board.ShogiPieces[CurrentX - 1, CurrentY + y], -1, y)){
                 return true;
-                // result = true;
-                // attackers.Add(board.ShogiPieces[CurrentX - 1, CurrentY + y]);
             }
         }
         if (CurrentX + 1 >= 0 && CurrentY + y >= 0 && CurrentX + 1 < C.numberRows && CurrentY + y < C.numberRows){
-        SingleMove(possibleLocations, CurrentX + 1, CurrentY + y);
+            SingleMove(possibleLocations, CurrentX + 1, CurrentY + y);
             if (CheckForAttacker(possibleLocations[CurrentX + 1, CurrentY + y], board.ShogiPieces[CurrentX + 1, CurrentY + y], 1, y)){
                 return true;
-                // result = true;
-                // attackers.Add(board.ShogiPieces[CurrentX + 1, CurrentY + y]);
             }
         }
-
-        // BoardHighlights.Instance.HighlightAllowedMoves(possibleLocations);
-
-        // foreach (ShogiPiece piece in attackers){
-        //     Debug.Log(piece + " " + piece.CurrentX + " " + piece.CurrentY);
-        // }
-
-        // return result;
         return false;
     }
     private bool CheckForAttacker(bool isPossibleLocation, ShogiPiece piece, int t, int s){

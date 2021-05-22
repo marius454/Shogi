@@ -19,11 +19,11 @@ public class GoldGeneral : ShogiPiece
     public override void CheckForPromotion(){
         // Golden general cannot be promoted
     }
-    public override void Promote()
+    public override void Promote(bool changePosition = true)
     {
         // Golden general cannot be promoted
     }
-    public override void Unpromote()
+    public override void Unpromote(bool changePosition = true)
     {
         // Golden general will never be promoted to be unpromoted
     }

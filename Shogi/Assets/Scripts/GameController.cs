@@ -20,7 +20,7 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         // Make game cap out at 60 fps for less stress on the computer
-        Application.targetFrameRate = 5;
+        Application.targetFrameRate = 60;
         Instance = this;
         gameStarted = false;
         singleplayerCamera.GetComponent<Camera>().enabled = true;

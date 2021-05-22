@@ -82,20 +82,24 @@ public class CaptureBoard : MonoBehaviour
         return (x, y);
     }
     
-    public void AddPiece(ShogiPiece piece){
+    public void AddPiece(ShogiPiece piece, bool isSimulated = false){
         // If needed, switching x and y places is exceptable depending on the order that is wanted for incoming captures
         for (int y=0; y < C.captureNumberRows; y++)
             for (int x=0; x < C.captureNumberColumns; x++){
                 if (capturedPieces[x, y] == null){
-                    if (player == PlayerNumber.Player1){
+                    if (!isSimulated){
+                        if (player == PlayerNumber.Player1){
                         piece.transform.position = GetTileCenter (minX + x, maxY - y);
-                        piece.SetXY(minX + x, maxY - y);
+                        piece.SetXY(minX + x, maxY - y, false);
+                        }
+                        else {
+                            piece.transform.position = GetTileCenter (maxX - x, minY + y);
+                            piece.SetXY(maxX - x, minY + y, false);
+                        }
+                        piece.Unpromote();
                     }
-                    else {
-                        piece.transform.position = GetTileCenter (maxX - x, minY + y);
-                        piece.SetXY(maxX - x, minY + y);
-                    }
-                    piece.Unpromote();
+                    else piece.Unpromote(false);
+                    
                     capturedPieces[x, y] = piece;
                     return;
                 }

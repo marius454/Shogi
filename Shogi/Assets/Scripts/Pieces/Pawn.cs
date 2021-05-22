@@ -79,7 +79,6 @@ public class Pawn : ShogiPiece
                             drops[x, y] = false;
                         }
             }
-        
     }
     private bool CheckIfDropWillCauseCheckmate(int x, int y){
         bool wouldCauseCheckMate = false;

@@ -21,14 +21,14 @@ public abstract class ShogiPiece : MonoBehaviour
     public ShogiPiece(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board){
         Init(x, y, player, pieceType, board);
     }
-    public void Init(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board){
+    public void Init(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board, bool changePosition = true){
         this.player = player;
         this.pieceType = pieceType;
         this.board = board;
         this.isPromoted = false;
-        SetXY(x, y);
+        SetXY(x, y, changePosition);
         // SetHeight();
-        SetNormalRotation();
+        if (changePosition) SetNormalRotation();
         moves = new bool[C.numberRows, C.numberRows];
         SetOpponents();
     }
@@ -46,11 +46,13 @@ public abstract class ShogiPiece : MonoBehaviour
             opponentPlayer = board.player1;
         }
     }
-    public void SetXY (int x, int y){
+    public void SetXY (int x, int y, bool changePosition = true){
         CurrentX = x;
         CurrentY = y;
-        this.gameObject.transform.position = board.GetTileCenter(x, y);
-        SetHeight();
+        if (changePosition){
+            this.gameObject.transform.position = board.GetTileCenter(x, y);
+            SetHeight();
+        }
     }
     public void SetHeight(){
         if (isPromoted){
@@ -283,13 +285,13 @@ public abstract class ShogiPiece : MonoBehaviour
         int tempX, tempY;
         tempX = CurrentX;
         tempY = CurrentY;
-        this.SetXY(x, y);
+        this.SetXY(x, y, false);
 
         currentPlayer.CheckIfKingIsBeingAttacked();
         wouldCauseSelfCheck = currentPlayer.isInCheck;
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
 
-        this.SetXY(tempX, tempY);
+        this.SetXY(tempX, tempY, false);
         if (tempCapture){
             board.ShogiPieces[x, y] = tempCapture;
         }
@@ -312,7 +314,7 @@ public abstract class ShogiPiece : MonoBehaviour
         board.ShogiPieces[x, y] = this;
         int tempX = CurrentX;
         int tempY = CurrentY;
-        this.SetXY(x, y);
+        this.SetXY(x, y, false);
 
         // currentPlayer.CalculateAttackedTiles(false, false);
         opponentPlayer.CheckIfKingIsBeingAttacked();
@@ -323,7 +325,7 @@ public abstract class ShogiPiece : MonoBehaviour
         }
 
         board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
-        this.SetXY(tempX, tempY);
+        this.SetXY(tempX, tempY, false);
         if (tempCapture){
             board.ShogiPieces[x, y] = tempCapture;
             // opponentPlayer.AddPieceInPlay(tempCapture);
@@ -363,15 +365,19 @@ public abstract class ShogiPiece : MonoBehaviour
             }
         }
     }
-    public virtual void Promote(){
+    public virtual void Promote(bool changePosition = true){
         isPromoted = true;
-        SetHeight();
-        SetRotation();
+        if (changePosition){
+            SetHeight();
+            SetRotation();
+        }
     }
-    public virtual void Unpromote(){
+    public virtual void Unpromote(bool changePosition = true){
         isPromoted = false;
-        SetHeight();
-        SetRotation();
+        if (changePosition){
+            SetHeight();
+            SetRotation();
+        }
     }
     public virtual bool IsAttacked(){
         // only applicable to king piece
