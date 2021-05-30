@@ -77,12 +77,12 @@ public class GameUI : MonoBehaviour
     [SerializeField] private GameObject promotionMenu;
     private ShogiPiece tempPiece;
     public void ShowPromotionMenu(ShogiPiece piece){
-        // if (promotionMenu){
-        //     promotionMenu.SetActive(true);
-        //     GameObject promotionText = promotionMenu.transform.Find("PromotionText").gameObject;
-        //     promotionText.GetComponent<TextMeshProUGUI>().text = "Do you wish to promote this " + piece.GetType() + "?";
-        //     tempPiece = piece;
-        // }
+        if (promotionMenu){
+            promotionMenu.SetActive(true);
+            GameObject promotionText = promotionMenu.transform.Find("PromotionText").gameObject;
+            promotionText.GetComponent<TextMeshProUGUI>().text = "Do you wish to promote this " + piece.GetType() + "?";
+            tempPiece = piece;
+        }
     }
     public void ShowOpponentPromotionMenu(ShogiPiece piece){
         if (promotionMenu){

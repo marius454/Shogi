@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,22 +15,26 @@ public class Rook : ShogiPiece
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedRook - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
-        moves = new bool[C.numberRows,C.numberRows];
+        Array.Clear(moves, 0, C.numberRows*C.numberRows);
+        int x = CurrentX;
+        int y = CurrentY;
+        PlayerNumber currentPlayer = player;
+        BoardManager localBoard = board;
 
         // Right
-        OrthagonalLine(moves, DirectionOrthagonal.right);
+        OrthagonalLine(moves, DirectionOrthagonal.right, currentPlayer, localBoard, x, y);
         // Left
-        OrthagonalLine(moves, DirectionOrthagonal.left);
+        OrthagonalLine(moves, DirectionOrthagonal.left, currentPlayer, localBoard, x, y);
         // Forwards
-        OrthagonalLine(moves, DirectionOrthagonal.forward);
+        OrthagonalLine(moves, DirectionOrthagonal.forward, currentPlayer, localBoard, x, y);
         // Backwards
-        OrthagonalLine(moves, DirectionOrthagonal.back);
+        OrthagonalLine(moves, DirectionOrthagonal.back, currentPlayer, localBoard, x, y);
         
         if (isPromoted){
-            SingleMove(moves, CurrentX + 1, CurrentY + 1);
-            SingleMove(moves, CurrentX - 1, CurrentY + 1);
-            SingleMove(moves, CurrentX + 1, CurrentY - 1);
-            SingleMove(moves, CurrentX - 1, CurrentY - 1);
+            SingleMove(moves, x + 1, y + 1, currentPlayer, localBoard);
+            SingleMove(moves, x - 1, y + 1, currentPlayer, localBoard);
+            SingleMove(moves, x + 1, y - 1, currentPlayer, localBoard);
+            SingleMove(moves, x - 1, y - 1, currentPlayer, localBoard);
         }
 
         moves = RemoveIllegalMoves(moves, checkForSelfCheck);

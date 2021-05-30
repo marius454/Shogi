@@ -86,7 +86,7 @@ public class CaptureBoard : MonoBehaviour
         // If needed, switching x and y places is exceptable depending on the order that is wanted for incoming captures
         for (int y=0; y < C.captureNumberRows; y++)
             for (int x=0; x < C.captureNumberColumns; x++){
-                if (capturedPieces[x, y] == null){
+                if (!capturedPieces[x, y]){
                     if (!isSimulated){
                         if (player == PlayerNumber.Player1){
                         piece.transform.position = GetTileCenter (minX + x, maxY - y);

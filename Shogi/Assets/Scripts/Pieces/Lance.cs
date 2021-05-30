@@ -13,13 +13,17 @@ public class Lance : ShogiPiece
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedLance - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
-        moves = new bool[C.numberRows,C.numberRows];
+        Array.Clear(moves, 0, C.numberRows*C.numberRows);
+        int x = CurrentX;
+        int y = CurrentY;
+        PlayerNumber currentPlayer = player;
+        BoardManager localBoard = board;
 
         if (!isPromoted){
             if (player == PlayerNumber.Player1)
-                OrthagonalLine(moves, DirectionOrthagonal.forward);
+                OrthagonalLine(moves, DirectionOrthagonal.forward, currentPlayer, localBoard, x, y);
             else if (player == PlayerNumber.Player2) 
-                OrthagonalLine(moves, DirectionOrthagonal.back);
+                OrthagonalLine(moves, DirectionOrthagonal.back, currentPlayer, localBoard, x, y);
             else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         }
         else{

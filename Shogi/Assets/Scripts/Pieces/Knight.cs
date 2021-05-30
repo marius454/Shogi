@@ -13,16 +13,20 @@ public class Knight : ShogiPiece
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedKnight - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
-        moves = new bool[C.numberRows,C.numberRows];
+        Array.Clear(moves, 0, C.numberRows*C.numberRows);
+        int x = CurrentX;
+        int y = CurrentY;
+        PlayerNumber currentPlayer = player;
+        BoardManager localBoard = board;
 
         if (!isPromoted){
             if (player == PlayerNumber.Player1){
-                SingleMove(moves, CurrentX + 1, CurrentY + 2);
-                SingleMove(moves, CurrentX - 1, CurrentY + 2);
+                SingleMove(moves, x + 1, y + 2, currentPlayer, localBoard);
+                SingleMove(moves, x - 1, y + 2, currentPlayer, localBoard);
             }
             else if (player == PlayerNumber.Player2) {
-                SingleMove(moves, CurrentX + 1, CurrentY - 2);
-                SingleMove(moves, CurrentX - 1, CurrentY - 2);
+                SingleMove(moves, x + 1, y - 2, currentPlayer, localBoard);
+                SingleMove(moves, x - 1, y - 2, currentPlayer, localBoard);
             }
             else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         }

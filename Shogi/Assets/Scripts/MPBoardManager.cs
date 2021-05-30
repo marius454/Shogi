@@ -15,6 +15,7 @@ public class MPBoardManager : BoardManager
     public bool[,] possibleMovesForSelectedPiece{set; get;}
     // private bool[,] possibleDropsForSelectedPiece{set; get;}
     private void Awake(){
+        checkForPerpetualCheck = true;
         possibleMovesForSelectedPiece = new bool[C.numberRows, C.numberRows];
         photonView = GetComponent<PhotonView>();
         InitializeGame();
@@ -51,7 +52,7 @@ public class MPBoardManager : BoardManager
     protected override void ComputeMouseClick(){
         if (Input.GetMouseButtonDown (0) && !EventSystem.current.IsPointerOverGameObject()){
             if (selectionX >= 0 && selectionY >= 0 && selectionX <= C.numberRows && selectionY <= C.numberRows){
-                if (pieceSelectedByPlayer == null || (ShogiPieces[selectionX, selectionY] != null && ShogiPieces[selectionX, selectionY].player == localPlayer.playerNumber && !freeMove)){
+                if (!pieceSelectedByPlayer || (ShogiPieces[selectionX, selectionY] && ShogiPieces[selectionX, selectionY].player == localPlayer.playerNumber && !freeMove)){
                     SelectShogiPiece(selectionX, selectionY);
                 }else{
                     if (localPlayer.capturedPieces.Contains(pieceSelectedByPlayer)){
@@ -72,7 +73,7 @@ public class MPBoardManager : BoardManager
         }
     }
     protected override void SelectShogiPiece(int x, int y, bool isSimulated = false){
-        if (ShogiPieces[x, y] == null)
+        if (!ShogiPieces[x, y])
             return;
         if (ShogiPieces[x, y].player != localPlayer.playerNumber)
             return;
@@ -119,7 +120,7 @@ public class MPBoardManager : BoardManager
     protected override void SelectCapturedPiece(int x, int y){
         int i, j;
         (i, j) = localPlayer.captureBoard.CoordinatesToIndeces(x, y);
-        if (localPlayer.captureBoard.capturedPieces[i, j] == null)
+        if (!localPlayer.captureBoard.capturedPieces[i, j])
             return;
         if (localPlayer.captureBoard.capturedPieces[i, j].player != localPlayer.playerNumber)
             return;

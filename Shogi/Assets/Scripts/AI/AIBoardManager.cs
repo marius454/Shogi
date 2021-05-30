@@ -24,8 +24,10 @@ public class AIBoardManager : BoardManager
     private bool AIMoveStarted;
     public Thread mainThread;
     public Thread AiThread;
+    private int AImoves;
     public TaskCompletionSource<Move> bestMove;
     private void Awake(){
+        checkForPerpetualCheck = true;
         mainThread = Thread.CurrentThread;
         random = new System.Random();
         Instance = this;
@@ -43,6 +45,7 @@ public class AIBoardManager : BoardManager
     public override void InitializeGame()
     {
         base.InitializeGame();
+        AImoves = 0;
         gameOver = false;
         AIMoveStarted = false;
         AIPlayer = player2; // later will need to be changed so that the user can chose
@@ -53,36 +56,43 @@ public class AIBoardManager : BoardManager
     }
 
     private void Update(){
-        if (!gameOver){
-            if (currentPlayer == AIPlayer && !AIMoveStarted){
-                if (AiThread.ThreadState != ThreadState.Aborted && AiThread.ThreadState != ThreadState.Unstarted){
-                    Move move = bestMove.Task.Result;
-                    Debug.Log(move);
-                    Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote + " " + move.score);
-                    AiThread.Abort();
-                    if (BoardEvaluation.boardStates.Count > 0){
-                        RestoreGameState(BoardEvaluation.boardStates[0][0], true);
-                    }
-                    
-                    FinishAIMove(move);
-                    InitializeAIThread();
-                }
-            }
-            if (currentPlayer != AIPlayer && shouldEndTurn && !AIMoveStarted){
-                DoMove(RandomMove(currentPlayer));
-                ChangePlayer();
-            }
-            else AIMove();
+        if (GameController.Instance.gameStarted && this.gameObject.activeSelf){
+            UpdateSelection();
+            MarkSelectedPiece();
+            MarkAllowedMoves();
+            MarkCheckedKing();
+            ComputeMouseClick();
         }
+        // if (!gameOver){
+        //     if (currentPlayer == AIPlayer && !AIMoveStarted){
+        //         if (AiThread.ThreadState != ThreadState.Aborted && AiThread.ThreadState != ThreadState.Unstarted){
+        //             Move move = bestMove.Task.Result;
+        //             Debug.Log(move);
+        //             Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote + " " + move.score);
+        //             AiThread.Abort();
+        //             if (BoardEvaluation.boardStates.Count > 0){
+        //                 RestoreGameState(BoardEvaluation.boardStates[0][0], true);
+        //             }
+                    
+        //             FinishAIMove(move);
+        //             InitializeAIThread();
+        //         }
+        //     }
+        //     if (currentPlayer != AIPlayer && shouldEndTurn && !AIMoveStarted){
+        //         DoMove(RandomMove(currentPlayer));
+        //         ChangePlayer();
+        //     }
+        //     else AIMove();
+        // }
     }
     protected override void SelectShogiPiece(int x, int y, bool isSimulated = false){
-        if (ShogiPieces[x, y] == null)
+        if (!ShogiPieces[x, y])
             return;
         if (ShogiPieces[x, y].player != currentPlayer.playerNumber && !isSimulated)
             return;
         base.SelectShogiPiece(x, y);
     }
-    // protected override void OnShogiPieceMove(int x, int y)
+    // protected override void OnShogiPieceMove(int x, int y, bool isSimulated = false)
     // {
     //     base.OnShogiPieceMove(x, y);
     //     if (currentPlayer != AIPlayer)
@@ -90,13 +100,19 @@ public class AIBoardManager : BoardManager
     // }
     private void AIMove(){
         Move bestMove;
-        //ChangePlayer();
+        ChangePlayer();
         shouldEndTurn = false;
         // bestMove = RandomMove();
-        bestMove = BoardEvaluation.GetAIMove(1, true, this, AIPlayer);
+        checkForPerpetualCheck = false;
+        bestMove = BoardEvaluation2.GetAIMove(3, this);
+        checkForPerpetualCheck = true;
         shouldEndTurn = true;
+        AImoves++;
+        Debug.Log(AImoves);
+        // Debug.Log(bestMove.pieceX + " " + bestMove.pieceY + " " + bestMove.targetX + " " + bestMove.targetY);
 
         DoMove(bestMove);
+        
         Debug.Break();
 
         EndTurn();
@@ -111,7 +127,7 @@ public class AIBoardManager : BoardManager
         Move bestMove;
         //ChangePlayer();
         shouldEndTurn = false;
-        bestMove = BoardEvaluation.GetAIMove(1, true, this, AIPlayer);
+        bestMove = BoardEvaluation.GetAIMove(2, this);
         return bestMove;
     }
     private void FinishAIMove(Move bestMove){
@@ -121,13 +137,19 @@ public class AIBoardManager : BoardManager
         ChangePlayer();
     }
     public void DoMove(Move move, bool isSimulated = false){
+        ShogiPlayer player;
+        if (ShogiPieces[move.pieceX, move.pieceY].player == PlayerNumber.Player1){
+            player = player1;
+        } 
+        else player = player2;
+
         if (move.pieceX >= 0 && move.pieceY >= 0 && move.pieceX <= C.numberRows && move.pieceY <= C.numberRows){
-            SelectShogiPiece(move.pieceX, move.pieceY);
+            SelectShogiPiece(move.pieceX, move.pieceY, isSimulated);
             allowedMoves[move.targetX, move.targetY] = true;
             MoveShogiPiece(move.targetX, move.targetY, isSimulated);
 
             if (move.promote){
-                if (ShogiPieces[move.targetX, move.targetY] == null){
+                if (!ShogiPieces[move.targetX, move.targetY]){
                     bool[,] moves = ShogiPieces[move.pieceX, move.pieceY].PossibleMoves();
                     Debug.Log(moves);
                     Debug.Log("Null after move");
@@ -136,9 +158,9 @@ public class AIBoardManager : BoardManager
                 PromotePiece(ShogiPieces[move.targetX, move.targetY], isSimulated);
             }
         }
-        else if (move.pieceX >= currentPlayer.captureBoard.minX && move.pieceY >= currentPlayer.captureBoard.minY 
-          && move.pieceX <= currentPlayer.captureBoard.maxX && move.pieceY <= currentPlayer.captureBoard.maxY){
-              SelectCapturedPiece(move.pieceX, move.pieceY);
+        else if (move.pieceX >= player.captureBoard.minX && move.pieceY >= player.captureBoard.minY 
+          && move.pieceX <= player.captureBoard.maxX && move.pieceY <= player.captureBoard.maxY){
+              SelectCapturedPiece(move.pieceX, move.pieceY, player);
               DropShogiPiece(move.targetX, move.targetY, isSimulated);
         }
     }
@@ -174,7 +196,8 @@ public class AIBoardManager : BoardManager
             }
         
         player.InitializeCapturedPieces();
-        player.CalculatePossibleMoves();
+        if (changePositions)
+            player.CalculatePossibleMoves();
     }
     // protected override void CapturePieceIfPossible(int x, int y, bool isSimulated = false)
     // {
@@ -182,8 +205,10 @@ public class AIBoardManager : BoardManager
     // }
 
     public Move RandomMove(ShogiPlayer player){
-
-        int randomMove = random.Next(player.possibleMoves.Count);
+        if (player.possibleMoves.Count <= 0){
+            return new Move{pieceX = -1, pieceY = -1, targetX = -1, targetY = -1, promote = false};
+        }
+        int randomMove = random.Next(player.possibleMoves.Count - 1);
         int pieceX = player.possibleMoves[randomMove].pieceX;
         int pieceY = player.possibleMoves[randomMove].pieceY;
         int targetX = player.possibleMoves[randomMove].targetX;
@@ -191,6 +216,11 @@ public class AIBoardManager : BoardManager
         bool promote = player.possibleMoves[randomMove].promote;
 
         return new Move{pieceX = pieceX, pieceY = pieceY, targetX = targetX, targetY = targetY, promote = promote};
+    }
+    private void SelectCapturedPiece(int x, int y, ShogiPlayer player){
+        (x, y) = player.captureBoard.CoordinatesToIndeces(x, y);
+        selectedShogiPiece = player.captureBoard.capturedPieces[x, y];
+        allowedMoves = selectedShogiPiece.PossibleDrops();
     }
     protected override void OnTurnEnd()
     {
@@ -204,13 +234,13 @@ public class AIBoardManager : BoardManager
             else if (CheckForRepetitionDraw()){
                 EndGame("Repetition Draw");
             }
-            // if (currentPlayer != AIPlayer)
-            //     AIMove();
+            if (currentPlayer != AIPlayer)
+                AIMove();
         }
     }
     protected override void CheckForPromotion(bool isSimulated = false)
     {
-        if (currentPlayer != AIPlayer)
+        if (currentPlayer != AIPlayer && !isSimulated)
             base.CheckForPromotion();
         else {
             if (AIPlayer == player1){

@@ -11,14 +11,18 @@ public class King : ShogiPiece
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.King - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
-        moves = new bool[C.numberRows,C.numberRows];
-        int a = 1;
+        Array.Clear(moves, 0, C.numberRows*C.numberRows);
+        int x = CurrentX;
+        int y = CurrentY;
+        PlayerNumber currentPlayer = player;
+        BoardManager localBoard = board;
 
         // Select all moves in a 3x3 square around the piece, except it's current position
+        int a = 1;
         for (int t = -a; t <= a; t++)
             for (int s = -a; s <= a; s++){
                 if (!(t == 0 && s == 0))
-                    SingleMove(moves, CurrentX + t, CurrentY + s);
+                    SingleMove(moves, x + t, y + s, currentPlayer, localBoard);
             }
 
         moves = RemoveIllegalMoves(moves, checkForSelfCheck);
@@ -44,33 +48,37 @@ public class King : ShogiPiece
     public override bool IsAttacked(){
         bool[,] possibleLocations = new bool[C.numberRows, C.numberRows];
         int a = 1;
+        int localX = CurrentX;
+        int localY = CurrentY;
+        PlayerNumber currentPlayer = player;
+        BoardManager localBoard = board;
 
         // Mark all possible locations from where an enemy piece might attack and check if the the piece in that location has a move that can attack
         if (player == PlayerNumber.Player1){
-            DiagonalLine(possibleLocations, DirectionDiagonal.forwardLeft, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardLeft, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            DiagonalLine(possibleLocations, DirectionDiagonal.forwardRight, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardRight, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            DiagonalLine(possibleLocations, DirectionDiagonal.backLeft, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.backLeft, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            DiagonalLine(possibleLocations, DirectionDiagonal.backRight, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.backRight, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
             
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.forward, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.forward, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.left, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.left, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.right, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.right, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.back, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.back, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
 
             for (int s = a; s >= -a; s--)
                 for (int t = a; t >= -a; t--){
                     if (!(t == 0 && s == 0)){
-                        SingleMove(possibleLocations, CurrentX + t, CurrentY + s);
-                        if (CurrentX + t >= 0 && CurrentY + s >= 0 && CurrentX + t < C.numberRows && CurrentY + s < C.numberRows){
-                            if (CheckForAttacker(possibleLocations[CurrentX + t, CurrentY + s], board.ShogiPieces[CurrentX + t, CurrentY + s], t, s)){
+                        SingleMove(possibleLocations, localX + t, localY + s, currentPlayer, localBoard);
+                        if (localX + t >= 0 && localY + s >= 0 && localX + t < C.numberRows && localY + s < C.numberRows){
+                            if (CheckForAttacker(possibleLocations[localX + t, localY + s], board.ShogiPieces[localX + t, localY + s], t, s)){
                                 return true;
                             }
                         }
@@ -78,30 +86,30 @@ public class King : ShogiPiece
                 }
         }
         else{
-            DiagonalLine(possibleLocations, DirectionDiagonal.backLeft, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.backLeft, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            DiagonalLine(possibleLocations, DirectionDiagonal.backRight, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.backRight, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            DiagonalLine(possibleLocations, DirectionDiagonal.forwardLeft, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardLeft, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            DiagonalLine(possibleLocations, DirectionDiagonal.forwardRight, true);
+            DiagonalLine(possibleLocations, DirectionDiagonal.forwardRight, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
             
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.back, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.back, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.right, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.right, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.left, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.left, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
-            OrthagonalLine(possibleLocations, DirectionOrthagonal.forward, true);
+            OrthagonalLine(possibleLocations, DirectionOrthagonal.forward, currentPlayer, localBoard, localX, localY, true);
             if (isAttacked) {isAttacked = false; return true;}
 
             for (int s = -a; s <= a; s++)
                 for (int t = -a; t <= a; t++){
                     if (!(t == 0 && s == 0)){
-                        SingleMove(possibleLocations, CurrentX + t, CurrentY + s);
-                        if (CurrentX + t >= 0 && CurrentY + s >= 0 && CurrentX + t < C.numberRows && CurrentY + s < C.numberRows){
-                            if (CheckForAttacker(possibleLocations[CurrentX + t, CurrentY + s], board.ShogiPieces[CurrentX + t, CurrentY + s], t, s)){
+                        SingleMove(possibleLocations, localX + t, localY + s, currentPlayer, localBoard);
+                        if (localX + t >= 0 && localY + s >= 0 && localX + t < C.numberRows && localY + s < C.numberRows){
+                            if (CheckForAttacker(possibleLocations[localX + t, localY + s], board.ShogiPieces[localX + t, localY + s], t, s)){
                                 return true;
                             }
                         }
@@ -110,15 +118,15 @@ public class King : ShogiPiece
         }
         int y = 2;
         if (player == PlayerNumber.Player2) y = -2;
-        if (CurrentX - 1 >= 0 && CurrentY + y >= 0 && CurrentX - 1 < C.numberRows && CurrentY + y < C.numberRows){
-            SingleMove(possibleLocations, CurrentX - 1, CurrentY + y);
-            if (CheckForAttacker(possibleLocations[CurrentX - 1, CurrentY + y], board.ShogiPieces[CurrentX - 1, CurrentY + y], -1, y)){
+        if (localX - 1 >= 0 && localY + y >= 0 && localX - 1 < C.numberRows && localY + y < C.numberRows){
+            SingleMove(possibleLocations, localX - 1, localY + y, currentPlayer, localBoard);
+            if (CheckForAttacker(possibleLocations[localX - 1, localY + y], board.ShogiPieces[localX - 1, localY + y], -1, y)){
                 return true;
             }
         }
-        if (CurrentX + 1 >= 0 && CurrentY + y >= 0 && CurrentX + 1 < C.numberRows && CurrentY + y < C.numberRows){
-            SingleMove(possibleLocations, CurrentX + 1, CurrentY + y);
-            if (CheckForAttacker(possibleLocations[CurrentX + 1, CurrentY + y], board.ShogiPieces[CurrentX + 1, CurrentY + y], 1, y)){
+        if (localX + 1 >= 0 && localY + y >= 0 && localX + 1 < C.numberRows && localY + y < C.numberRows){
+            SingleMove(possibleLocations, localX + 1, localY + y, currentPlayer, localBoard);
+            if (CheckForAttacker(possibleLocations[localX + 1, localY + y], board.ShogiPieces[localX + 1, localY + y], 1, y)){
                 return true;
             }
         }
@@ -126,7 +134,7 @@ public class King : ShogiPiece
     }
     private bool CheckForAttacker(bool isPossibleLocation, ShogiPiece piece, int t, int s){
         if (!isPossibleLocation) return false;
-        if (piece == null) return false;
+        if (!piece) return false;
 
         if (s != 2 && s != -2){
             if ((piece.GetType() == typeof(Rook) && piece.isPromoted) 

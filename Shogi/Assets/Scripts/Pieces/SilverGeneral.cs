@@ -13,7 +13,11 @@ public class SilverGeneral : ShogiPiece
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedSilverGeneral - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
-        moves = new bool[C.numberRows,C.numberRows];
+        Array.Clear(moves, 0, C.numberRows*C.numberRows);
+        int x = CurrentX;
+        int y = CurrentY;
+        PlayerNumber currentPlayer = player;
+        BoardManager localBoard = board;
         int a = 1;
 
         if (!isPromoted){
@@ -22,14 +26,14 @@ public class SilverGeneral : ShogiPiece
                 for (int t = -a; t <= a; t++)
                     for (int s = -a; s <= a; s++){
                         if (!(t == 0 && s == 0) && !(t == 1 && s == 0) && !(t == -1 && s == 0) && !(t == 0 && s == -1))
-                            SingleMove(moves, CurrentX + t, CurrentY + s);
+                            SingleMove(moves, x + t, y + s, currentPlayer, localBoard);
                     }
             }
             else if (player == PlayerNumber.Player2) {
                 for (int t = -a; t <= a; t++)
                     for (int s = -a; s <= a; s++){
                         if (!(t == 0 && s == 0) && !(t == 1 && s == 0) && !(t == -1 && s == 0) && !(t == 0 && s == 1))
-                            SingleMove(moves, CurrentX + t, CurrentY + s);
+                            SingleMove(moves, x + t, y + s, currentPlayer, localBoard);
                     }
             }
             else {

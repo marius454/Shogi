@@ -22,7 +22,7 @@ public class BoardHighlights : MonoBehaviour
         // Find and return already created Highlight to not create more than necessary.
         GameObject go = moveHighlights.Find(g=> !g.activeSelf);
 
-        if (go == null){
+        if (!go){
             go = Instantiate(highlightPrefab);
             moveHighlights.Add(go);
             allHighlights.Add(go);

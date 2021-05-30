@@ -12,7 +12,7 @@ public class ShogiPlayer
     public List<ShogiPiece> piecesInPlay{set;get;}
     public List<ShogiPiece> capturedPieces{set;get;}
     public List<ShogiPiece> allPieces{set;get;}
-    public ShogiPiece king{set;get;}
+    public King king{set;get;}
     public CaptureBoard captureBoard{set;get;}
     public bool isInCheck{set; get;}
     public bool isAttackingKing{set; get;}
@@ -95,8 +95,10 @@ public class ShogiPlayer
         this.isAttackingKing = isAttackingKing;
     }
     public void CheckIfKingIsBeingAttacked(){
-        if (king.IsAttacked()) PlaceInCheck();
-        else RemoveCheck();
+        if (king){
+            if (king.IsAttacked()) PlaceInCheck();
+            else RemoveCheck();
+        }
     }
     public void InitializePiecesInPlay(){
         allPieces.Clear(); // Needs to be done better so that InitializeCapturedPieces also gets this when needed
@@ -105,7 +107,9 @@ public class ShogiPlayer
             if (piece && piece.player == playerNumber){
                 piecesInPlay.Add(piece);
                 allPieces.Add(piece);
-                if (piece is King) king = piece;
+                if (piece is King){
+                    king = piece as King;
+                }
             }
         }
     }

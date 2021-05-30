@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,22 +15,26 @@ public class Bishop : ShogiPiece
         this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, Y.promotedBishop - 0.01f, gameObject.transform.position.z);
     }
     public override bool[,] PossibleMoves(bool checkForSelfCheck = true){
-        moves = new bool[C.numberRows,C.numberRows];
+        Array.Clear(moves, 0, C.numberRows*C.numberRows);
+        int x = CurrentX;
+        int y = CurrentY;
+        PlayerNumber currentPlayer = player;
+        BoardManager localBoard = board;
 
         // Forward left
-        DiagonalLine(moves, DirectionDiagonal.forwardLeft);
+        DiagonalLine(moves, DirectionDiagonal.forwardLeft, currentPlayer, localBoard, x, y);
         // Forward right
-        DiagonalLine(moves, DirectionDiagonal.forwardRight);
+        DiagonalLine(moves, DirectionDiagonal.forwardRight, currentPlayer, localBoard, x, y);
         // Backward left
-        DiagonalLine(moves, DirectionDiagonal.backLeft);
+        DiagonalLine(moves, DirectionDiagonal.backLeft, currentPlayer, localBoard, x, y);
         // Backward right
-        DiagonalLine(moves, DirectionDiagonal.backRight);
+        DiagonalLine(moves, DirectionDiagonal.backRight, currentPlayer, localBoard, x, y);
 
         if (isPromoted){
-            SingleMove(moves, CurrentX, CurrentY + 1);
-            SingleMove(moves, CurrentX, CurrentY - 1);
-            SingleMove(moves, CurrentX + 1, CurrentY);
-            SingleMove(moves, CurrentX - 1, CurrentY);
+            SingleMove(moves, x, y + 1, currentPlayer, localBoard);
+            SingleMove(moves, x, y - 1, currentPlayer, localBoard);
+            SingleMove(moves, x + 1, y, currentPlayer, localBoard);
+            SingleMove(moves, x - 1, y, currentPlayer, localBoard);
         }
 
         moves = RemoveIllegalMoves(moves, checkForSelfCheck);

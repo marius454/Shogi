@@ -16,12 +16,14 @@ public class SimulatedBoard
         public PlayerNumber player;
         public bool isPromoted;
         public bool isAttacked;
+        public bool isCaptured;
     }
     public Piece[,] mainBoard;
     public Piece[,] player1CaptureBoard;
     public Piece[,] player2CaptureBoard;
     // private List<Piece> player1Captures;
     // private List<Piece> player2Captures;
+    public SimulatedBoard originalBoard;
 
     public SimulatedBoard(BoardManager board){
         mainBoard = new Piece[C.numberRows, C.numberRows];
@@ -30,9 +32,9 @@ public class SimulatedBoard
                 if (board.ShogiPieces[x, y]){
                     mainBoard[x, y] = new Piece{empty = false, x = x, y = y, pieceType = board.ShogiPieces[x, y].pieceType, 
                         player = board.ShogiPieces[x, y].player, isPromoted = board.ShogiPieces[x, y].isPromoted, 
-                        isAttacked = false};
+                        isAttacked = false, isCaptured = false};
                 }
-                else mainBoard[x, y] = new Piece{empty = true};
+                else mainBoard[x, y] = new Piece{empty = true, isCaptured = false};
             }
         
         player1CaptureBoard = new Piece[C.captureNumberColumns, C.captureNumberRows];
@@ -43,16 +45,16 @@ public class SimulatedBoard
                 if (board.player1.captureBoard.capturedPieces[x, y]){
                     player1CaptureBoard[x, y] = new Piece{empty = false, x = x, y = y, pieceType = board.player1.captureBoard.capturedPieces[x, y].pieceType, 
                         player = board.player1.captureBoard.capturedPieces[x, y].player, isPromoted = board.player1.captureBoard.capturedPieces[x, y].isPromoted, 
-                        isAttacked = false};
+                        isAttacked = false, isCaptured = true};
                 }
-                else mainBoard[x, y] = new Piece{empty = true};
+                else player1CaptureBoard[x, y] = new Piece{empty = true, isCaptured = true};
 
                 if (board.player2.captureBoard.capturedPieces[x, y]){
                     player2CaptureBoard[x, y] = new Piece{empty = false, x = x, y = y, pieceType = board.player2.captureBoard.capturedPieces[x, y].pieceType, 
                         player = board.player2.captureBoard.capturedPieces[x, y].player, isPromoted = board.player2.captureBoard.capturedPieces[x, y].isPromoted, 
-                        isAttacked = false};
+                        isAttacked = false, isCaptured = true};
                 }
-                else mainBoard[x, y] = new Piece{empty = true};
+                else player2CaptureBoard[x, y] = new Piece{empty = true, isCaptured = true};
             }
 
 
@@ -101,11 +103,15 @@ public class SimulatedBoard
         // }
     }
     public SimulatedBoard (SimulatedBoard board){
+        CopyBoard(board);
+    }
+    public void CopyBoard(SimulatedBoard board){
         mainBoard = board.mainBoard.Clone() as Piece[,];
         player1CaptureBoard = board.player1CaptureBoard.Clone() as Piece[,];
         player2CaptureBoard = board.player2CaptureBoard.Clone() as Piece[,];
     }
     public void DoMove(Move move){
+        Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote);
         if (move.pieceX >= 0 && move.pieceY >= 0 && move.pieceX < C.numberRows && move.pieceY < C.numberRows){
             if (!mainBoard[move.targetX, move.targetY].empty){
                 bool stopLooking = false;
@@ -114,6 +120,7 @@ public class SimulatedBoard
                         if (mainBoard[move.targetX, move.targetY].player == PlayerNumber.Player1){
                             if (player1CaptureBoard[x, y].empty){
                                 player1CaptureBoard[x, y] = mainBoard[move.targetX, move.targetY];
+                                player1CaptureBoard[x, y].isCaptured = true;
                                 stopLooking = true;
                                 break;
                             }
@@ -121,6 +128,7 @@ public class SimulatedBoard
                         if (mainBoard[move.targetX, move.targetY].player == PlayerNumber.Player2){
                             if (player2CaptureBoard[x, y].empty){
                                 player2CaptureBoard[x, y] = mainBoard[move.targetX, move.targetY];
+                                player2CaptureBoard[x, y].isCaptured = true;
                                 stopLooking = true;
                                 break;
                             }
@@ -131,14 +139,17 @@ public class SimulatedBoard
                     }
                 }
             }
+            // if (move.pieceX == 4 && move.pieceY == 0 && move.targetX == 3 && move.targetY == 0){
+            //     Debug.Log("bad");
+            // }
             mainBoard[move.targetX, move.targetY] = mainBoard[move.pieceX, move.pieceY];
             mainBoard[move.pieceX, move.pieceY].empty = true;
-
         }
         else if (move.pieceX >= (C.numberRows + 1) && move.pieceY >= (C.numberRows - C.captureNumberRows) 
           && move.pieceX <= (C.numberRows + C.captureNumberColumns) 
           && move.pieceY <= C.captureNumberColumns){
             mainBoard[move.targetX, move.targetY] = player1CaptureBoard[move.pieceX, move.pieceY];
+            mainBoard[move.targetX, move.targetY].isCaptured = false;
             player1CaptureBoard[move.pieceX, move.pieceY].empty = true;
 
 
@@ -150,6 +161,7 @@ public class SimulatedBoard
           && move.pieceX <= -2
           && move.pieceY <= (C.numberRows - 1)){
             mainBoard[move.targetX, move.targetY] = player2CaptureBoard[move.pieceX, move.pieceY];
+            mainBoard[move.targetX, move.targetY].isCaptured = false;
             player2CaptureBoard[move.pieceX, move.pieceY].empty = true;
 
 
@@ -171,6 +183,7 @@ public class SimulatedBoard
             // }
         }
     }
+    
 
     public List<Move> GetAllMoves(PlayerNumber player, bool checkForSelfCheck = true, bool checkDrops = true){
         List<Move> possibleMoves = new List<Move>();
@@ -197,9 +210,9 @@ public class SimulatedBoard
             if (checkDrops){
                 List<PieceType> calculatedTypes = new List<PieceType>();
                 foreach (Piece piece in player1CaptureBoard){
-                    if (!calculatedTypes.Exists(item => item == piece.pieceType)){
+                    if (!piece.empty){
+                        if (!calculatedTypes.Exists(item => item == piece.pieceType)){
                         calculatedTypes.Add(piece.pieceType);
-                        if (!piece.empty){
                             bool[,] moves = GetPiecePossibleDrops(piece, checkForSelfCheck);
                             for (int x=0; x < C.numberRows; x++)
                                 for (int y=0; y < C.numberRows; y++){
@@ -229,19 +242,23 @@ public class SimulatedBoard
                 }
             }
             if (checkDrops){
+                List<PieceType> calculatedTypes = new List<PieceType>();
                 foreach (Piece piece in player2CaptureBoard){
                     if (!piece.empty){
-                        bool[,] moves = GetPiecePossibleDrops(piece, checkForSelfCheck);
-                        for (int x=0; x < C.numberRows; x++)
-                            for (int y=0; y < C.numberRows; y++){
-                                if (moves[x,y]){
-                                    possibleMoves.Add(new Move{pieceX = piece.x, pieceY = piece.y, 
+                        if (!calculatedTypes.Exists(item => item == piece.pieceType)){
+                        calculatedTypes.Add(piece.pieceType);
+                            bool[,] moves = GetPiecePossibleDrops(piece, checkForSelfCheck);
+                            for (int x=0; x < C.numberRows; x++)
+                                for (int y=0; y < C.numberRows; y++){
+                                    if (moves[x,y]){
+                                        possibleMoves.Add(new Move{pieceX = piece.x, pieceY = piece.y, 
                                             targetX = x, targetY = y, promote = false});
+                                    }
                                 }
-                            }
+                        }
                     }
                 }
-            }
+            } 
         }
         return possibleMoves;
     }
@@ -299,7 +316,7 @@ public class SimulatedBoard
     }
 
     #region Piece Moves
-    private bool[,] GetPiecePossibleMoves(Piece piece, bool checkForSelfCheck){
+    public bool[,] GetPiecePossibleMoves(Piece piece, bool checkForSelfCheck){
         // Don't need to check if king is attacked if the minimax debth is more than 1
         if (piece.pieceType == PieceType.bishop)
             return BishopMoves(piece, checkForSelfCheck);
@@ -589,6 +606,7 @@ public class SimulatedBoard
 
         Piece king = GetKing(piece.player);
         if (king.empty){
+            Debug.Break();
             throw new InvalidOperationException("King not found!");
         }
         wouldCauseSelfCheck = CheckIfBeingAttacked(king);

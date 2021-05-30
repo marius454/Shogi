@@ -26,6 +26,10 @@ public class GoldGeneral : ShogiPiece
     public override void Unpromote(bool changePosition = true)
     {
         // Golden general will never be promoted to be unpromoted
+        if (changePosition){
+            SetHeight();
+            SetRotation();
+        }
     }
     public override bool CheckIfCouldBePromoted(int y){
         // Golden general cannot be promoted
