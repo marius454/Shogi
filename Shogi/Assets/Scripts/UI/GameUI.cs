@@ -38,8 +38,7 @@ public class GameUI : MonoBehaviour
     }
     public void SelectVsAIGame(){
         HideMainMenu();
-        ShowIngameUI();
-        GameController.Instance.StartAIGame();
+        ShowAIMenu();
     }
     public void QuitGame(){
         Application.Quit();
@@ -133,6 +132,24 @@ public class GameUI : MonoBehaviour
                 ingameUI.SetActive(false);
             } 
     }
+    public void ShowImpasseButton(){
+        if (ingameUI){
+            if (!ingameUI.transform.Find("ImpasseButton").gameObject.activeSelf){
+                ingameUI.transform.Find("ImpasseButton").gameObject.SetActive(true);
+            }
+        }
+    }
+    public void HideImpasseButton(){
+        if (ingameUI){
+            if (ingameUI.transform.Find("ImpasseButton").gameObject.activeSelf){
+                ingameUI.transform.Find("ImpasseButton").gameObject.SetActive(false);
+            }
+        }
+    }
+    public void AskForImpasse(){
+        MPBoardManager board = BoardManager.Instance as MPBoardManager;
+        board.AskForImpasse();
+    }
     #endregion
     
     #region NetworkConnectionMenu
@@ -164,6 +181,42 @@ public class GameUI : MonoBehaviour
     }
     #endregion
 
+    #region AI Difficulty Selection
+    [SerializeField] private GameObject AIMenu;
+    public void ShowAIMenu(){
+        if (AIMenu)
+            if (!AIMenu.activeSelf){
+                AIMenu.SetActive(true);
+            }
+    }
+    private void HideAIMenu(){
+        if (AIMenu)
+            if (AIMenu.activeSelf){
+                AIMenu.SetActive(false);
+            } 
+    }
+    public void RandomMoves(){
+        HideAIMenu();
+        ShowIngameUI();
+        GameController.Instance.StartAIGame(0);
+    }
+    public void MinimaxDepth1(){
+        HideAIMenu();
+        ShowIngameUI();
+        GameController.Instance.StartAIGame(1);
+    }
+    public void MinimaxDepth2(){
+        HideAIMenu();
+        ShowIngameUI();
+        GameController.Instance.StartAIGame(2);
+    }
+    public void MinimaxDepth3(){
+        HideAIMenu();
+        ShowIngameUI();
+        GameController.Instance.StartAIGame(3);
+    }
+
+    #endregion
     private void HideAllUI(){
         HideMainMenu();
         HideGameOverMenu();

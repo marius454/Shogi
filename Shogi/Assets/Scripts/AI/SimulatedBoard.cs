@@ -18,12 +18,12 @@ public class SimulatedBoard
         public bool isAttacked;
         public bool isCaptured;
     }
-    public Piece[,] mainBoard;
-    public Piece[,] player1CaptureBoard;
-    public Piece[,] player2CaptureBoard;
+    public Piece[,] mainBoard { set; get; }
+    public Piece[,] player1CaptureBoard { set; get; }
+    public Piece[,] player2CaptureBoard { set; get; }
     // private List<Piece> player1Captures;
     // private List<Piece> player2Captures;
-    public SimulatedBoard originalBoard;
+    public SimulatedBoard originalBoard { set; get; }
 
     public SimulatedBoard(BoardManager board){
         mainBoard = new Piece[C.numberRows, C.numberRows];

@@ -5,8 +5,7 @@ using Photon.Pun;
 
 public class GameController : MonoBehaviour
 {
-    private PhotonView photonView{set; get;}
-    public static GameController Instance {set; get;}
+    public static GameController Instance { set; get; }
     [SerializeField] private GameObject networkManager;
     [SerializeField] private GameObject singleplayerBoard;
     [SerializeField] private GameObject multiplayerBoard;
@@ -24,7 +23,6 @@ public class GameController : MonoBehaviour
         Instance = this;
         gameStarted = false;
         singleplayerCamera.GetComponent<Camera>().enabled = true;
-        photonView = GetComponent<PhotonView>();
     }
     private void Update(){
         if (tryToStartGame){
@@ -65,10 +63,11 @@ public class GameController : MonoBehaviour
         multiplayerBoard.transform.Find("ShogiBoard").GetComponent<MPBoardManager>().SetupCamera(player1Camera, player2Camera);
         //MPBoardManager.Instance.SetupCamera(player1Camera, player2Camera);
     }
-    public void StartAIGame(){
+    public void StartAIGame(int difficulty){
         AIBoard.SetActive(true);
         singleplayerBoard.SetActive(false);
         AIBoard.transform.Find("ShogiBoard").GetComponent<AIBoardManager>().InitializeGame();
+        AIBoard.transform.Find("ShogiBoard").GetComponent<AIBoardManager>().SetDifficulty(difficulty);
         gameStarted = true;
         SetupSinglePlayerCamera();
     }

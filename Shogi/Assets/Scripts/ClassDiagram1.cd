@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AIBoardManager">
+    <Position X="22.5" Y="6.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>IIQAABABUEAACAsEAIBIIAAgBAFAAAgAEAYAAIAAAMA=</HashCode>
+      <FileName>Assets\Scripts\AI\AIBoardManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BoardState">
+    <Position X="25.25" Y="13.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAQAIAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\AI\BoardState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BoardHighlights">
+    <Position X="37.5" Y="16" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACQAECAggAAQAAAAQIAACAgEAJAAQAACAAABIAA=</HashCode>
+      <FileName>Assets\Scripts\BoardHighlights.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BoardManager">
+    <Position X="18" Y="6" Width="4" />
+    <AssociationLine Name="allPieces" Type="ShogiPiece" ManuallyRouted="true">
+      <Path>
+        <Point X="20.812" Y="15.828" />
+        <Point X="20.812" Y="20.165" />
+        <Point X="31.667" Y="20.165" Type="JumpStart" />
+        <Point X="31.833" Y="20.165" Type="JumpEnd" />
+        <Point X="32" Y="20.165" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>4AYIAAAAAAAIiAGAAAAHIAQoJQIQgUHSSCJAAICYAkA=</HashCode>
+      <FileName>Assets\Scripts\BoardManager.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="player1" />
+      <Property Name="player2" />
+      <Property Name="currentPlayer" />
+      <Property Name="opponentPlayer" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="allPieces" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="CaptureBoard">
+    <Position X="11.25" Y="16.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>IDQAAAAAAAAAAAAAAAAAAEAgQAAAAUDBGAACAHEAAEI=</HashCode>
+      <FileName>Assets\Scripts\CaptureBoard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Constants">
+    <Position X="31" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAQQAAAABAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Constants\Constants.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PieceYValues">
+    <Position X="32.75" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>CCBAAAAAABEggAACAEAAAAQAAgABAAAAAIAAAAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Constants\PieceYValues.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameController">
+    <Position X="28.5" Y="10" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQCAAAAASIAAAIAAAAAIAEEAAAAQAMwQAAggQAAAQA=</HashCode>
+      <FileName>Assets\Scripts\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MPBoardManager">
+    <Position X="15" Y="8.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>PCSAAAAAAAAA4AAAAFBQoAQgJgAQAQEAACAAAAIYAkA=</HashCode>
+      <FileName>Assets\Scripts\MPBoardManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetworkManager">
+    <Position X="37.5" Y="10.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAIAAEAAAAAAAEAAAIAAAAAAAAAIEQAEAAAAAIA=</HashCode>
+      <FileName>Assets\Scripts\NetworkManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Bishop">
+    <Position X="23.25" Y="23.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Bishop.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GoldGeneral">
+    <Position X="27.75" Y="23.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAQBAAAAAAAAIAAAAAAAAAAAAAAgAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\GoldGeneral.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="King">
+    <Position X="30.25" Y="23.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAQBAAAAAAAQIAAAAAAAAAAEAAAgAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\King.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Knight">
+    <Position X="35" Y="23.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQBAAAAAAAAIAAAAAAAAAAQAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Knight.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lance">
+    <Position X="37.5" Y="23.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQBAAAAAAAAIAAAAAAAAAAQAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Lance.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Pawn">
+    <Position X="40" Y="23.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQBCAAAAAAAIAAAAQAAAAIQAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Pawn.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Rook">
+    <Position X="25.5" Y="23.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Rook.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ShogiPiece">
+    <Position X="32" Y="13.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AACIKBAkAAQBAFAAEAAUNgAAwSUgAC6RIAAyAAAGAhA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\ShogiPiece.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="currentPlayer" />
+      <Field Name="opponentPlayer" />
+      <Property Name="player" />
+      <Property Name="pieceType" />
+      <Property Name="board" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SilverGeneral">
+    <Position X="32.75" Y="23.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\SilverGeneral.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ShogiPlayer">
+    <Position X="14.75" Y="16.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAIBAAgBACKEIEIAAAEAACQAAiAUEKMBAQACAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Player.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="board" />
+      <Property Name="playerNumber" />
+      <Property Name="king" />
+      <Property Name="captureBoard" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="piecesInPlay" />
+      <Property Name="capturedPieces" />
+      <Property Name="allPieces" />
+      <Property Name="possibleMoves" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="SPBoardManager">
+    <Position X="15" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\SPBoardManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CameraAwake">
+    <Position X="37.5" Y="14.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\UI\CameraAwake.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameUI">
+    <Position X="40.5" Y="10.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAAIAAIAAQgAMkAEIAAIFABIhYEQCASOgEAAAzC0Q=</HashCode>
+      <FileName>Assets\Scripts\UI\GameUI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BoardEvaluation">
+    <Position X="25.25" Y="6.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AgIIAAiEgEAAAAACEIEBAEYAAhAIBAQAAAAAAAAAATA=</HashCode>
+      <FileName>Assets\Scripts\AI\BoardEvaluation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Move">
+    <Position X="35" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAIAAAAAAAAACAgAAAAAAAwAAA=</HashCode>
+      <FileName>Assets\Scripts\AI\AIBoardManager.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="DirectionDiagonal">
+    <Position X="36.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAECAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Constants\DirectionDiagonal.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DirectionOrthagonal">
+    <Position X="38.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgEAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Constants\DirectionOrthagonal.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="PieceType">
+    <Position X="40.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAABJIACAABAAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Assets\Scripts\Constants\PieceType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="PlayerNumber">
+    <Position X="42" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Constants\PlayerNumber.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

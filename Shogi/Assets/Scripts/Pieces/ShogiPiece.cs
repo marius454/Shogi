@@ -5,18 +5,18 @@ using C = Constants;
 
 public abstract class ShogiPiece : MonoBehaviour
 {
-    public int id {set;get;}
-    public int CurrentX {set;get;}
-    public int CurrentY {set;get;}
-    public PlayerNumber player{set;get;}
-    public PieceType pieceType{set;get;}
-    public BoardManager board{set;get;}
-    protected ShogiPlayer currentPlayer{set;get;}
-    protected ShogiPlayer opponentPlayer{set;get;}
-    public bool[,] moves{set;get;}
-    public bool[,] drops{set;get;}
-    public bool isPromoted{set;get;}
-    public bool isAttacked = false;
+    public int id { set; get; }
+    public int CurrentX { set; get; }
+    public int CurrentY { set; get; }
+    public PlayerNumber player { set; get; }
+    public PieceType pieceType { set; get; }
+    public BoardManager board { set; get; }
+    protected ShogiPlayer currentPlayer;
+    protected ShogiPlayer opponentPlayer;
+    public bool[,] moves { set; get; }
+    public bool[,] drops { set; get; }
+    public bool isPromoted { set; get; }
+    public bool isAttacked { set; get; }
 
     public ShogiPiece(int x, int y, PlayerNumber player, PieceType pieceType, BoardManager board){
         Init(x, y, player, pieceType, board);
@@ -28,6 +28,7 @@ public abstract class ShogiPiece : MonoBehaviour
         this.isPromoted = false;
         this.moves = new bool[C.numberRows, C.numberRows];
         this.drops = new bool[C.numberRows, C.numberRows];
+        this.isAttacked = false;
 
         SetXY(x, y, changePosition);
         // SetHeight();

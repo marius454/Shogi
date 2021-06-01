@@ -5,7 +5,7 @@ using C = Constants;
 
 public class BoardHighlights : MonoBehaviour
 {
-    public static BoardHighlights Instance{set;get;}
+    public static BoardHighlights Instance { set; get; }
     [SerializeField] private GameObject highlightPrefab;
     private List<GameObject> allHighlights;
     private List<GameObject> moveHighlights;

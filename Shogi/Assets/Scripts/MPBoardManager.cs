@@ -8,22 +8,49 @@ using C = Constants;
 
 public class MPBoardManager : BoardManager
 {
-    private PhotonView photonView{set; get;}
-    public ShogiPlayer localPlayer{set; get;}
-    public ShogiPiece pieceSelectedByPlayer{set; get;}
-    // private ShogiPiece capturedPieceSelectedByPlayer{set; get;}
-    public bool[,] possibleMovesForSelectedPiece{set; get;}
-    // private bool[,] possibleDropsForSelectedPiece{set; get;}
+    private PhotonView photonView;
+    public ShogiPlayer localPlayer { set; get; }
+    public ShogiPiece pieceSelectedByPlayer { set; get; }
+    public bool[,] possibleMovesForSelectedPiece { set; get; }
+    public bool player1Impasse;
+    public bool player2Impasse;
     private void Awake(){
         checkForPerpetualCheck = true;
         possibleMovesForSelectedPiece = new bool[C.numberRows, C.numberRows];
         photonView = GetComponent<PhotonView>();
+        player1Impasse = false;
+        player2Impasse = false;
         InitializeGame();
         if (PhotonNetwork.LocalPlayer.ActorNumber == 1) this.localPlayer = player1;
         else this.localPlayer = player2;
         Instance = this;
         // this.gameObject.transform.parent.transform.Find("CaptureBoardPlayer1").GetComponent<MPCaptureBoard>().InitializeCaptureBoard();
         // this.gameObject.transform.parent.transform.Find("CaptureBoardPlayer2").GetComponent<MPCaptureBoard>().InitializeCaptureBoard();
+    }
+    private void Update(){
+        if (GameController.Instance.gameStarted && this.gameObject.activeSelf){
+            UpdateSelection();
+            MarkSelectedPiece();
+            MarkAllowedMoves();
+            MarkCheckedKing();
+            ComputeMouseClick();
+        }
+        if (player1Impasse && player2Impasse){
+            CalculateImpasse();
+        }
+        if (player1.king.CurrentY >= C.numberRows - 3 && player2.king.CurrentY <= 2){
+            if (localPlayer.playerNumber == PlayerNumber.Player1){
+                if (player1Impasse) localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().HideImpasseButton();
+                else localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowImpasseButton();
+            }
+            else {
+                if (player2Impasse) localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().HideImpasseButton();
+                else localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowImpasseButton();
+            }
+        }
+        else {
+            localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().HideImpasseButton();
+        }
     }
     protected override void MarkSelectedPiece()
     {
@@ -185,7 +212,8 @@ public class MPBoardManager : BoardManager
                         willCheckForPromotion = true;
                     if (selectedShogiPiece.player == localPlayer.playerNumber)
                         selectedShogiPiece.CheckForPromotion();
-                    else localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowOpponentPromotionMenu(selectedShogiPiece);
+                    else if (selectedShogiPiece.pieceType == PieceType.king && selectedShogiPiece.pieceType == PieceType.gold)
+                        localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowOpponentPromotionMenu(selectedShogiPiece);
                 }
             }
             else{
@@ -194,7 +222,8 @@ public class MPBoardManager : BoardManager
                         willCheckForPromotion = true;
                     if (selectedShogiPiece.player == localPlayer.playerNumber)
                         selectedShogiPiece.CheckForPromotion();
-                    else localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowOpponentPromotionMenu(selectedShogiPiece);
+                    else if (selectedShogiPiece.pieceType == PieceType.king && selectedShogiPiece.pieceType == PieceType.gold) 
+                        localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().ShowOpponentPromotionMenu(selectedShogiPiece);
                 }
             }
         }
@@ -239,5 +268,38 @@ public class MPBoardManager : BoardManager
     private void RPC_EndTurnAfterPromotion(){
         localPlayer.playerCamera.transform.Find("UI").GetComponent<GameUI>().HidePromotionMenu();
         OnTurnEnd();
+    }
+    protected override void OnTurnEnd()
+    {
+        player1Impasse = false;
+        player2Impasse = false;
+        base.OnTurnEnd();
+    }
+    public void AskForImpasse(){
+        PlayerNumber player;
+        if (localPlayer.playerNumber == PlayerNumber.Player1) player = PlayerNumber.Player1;
+        else player = PlayerNumber.Player2;
+        photonView.RPC(nameof(RPC_AskForImpasse), RpcTarget.AllBuffered, new object[] { player });
+    }
+    [PunRPC]
+    private void RPC_AskForImpasse(PlayerNumber player)
+    {
+        if (player == PlayerNumber.Player1) player1Impasse = true;
+        else player2Impasse = true;
+    }
+    private void CalculateImpasse(){
+        int sumPieces = 0;
+        foreach (ShogiPiece piece in localPlayer.allPieces){
+            if (piece is King) continue;
+            else if (piece is Rook || piece is Bishop){
+                sumPieces += 5;
+            }
+            else{
+                sumPieces += 1;
+            }
+        }
+        if (sumPieces > 30) EndGame("Victory");
+        else if (sumPieces > 24) EndGame("Draw");
+        else EndGame("Defeat");
     }
 }

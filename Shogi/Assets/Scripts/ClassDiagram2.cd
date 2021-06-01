@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BoardManager">
+    <Position X="21.75" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>4AYIAAAAAAAIiAGAAAAHIAQoJQIQgUHSSCJAAICYAkA=</HashCode>
+      <FileName>Assets\Scripts\BoardManager.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="currentPlayer" />
+      <Property Name="player1" />
+      <Property Name="player2" />
+      <Property Name="opponentPlayer" />
+      <Property Name="selectedShogiPiece" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="allPieces" />
+      <Property Name="ShogiPieces" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="ShogiPlayer">
+    <Position X="25.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAIBAAgBACKEIEIAAAEAACQAAiAUEKMBAQACAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Player.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="captureBoard" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="allPieces" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Bishop">
+    <Position X="15.5" Y="12.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Bishop.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GoldGeneral">
+    <Position X="21.75" Y="12.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAQBAAAAAAAAIAAAAAAAAAAAAAAgAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\GoldGeneral.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="King">
+    <Position X="26.25" Y="12.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAQBAAAAAAAQIAAAAAAAAAAEAAAgAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\King.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Knight">
+    <Position X="17.5" Y="12.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQBAAAAAAAAIAAAAAAAAAAQAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Knight.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lance">
+    <Position X="24" Y="12.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQBAAAAAAAAIAAAAAAAAAAQAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Lance.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Pawn">
+    <Position X="28.5" Y="12.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQBCAAAAAAAIAAAAQAAAAIQAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Pawn.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Rook">
+    <Position X="19.75" Y="12.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\Rook.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ShogiPiece">
+    <Position X="17.5" Y="2.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AACIKBAkAAQBAFAAEAAUNgAAwSUgAC6RIAAyAAAGAhA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\ShogiPiece.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="board" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SilverGeneral">
+    <Position X="31.25" Y="12.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Assets\Scripts\Pieces\SilverGeneral.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaptureBoard">
+    <Position X="28.75" Y="4.25" Width="2" />
+    <AssociationLine Name="capturedPieces" Type="ShogiPiece" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="29.75" Y="9.655" />
+        <Point X="29.75" Y="11.619" />
+        <Point X="21.285" Y="11.619" />
+        <Point X="21.285" Y="11.625" />
+        <Point X="20.25" Y="11.625" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>IDQAAAAAAAAAAAAAAAAAAEAgQAAAAUDBGAACAHEAAEI=</HashCode>
+      <FileName>Assets\Scripts\CaptureBoard.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="capturedPieces" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

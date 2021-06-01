@@ -87,30 +87,30 @@ public class Pawn : ShogiPiece
     private bool CheckIfDropWillCauseCheckmate(int x, int y){
         bool wouldCauseCheckMate = false;
 
-        //I forgot the reason, but it does not work with "this" but works with a new pawn object
-        GameObject clone = Instantiate(board.piecePrefabs[(int)PieceType.pawn], board.GetTileCenter(x, y), Quaternion.Euler(0,0,0)) as GameObject;
-        board.ShogiPieces[x, y] = clone.GetComponent<ShogiPiece>();
-        board.ShogiPieces[x, y].Init(x, y, player, PieceType.pawn, board);
+        board.ShogiPieces[x, y] = this;
+        int tempX = this.CurrentX;
+        int tempY = this.CurrentY;
+        this.CurrentX = x;
+        this.CurrentY = y;
 
-        currentPlayer.AddPieceInPlay(clone.GetComponent<ShogiPiece>());
+        currentPlayer.AddPieceInPlay(this);
         currentPlayer.isAttackingKing = true;
         opponentPlayer.PlaceInCheck();
 
         bool tempHasPossibleMoves = opponentPlayer.hasPossibleMoves;
         bool[,] tempAttackedTile = opponentPlayer.attackedTiles.Clone() as bool[,];
-        int tempNrMoves = opponentPlayer.nrMoves;
         bool tempIsAttackingKing = opponentPlayer.isAttackingKing;
         opponentPlayer.CalculatePossibleMoves(true, false);
 
         wouldCauseCheckMate = !opponentPlayer.hasPossibleMoves;
-        currentPlayer.RemovePieceInPlay(clone.GetComponent<ShogiPiece>());
+        currentPlayer.RemovePieceInPlay(this);
         currentPlayer.isAttackingKing = false;
         opponentPlayer.RemoveCheck();
         board.ShogiPieces[x, y] = null;
-        Destroy (clone);
+        this.CurrentX = tempX;
+        this.CurrentY = tempY;
 
-        // opponentPlayer.CalculateAttackedTiles(true, false);
-        opponentPlayer.RebuildAfterAttackedTileCalculation(tempHasPossibleMoves, tempAttackedTile, tempNrMoves, tempIsAttackingKing);
+        opponentPlayer.RebuildAfterPossibleMoveCalculation(tempHasPossibleMoves, tempAttackedTile, tempIsAttackingKing);
         return wouldCauseCheckMate;
     }
 

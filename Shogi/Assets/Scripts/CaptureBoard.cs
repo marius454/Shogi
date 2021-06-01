@@ -7,15 +7,15 @@ public class CaptureBoard : MonoBehaviour
 {
     [SerializeField] protected PlayerNumber player;
     // protected BoardManager board;
-    public ShogiPiece[,] capturedPieces{set;get;}
+    public ShogiPiece[,] capturedPieces { set; get; }
     protected int selectionX;
     protected int selectionY;
     protected int layerMask;
     // Ribos bus naudingos transformuojant absoliucias koordinates i masyvo koordinates
-    public int maxX;
-    public int maxY;
-    public int minX;
-    public int minY;
+    public int maxX { set; get; }
+    public int maxY { set; get; }
+    public int minX { set; get; }
+    public int minY { set; get; }
     private void Awake(){
         // board = BoardManager.Instance;
         Init();

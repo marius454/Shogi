@@ -8,9 +8,9 @@ public class BoardState
     // public List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted, int x, int y)> shogiPieceState;
     // public List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)> captureBoardPlayer1State;
     // public List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)> captureBoardPlayer2State;
-    public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted)[,] shogiPieceState;
-    public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[,] captureBoardPlayer1State;
-    public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[,] captureBoardPlayer2State;
+    public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted)[,] shogiPieceState { set; get; }
+    public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[,] captureBoardPlayer1State { set; get; }
+    public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[,] captureBoardPlayer2State { set; get; }
     public BoardState (AIBoardManager board){
         // shogiPieceState = new List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted, int x, int y)>();
         // captureBoardPlayer1State = new List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)>();

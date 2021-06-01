@@ -10,28 +10,27 @@ public class BoardManager : MonoBehaviour
 {
     // Decide whether to allow free movement for dubugging
     public bool freeMove;
-
-    public static BoardManager Instance{set;get;}
+    public static BoardManager Instance { set; get; }
     // [SerializeField] private GameObject CaptureBoardPlayer1;
     // [SerializeField] private GameObject CaptureBoardPlayer2;
 
-    public ShogiPlayer player1;
-    public ShogiPlayer player2;
-    public ShogiPlayer currentPlayer;
-    public ShogiPlayer opponentPlayer;
-    
-    public bool[,] allowedMoves{set;get;}
-    public ShogiPiece selectedShogiPiece{set;get;}
+    public ShogiPlayer player1 { set; get; }
+    public ShogiPlayer player2 { set; get; }
+    public ShogiPlayer currentPlayer { set; get; }
+    public ShogiPlayer opponentPlayer { set; get; }
+
+    public bool[,] allowedMoves { set; get; }
+    public ShogiPiece selectedShogiPiece { set; get; }
 
     protected int selectionX;
     protected int selectionY;
 
     public List<GameObject> piecePrefabs;
     //private List<GameObject> activePieceObjects;
-    public ShogiPiece[,] ShogiPieces{set;get;}
-    protected List<ShogiPiece> allPieces{set;get;}
-    public List<(ShogiPiece[,] state, int repetitions)> gameStates{set; get;}
-    public bool checkForPerpetualCheck{set;get;}
+    public ShogiPiece[,] ShogiPieces { set; get; }
+    protected List<ShogiPiece> allPieces;
+    public List<(ShogiPiece[,] state, int repetitions)> gameStates { set; get; }
+    public bool checkForPerpetualCheck { set; get; }
 
     // Start is called before the first frame update
     private void Awake(){
@@ -269,10 +268,23 @@ public class BoardManager : MonoBehaviour
     }
     protected virtual void OnShogiPieceDrop(int x, int y, bool isSimulated = false){
         if (allowedMoves[x,y]){
-            currentPlayer.DropPiece(selectedShogiPiece);
-            currentPlayer.AddPieceInPlay(selectedShogiPiece);
+            if (!isSimulated){
+                currentPlayer.DropPiece(selectedShogiPiece);
+                currentPlayer.AddPieceInPlay(selectedShogiPiece);
+            }
+            else {
+                if (selectedShogiPiece.player == PlayerNumber.Player1){
+                    player1.DropPiece(selectedShogiPiece);
+                    player1.AddPieceInPlay(selectedShogiPiece);
+                }
+                else{
+                    player2.DropPiece(selectedShogiPiece);
+                    player2.AddPieceInPlay(selectedShogiPiece);
+                }
+            }
             PlacePiece(selectedShogiPiece, x, y, isSimulated);
-            EndTurn();
+            if (!isSimulated)
+                EndTurn();
         }
         selectedShogiPiece = null;
         // BoardHighlights.Instance.HideHighlights();
@@ -281,9 +293,20 @@ public class BoardManager : MonoBehaviour
         ShogiPiece targetPiece = ShogiPieces[x,y];
         //if (targetPiece && (targetPiece.player != currentPlayer.playerNumber || freeMove)){
         if (targetPiece){
-            //activePieceObjects.Remove(targetPiece.gameObject);
-            opponentPlayer.RemovePieceInPlay(targetPiece);
-            currentPlayer.CapturePiece(targetPiece, isSimulated);
+            if (!isSimulated){
+                opponentPlayer.RemovePieceInPlay(targetPiece);
+                currentPlayer.CapturePiece(targetPiece, isSimulated);
+            }
+            else{
+                if (targetPiece.player == PlayerNumber.Player1){
+                    player1.RemovePieceInPlay(targetPiece);
+                    player2.CapturePiece(targetPiece, isSimulated);
+                }
+                else {
+                    player2.RemovePieceInPlay(targetPiece);
+                    player1.CapturePiece(targetPiece, isSimulated);
+                }
+            }
             ShogiPieces[x, y] = null;
         }
     }
@@ -302,8 +325,10 @@ public class BoardManager : MonoBehaviour
         }
 
         // opponentPlayer.CheckIfKingIsBeingAttacked();
-        if (currentPlayer.isAttackingKing) currentPlayer.nrOfChecksInARow ++;
-        else currentPlayer.nrOfChecksInARow = 0;
+        if (player1.isInCheck) player2.nrOfChecksInARow ++;
+        else player2.nrOfChecksInARow = 0;
+        if (player2.isInCheck) player1.nrOfChecksInARow ++;
+        else player1.nrOfChecksInARow = 0;
     }
     public void EndTurn(){
         OnTurnEnd();
@@ -359,8 +384,8 @@ public class BoardManager : MonoBehaviour
         }
     }
     public bool CheckIfGameOver(){
-        if (!opponentPlayer.hasPossibleMoves) return true;
-        if (!currentPlayer.hasPossibleMoves) return true;
+        if (!player1.hasPossibleMoves) return true;
+        if (!player2.hasPossibleMoves) return true;
         return false;
     }
     public virtual void EndGame(string message = "placeholder"){
@@ -370,8 +395,8 @@ public class BoardManager : MonoBehaviour
             GameUI.Instance.ShowEndScreen(message);
         }
         else{
-            if (!opponentPlayer.hasPossibleMoves) GameUI.Instance.ShowEndScreen(currentPlayer.playerNumber);
-            if (!currentPlayer.hasPossibleMoves) GameUI.Instance.ShowEndScreen(currentPlayer.playerNumber);
+            if (!player1.hasPossibleMoves) GameUI.Instance.ShowEndScreen(player2.playerNumber);
+            if (!player2.hasPossibleMoves) GameUI.Instance.ShowEndScreen(player1.playerNumber);
         }
     }
     public virtual void ResetGame(){

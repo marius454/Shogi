@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,22 +6,21 @@ using C = Constants;
 
 public class ShogiPlayer
 {
-    public PlayerNumber playerNumber{set;get;}
-    public int nrMoves;
-    private BoardManager board{set;get;}
-    public bool[,] attackedTiles{set;get;}
-    public List<ShogiPiece> piecesInPlay{set;get;}
-    public List<ShogiPiece> capturedPieces{set;get;}
-    public List<ShogiPiece> allPieces{set;get;}
-    public King king{set;get;}
-    public CaptureBoard captureBoard{set;get;}
-    public bool isInCheck{set; get;}
-    public bool isAttackingKing{set; get;}
-    public int nrOfChecksInARow{set; get;}
+    public PlayerNumber playerNumber { set; get; }
+    private BoardManager board;
+    public bool[,] attackedTiles { set; get; }
+    public List<ShogiPiece> piecesInPlay { set; get; }
+    public List<ShogiPiece> capturedPieces { set; get; }
+    public List<ShogiPiece> allPieces { set; get; }
+    public King king { set; get; }
+    public CaptureBoard captureBoard { set; get; }
+    public bool isInCheck { set; get; }
+    public bool isAttackingKing { set; get; }
+    public int nrOfChecksInARow { set; get; }
     // to set this check both attacked tiles and whether are legal drops available
-    public bool hasPossibleMoves{set; get;}
-    public List<Move> possibleMoves {set; get;}
-    public GameObject playerCamera{set; get;}
+    public bool hasPossibleMoves { set; get; }
+    public List<Move> possibleMoves { set; get; }
+    public GameObject playerCamera { set; get; }
 
     public ShogiPlayer (PlayerNumber playerNumber, BoardManager board, CaptureBoard captureBoard){
         piecesInPlay = new List<ShogiPiece>();
@@ -36,9 +36,10 @@ public class ShogiPlayer
         this.playerNumber = playerNumber;
     }
     public void CalculatePossibleMoves(bool checkForSelfCheck = true, bool checkDrops = true){
-        attackedTiles = new bool[C.numberRows, C.numberRows];
+        // attackedTiles = new bool[C.numberRows, C.numberRows];
+        Array.Clear(attackedTiles, 0, C.numberRows*C.numberRows);
         possibleMoves = new List<Move>();
-        nrMoves = 0;
+        int nrMoves = 0;
         foreach(ShogiPiece piece in piecesInPlay){
             bool[,] moves = piece.PossibleMoves(checkForSelfCheck); 
             for (int x=0; x < C.numberRows; x++)
@@ -88,10 +89,9 @@ public class ShogiPlayer
             }
         isAttackingKing = false;
     }
-    public void RebuildAfterAttackedTileCalculation(bool hasPossibleMoves, bool[,] attackedTiles, int nrMoves, bool isAttackingKing){
+    public void RebuildAfterPossibleMoveCalculation(bool hasPossibleMoves, bool[,] attackedTiles, bool isAttackingKing){
         this.hasPossibleMoves = hasPossibleMoves;
         this.attackedTiles = attackedTiles.Clone() as bool[,];
-        this.nrMoves = nrMoves;
         this.isAttackingKing = isAttackingKing;
     }
     public void CheckIfKingIsBeingAttacked(){
