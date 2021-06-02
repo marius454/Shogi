@@ -31,8 +31,8 @@ public static class BoardEvaluation
     private static int selectedDepth;
 
 
-    private static void SaveState(AIBoardManager board, int currentDebth){
-        boardStates[currentDebth].Add(new BoardState(board));
+    private static void SaveState(AIBoardManager board, int currentDepth){
+        boardStates[currentDepth].Add(new BoardState(board));
     }
     public static float EvaluatePosition(AIBoardManager board, ShogiPlayer player){
         ShogiPlayer opponentPlayer;
@@ -185,10 +185,7 @@ public static class BoardEvaluation
         for (int i = 0; i < depth; i++){
             boardStates.Add(new List<BoardState>());
         }
-        //SimulatedBoard simBoard = new SimulatedBoard(board);
-        // List<Move> simulatedMoves = simBoard.GetAllMoves(board.AIPlayer.playerNumber);
         SaveState(board, 0);
-        // Move bestMove = MiniMax(debth, maximizing, float.MinValue, float.MaxValue, board);
         Move bestMove = MiniMax(depth, true, float.MinValue, float.MaxValue, board);
 
         return bestMove;
@@ -197,27 +194,14 @@ public static class BoardEvaluation
         if (board.gameOver){
             board.AiThread.Abort();
         }
-        // board.AIPlayer.CalculatePossibleMoves();
-        // board.localPlayer.CalculatePossibleMoves();
 
         float currentScore;
         currentScore = EvaluatePosition(board, board.AIPlayer);
-        // if (!board.AIPlayer.hasPossibleMoves){
-        //     currentScore -= kingValue;
-        //     Debug.Log("AIPlayer lose score " + currentScore);
-        // }
-        // if (!board.localPlayer.hasPossibleMoves){
-        //     currentScore += kingValue;
-        //     Debug.Log("AIPlayer win score " + currentScore);
-        // }
         
         if (depth == 0 || currentScore > kingValue/10 || currentScore < -kingValue/10) 
             return new Move{pieceX = -1, pieceY = -1, targetX = -1, targetY = -1, promote = false, score = currentScore};
 
-        // Debug.Log("AI debth " + depth);
         float tempScore;
-
-        // BoardState boardState = new BoardState(board);
 
         if (maximize){
             board.AIPlayer.CalculatePossibleMoves();
@@ -226,10 +210,6 @@ public static class BoardEvaluation
             float maxScore = float.MinValue;
 
             foreach (Move move in possibleMoves){
-                // Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote);
-                if (depth == 3 && move.pieceX == 7 && move.pieceY == 7 && move.targetX == 2 && move.targetY == 2 && move.promote){
-                    Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote);
-                }
                 board.DoMove(move, true);
                 if (depth > 1) SaveState(board, selectedDepth - depth + 1);
                 tempScore = MiniMax(depth-1, false, alpha, beta, board).score;
@@ -255,10 +235,6 @@ public static class BoardEvaluation
             float minScore = float.MaxValue;
 
             foreach (Move move in possibleMoves){
-                // Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote);
-                if (depth == 2 && move.pieceX == 1 && move.pieceY == 0 && move.targetX == 2 && move.targetY == 2){
-                    Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote);
-                }
                 board.DoMove(move, true);
                 if (depth > 1) SaveState(board, selectedDepth - depth + 1);
                 tempScore = MiniMax(depth-1, true, alpha, beta, board).score;

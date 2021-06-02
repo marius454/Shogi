@@ -298,8 +298,8 @@ public class MPBoardManager : BoardManager
                 sumPieces += 1;
             }
         }
-        if (sumPieces > 30) EndGame("Victory");
-        else if (sumPieces > 24) EndGame("Draw");
-        else EndGame("Defeat");
+        if (sumPieces > 30) EndGame("Victory by impasse");
+        else if (sumPieces > 24) EndGame("Draw by impasse");
+        else EndGame("Defeat by impasse");
     }
 }

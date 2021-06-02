@@ -24,7 +24,6 @@ public class AIBoardManager : BoardManager
     private bool AIMoveStarted;
     public Thread mainThread { set; get; }
     public Thread AiThread { set; get; }
-    private int AImoves;
     public TaskCompletionSource<Move> bestMove { set; get; }
     public int difficulty { set; get; }
 
@@ -47,7 +46,6 @@ public class AIBoardManager : BoardManager
     public override void InitializeGame()
     {
         base.InitializeGame();
-        AImoves = 0;
         gameOver = false;
         AIMoveStarted = false;
         AIPlayer = player2; // later will need to be changed so that the user can chose
