@@ -21,7 +21,7 @@ public class SilverGeneral : ShogiPiece
         int a = 1;
 
         if (!isPromoted){
-            // Select all moves in a 3x3 square around the piece, except it's current position and the tile it cannot go
+            // Select all moves in a 3x3 square around the piece, except it's current position and the tiles it cannot go
             if (player == PlayerNumber.Player1){
                 for (int t = -a; t <= a; t++)
                     for (int s = -a; s <= a; s++){
@@ -35,9 +35,6 @@ public class SilverGeneral : ShogiPiece
                         if (!(t == 0 && s == 0) && !(t == 1 && s == 0) && !(t == -1 && s == 0) && !(t == 0 && s == 1))
                             SingleMove(moves, x + t, y + s, currentPlayer, localBoard);
                     }
-            }
-            else {
-                throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
             }
         }
         else {

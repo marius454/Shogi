@@ -17,7 +17,6 @@ public class ShogiPlayer
     public bool isInCheck { set; get; }
     public bool isAttackingKing { set; get; }
     public int nrOfChecksInARow { set; get; }
-    // to set this check both attacked tiles and whether are legal drops available
     public bool hasPossibleMoves { set; get; }
     public List<Move> possibleMoves { set; get; }
     public GameObject playerCamera { set; get; }
@@ -36,7 +35,6 @@ public class ShogiPlayer
         this.playerNumber = playerNumber;
     }
     public void CalculatePossibleMoves(bool checkForSelfCheck = true, bool checkDrops = true){
-        // attackedTiles = new bool[C.numberRows, C.numberRows];
         Array.Clear(attackedTiles, 0, C.numberRows*C.numberRows);
         possibleMoves = new List<Move>();
         int nrMoves = 0;
@@ -101,7 +99,7 @@ public class ShogiPlayer
         }
     }
     public void InitializePiecesInPlay(){
-        allPieces.Clear(); // Needs to be done better so that InitializeCapturedPieces also gets this when needed
+        allPieces.Clear();
         piecesInPlay.Clear();
         foreach (ShogiPiece piece in board.ShogiPieces){
             if (piece && piece.player == playerNumber){
@@ -165,12 +163,10 @@ public class ShogiPlayer
         if (!isInCheck){
             isInCheck = true;
         }
-        // BoardHighlights.Instance.HighlightCheck(king.CurrentX, king.CurrentY);
     }
     public void RemoveCheck(){
         if (isInCheck){
             isInCheck = false;
-            // BoardHighlights.Instance.HideCheckHighlight();
         }
     }
     #region Multiplayer

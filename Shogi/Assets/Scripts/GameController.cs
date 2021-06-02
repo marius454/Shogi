@@ -35,15 +35,10 @@ public class GameController : MonoBehaviour
     }
     public void StartSingleplayerGame(){
         singleplayerBoard.SetActive(true);
-        //multiplayerBoard.SetActive(false);
-        // SPBoardManager.Instance.InitializeGame();
         singleplayerBoard.transform.Find("ShogiBoard").GetComponent<SPBoardManager>().InitializeGame();
         gameStarted = true;
         SetupSinglePlayerCamera();
     }
-    // public void StartMultiplayerGame(){
-    //     photonView.RPC(nameof(RPC_InitializeMultiplayerGame), RpcTarget.AllBuffered);
-    // }
     public void StartMultiplayerGame(){
         multiplayerBoard.SetActive(true);
         singleplayerBoard.SetActive(false);
@@ -61,7 +56,6 @@ public class GameController : MonoBehaviour
         player1Camera.SetActive(false);
         player2Camera.SetActive(false);
         multiplayerBoard.transform.Find("ShogiBoard").GetComponent<MPBoardManager>().SetupCamera(player1Camera, player2Camera);
-        //MPBoardManager.Instance.SetupCamera(player1Camera, player2Camera);
     }
     public void StartAIGame(int difficulty){
         AIBoard.SetActive(true);
@@ -70,10 +64,5 @@ public class GameController : MonoBehaviour
         AIBoard.transform.Find("ShogiBoard").GetComponent<AIBoardManager>().SetDifficulty(difficulty);
         gameStarted = true;
         SetupSinglePlayerCamera();
-    }
-    public void QuitMatch(){
-        singleplayerBoard.SetActive(true);
-        multiplayerBoard.SetActive(false);
-        gameStarted = false;
     }
 }

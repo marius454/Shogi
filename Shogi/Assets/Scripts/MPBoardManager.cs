@@ -24,8 +24,6 @@ public class MPBoardManager : BoardManager
         if (PhotonNetwork.LocalPlayer.ActorNumber == 1) this.localPlayer = player1;
         else this.localPlayer = player2;
         Instance = this;
-        // this.gameObject.transform.parent.transform.Find("CaptureBoardPlayer1").GetComponent<MPCaptureBoard>().InitializeCaptureBoard();
-        // this.gameObject.transform.parent.transform.Find("CaptureBoardPlayer2").GetComponent<MPCaptureBoard>().InitializeCaptureBoard();
     }
     private void Update(){
         if (GameController.Instance.gameStarted && this.gameObject.activeSelf){
@@ -94,7 +92,7 @@ public class MPBoardManager : BoardManager
               && selectionX <= localPlayer.captureBoard.maxX && selectionY <= localPlayer.captureBoard.maxY)
             {
                 if (localPlayer.captureBoard.ExistsPiece(selectionX, selectionY)){
-                    SelectCapturedPiece(selectionX, selectionY); // still needs to be changed with RPC
+                    SelectCapturedPiece(selectionX, selectionY);
                 }
             }
         }
@@ -107,7 +105,6 @@ public class MPBoardManager : BoardManager
 
         pieceSelectedByPlayer = ShogiPieces[x, y];
         possibleMovesForSelectedPiece = pieceSelectedByPlayer.PossibleMoves();
-        // Debug.LogError("Piece Selected " + pieceSelectedByPlayer);
 
         if (currentPlayer != localPlayer) return;
         photonView.RPC(nameof(RPC_SelectShogiPiece), RpcTarget.AllBuffered, new object[] { x, y });
@@ -142,7 +139,6 @@ public class MPBoardManager : BoardManager
                     SelectCapturedPiece(pieceSelectedByPlayer.CurrentX, pieceSelectedByPlayer.CurrentY);
             }
         }
-        // Debug.Log("current player - " + currentPlayer.playerNumber + " local player - " + localPlayer.playerNumber);
     }
     protected override void SelectCapturedPiece(int x, int y){
         int i, j;
@@ -156,7 +152,6 @@ public class MPBoardManager : BoardManager
         if (localPlayer == currentPlayer)
             possibleMovesForSelectedPiece = pieceSelectedByPlayer.PossibleDrops();
         else possibleMovesForSelectedPiece = pieceSelectedByPlayer.PossibleDrops(false);
-        // Debug.LogError("Piece Selected " + pieceSelectedByPlayer);
 
         if (currentPlayer != localPlayer) return;
         photonView.RPC(nameof(RPC_SelectCapturedPiece), RpcTarget.AllBuffered, new object[] { x, y });
@@ -169,9 +164,6 @@ public class MPBoardManager : BoardManager
     protected override void OnCapturedPieceSelect(int x, int y)
     {
         base.OnCapturedPieceSelect(x, y);
-
-        // player1.CheckIfKingIsBeingAttacked();
-        // player2.CheckIfKingIsBeingAttacked();
     }
 
     protected override void DropShogiPiece(int x, int y, bool isSimulated = false)

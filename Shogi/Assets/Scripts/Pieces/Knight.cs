@@ -28,7 +28,6 @@ public class Knight : ShogiPiece
                 SingleMove(moves, x + 1, y - 2, currentPlayer, localBoard);
                 SingleMove(moves, x - 1, y - 2, currentPlayer, localBoard);
             }
-            else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         }
         else{
             GoldMove();
@@ -39,7 +38,7 @@ public class Knight : ShogiPiece
     }
     public override void RemoveIllegalDrops(bool checkForSelfCheck = true)
     {
-        // do not allow to drop in the last two rows
+        // Do not allow drops in the last two rows
         RemoveDropsLastRows(true);
         base.RemoveIllegalDrops(checkForSelfCheck);
     }

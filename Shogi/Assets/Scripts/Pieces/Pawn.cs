@@ -56,10 +56,10 @@ public class Pawn : ShogiPiece
         return moves;
     }
     public override void RemoveIllegalDrops(bool checkForSelfCheck = true){
-        // pawn cant be on the last row
+        // Pawn cant be on the last row
         RemoveDropsLastRows();
 
-        // cant drop pawn on a row with an unpromoted pawn
+        // Can't drop pawn on a row with an unpromoted pawn
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
                 if (board.ShogiPieces[x, y]) {

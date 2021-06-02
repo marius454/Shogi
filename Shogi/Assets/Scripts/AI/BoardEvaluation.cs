@@ -63,9 +63,9 @@ public static class BoardEvaluation
 
         return Score;
     }
+    
+    // Calculate all the material a player has based on the set values
     private static float EvaluateMaterial(ShogiPlayer player){
-        // calculate all the material a player has based on the set values
-        // could experiment with giving a slightly lower score to pieces that are in the capture board
         float materialSum = 0f;
         foreach (ShogiPiece piece in player.allPieces){
             if (piece is Pawn){
@@ -114,22 +114,19 @@ public static class BoardEvaluation
         for (int x = 0; x < C.numberRows; x++)
             for (int y = 0; y < C.numberRows; y++){
                 if (attackedTiles[x, y]) score += controledTileValue;
-                // make own camp more valuable, but might need to add a special case so that it doesn't move pieces out of the camp only to have more attacked tiles there
+                // Make own camp more valuable
                 if (player.playerNumber == PlayerNumber.Player1 && y <= 2){
-                    score += controledCampTileValue;
+                    score += controledCampTileValue - controledTileValue;
                 }
                 if (player.playerNumber == PlayerNumber.Player2 && y >= C.numberRows - 3){
-                    score += controledCampTileValue;
+                    score += controledCampTileValue - controledTileValue;
                 }
             }
         return score;
     }
     private static float EvaluateKingSafety(AIBoardManager board, ShogiPlayer player){
-        // King safety is more valueble in the later stages of the game
-        // Would be good to add a consideration for attackers
         float score = 0f;
         bool[,] kingMoves = player.king.PossibleMoves();
-        // bool[,] attackedTiles = GetAttacketTiles(player, false);
 
         int a = 1;
         for (int t = -a; t <= a; t++)
@@ -142,8 +139,6 @@ public static class BoardEvaluation
                         else if (board.ShogiPieces[player.king.CurrentX + t, player.king.CurrentY + s])
                             if (board.ShogiPieces[player.king.CurrentX + t, player.king.CurrentY + s].player == player.playerNumber)
                                 score += baseKingProtectedTileValue;
-                        // else if (attackedTiles[player.king.CurrentX + t, player.king.CurrentY + s])
-                        //     score += baseKingProtectedTileValue;
                     }
             }
         return score;

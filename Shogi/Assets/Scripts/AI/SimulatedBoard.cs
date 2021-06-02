@@ -21,8 +21,6 @@ public class SimulatedBoard
     public Piece[,] mainBoard { set; get; }
     public Piece[,] player1CaptureBoard { set; get; }
     public Piece[,] player2CaptureBoard { set; get; }
-    // private List<Piece> player1Captures;
-    // private List<Piece> player2Captures;
     public SimulatedBoard originalBoard { set; get; }
 
     public SimulatedBoard(BoardManager board){
@@ -56,51 +54,6 @@ public class SimulatedBoard
                 }
                 else player2CaptureBoard[x, y] = new Piece{empty = true, isCaptured = true};
             }
-
-
-        // player1Captures = new List<Piece>();
-        // player2Captures = new List<Piece>();
-
-        // foreach (ShogiPiece piece in board.player1.captureBoard.capturedPieces){
-        //     if (piece){
-        //         if (!player1Captures.Exists(item => item.pieceType == piece.pieceType)){
-        //             player1Captures.Add(new Piece{empty = false, x = piece.CurrentX, y = piece.CurrentY, 
-        //             pieceType = piece.pieceType, 
-        //             player = piece.player, 
-        //             isPromoted = piece.isPromoted, 
-        //             isAttacked = false, numberOfCaptures = 1});
-        //         }
-        //         else{
-        //             int index = player1Captures.FindIndex(item => item.pieceType == piece.pieceType);
-        //             player1Captures[index] = new Piece{empty = false, x = piece.CurrentX, y = piece.CurrentY, 
-        //             pieceType = piece.pieceType, 
-        //             player = piece.player, 
-        //             isPromoted = piece.isPromoted, 
-        //             isAttacked = false, 
-        //             numberOfCaptures = player1Captures[index].numberOfCaptures + 1};
-        //         }
-        //     }
-        // }
-        // foreach (ShogiPiece piece in board.player2.captureBoard.capturedPieces){
-        //     if (piece){
-        //         if (!player2Captures.Exists(item => item.pieceType == piece.pieceType)){
-        //             player2Captures.Add(new Piece{empty = false, x = piece.CurrentX, y = piece.CurrentY, 
-        //             pieceType = piece.pieceType, 
-        //             player = piece.player, 
-        //             isPromoted = piece.isPromoted, 
-        //             isAttacked = false});
-        //         }
-        //         else{
-        //             int index = player2Captures.FindIndex(item => item.pieceType == piece.pieceType);
-        //             player2Captures[index] = new Piece{empty = false, x = piece.CurrentX, y = piece.CurrentY, 
-        //             pieceType = piece.pieceType, 
-        //             player = piece.player, 
-        //             isPromoted = piece.isPromoted, 
-        //             isAttacked = false, 
-        //             numberOfCaptures = player2Captures[index].numberOfCaptures + 1};
-        //         }
-        //     }
-        // }
     }
     public SimulatedBoard (SimulatedBoard board){
         CopyBoard(board);
@@ -111,7 +64,6 @@ public class SimulatedBoard
         player2CaptureBoard = board.player2CaptureBoard.Clone() as Piece[,];
     }
     public void DoMove(Move move){
-        Debug.Log(move.pieceX + " " + move.pieceY + " " + move.targetX + " " + move.targetY + " " + move.promote);
         if (move.pieceX >= 0 && move.pieceY >= 0 && move.pieceX < C.numberRows && move.pieceY < C.numberRows){
             if (!mainBoard[move.targetX, move.targetY].empty){
                 bool stopLooking = false;
@@ -139,9 +91,6 @@ public class SimulatedBoard
                     }
                 }
             }
-            // if (move.pieceX == 4 && move.pieceY == 0 && move.targetX == 3 && move.targetY == 0){
-            //     Debug.Log("bad");
-            // }
             mainBoard[move.targetX, move.targetY] = mainBoard[move.pieceX, move.pieceY];
             mainBoard[move.pieceX, move.pieceY].empty = true;
         }
@@ -151,11 +100,6 @@ public class SimulatedBoard
             mainBoard[move.targetX, move.targetY] = player1CaptureBoard[move.pieceX, move.pieceY];
             mainBoard[move.targetX, move.targetY].isCaptured = false;
             player1CaptureBoard[move.pieceX, move.pieceY].empty = true;
-
-
-            // mainBoard[move.targetX, move.targetY] = player1Captures.Find(item => item.x == move.pieceX && item.y == move.pieceY);
-            // int index = player1Captures.FindIndex(item => item.x == move.pieceX && item.y == move.pieceY);
-            // player1Captures[index] = new Piece{empty = true};
         }
         else if (move.pieceX >= (-1 - C.captureNumberColumns) && move.pieceY >= 0 
           && move.pieceX <= -2
@@ -163,24 +107,6 @@ public class SimulatedBoard
             mainBoard[move.targetX, move.targetY] = player2CaptureBoard[move.pieceX, move.pieceY];
             mainBoard[move.targetX, move.targetY].isCaptured = false;
             player2CaptureBoard[move.pieceX, move.pieceY].empty = true;
-
-
-
-            // mainBoard[move.targetX, move.targetY] = player2Captures.Find(item => item.x == move.pieceX && item.y == move.pieceY);
-            // if (player2Captures.Find(item => item.x == move.pieceX && item.y == move.pieceY).numberOfCaptures > 1){
-            //     Piece piece = player2Captures.Find(item => item.x == move.pieceX && item.y == move.pieceY);
-            //     int index = player2Captures.FindIndex(item => item.pieceType == piece.pieceType);
-            //     player2Captures[index] = new Piece{empty = false, x = piece.x, y = piece.x, 
-            //     pieceType = piece.pieceType, 
-            //     player = piece.player, 
-            //     isPromoted = piece.isPromoted, 
-            //     isAttacked = false, 
-            //     numberOfCaptures = player2Captures[index].numberOfCaptures - 1};
-            // }
-            // else {
-            //     int index = player2Captures.FindIndex(item => item.x == move.pieceX && item.y == move.pieceY);
-            //     player2Captures[index] = new Piece{empty = true};
-            // }
         }
     }
     
@@ -317,7 +243,6 @@ public class SimulatedBoard
 
     #region Piece Moves
     public bool[,] GetPiecePossibleMoves(Piece piece, bool checkForSelfCheck){
-        // Don't need to check if king is attacked if the minimax debth is more than 1
         if (piece.pieceType == PieceType.bishop)
             return BishopMoves(piece, checkForSelfCheck);
         if (piece.pieceType == PieceType.gold)
@@ -606,7 +531,6 @@ public class SimulatedBoard
 
         Piece king = GetKing(piece.player);
         if (king.empty){
-            Debug.Break();
             throw new InvalidOperationException("King not found!");
         }
         wouldCauseSelfCheck = CheckIfBeingAttacked(king);
@@ -817,7 +741,7 @@ public class SimulatedBoard
     }
 
     private void RemoveIllegalPawnDrops(bool[,] drops, Piece piece){
-        // cant drop pawn on a row with an unpromoted pawn
+        // Can't drop pawn on a row with an unpromoted pawn
         for (int x=0; x < C.numberRows; x++)
             for (int y=0; y < C.numberRows; y++){
                 if (!mainBoard[x, y].empty) {

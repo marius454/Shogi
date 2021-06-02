@@ -5,34 +5,15 @@ using C = Constants;
 
 public class BoardState
 {
-    // public List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted, int x, int y)> shogiPieceState;
-    // public List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)> captureBoardPlayer1State;
-    // public List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)> captureBoardPlayer2State;
     public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted)[,] shogiPieceState { set; get; }
     public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[,] captureBoardPlayer1State { set; get; }
     public (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[,] captureBoardPlayer2State { set; get; }
     public BoardState (AIBoardManager board){
-        // shogiPieceState = new List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted, int x, int y)>();
-        // captureBoardPlayer1State = new List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)>();
-        // captureBoardPlayer2State = new List<(int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)>();
-        
-        // foreach (ShogiPiece piece in board.ShogiPieces){
-        //     if (piece)
-        //         shogiPieceState.Add((piece.id, piece.player, piece.pieceType, piece.isPromoted, piece.CurrentX, piece.CurrentY));
-        // }
-        // foreach (ShogiPiece piece in board.player1.capturedPieces){
-        //     if (piece)
-        //         captureBoardPlayer1State.Add((piece.id, piece.player, piece.pieceType, piece.CurrentX, piece.CurrentY));
-        // }
-        // foreach (ShogiPiece piece in board.player2.capturedPieces){
-        //     if (piece)
-        //         captureBoardPlayer2State.Add((piece.id, piece.player, piece.pieceType, piece.CurrentX, piece.CurrentY));
-        // }
-
         shogiPieceState = new (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, bool promoted)[C.numberRows, C.numberRows];
         captureBoardPlayer1State = new (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[C.captureNumberColumns, C.captureNumberRows];
         captureBoardPlayer2State = new (int pieceIndex, PlayerNumber playerNumber, PieceType pieceType, int x, int y)[C.captureNumberColumns, C.captureNumberRows];
         ShogiPiece piece;
+        
         for (int x = 0; x < C.numberRows; x++)
             for (int y = 0; y < C.numberRows; y++){
                 piece = board.ShogiPieces[x,y];

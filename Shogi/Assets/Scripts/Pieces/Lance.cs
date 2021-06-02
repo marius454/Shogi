@@ -24,7 +24,6 @@ public class Lance : ShogiPiece
                 OrthagonalLine(moves, DirectionOrthagonal.forward, currentPlayer, localBoard, x, y);
             else if (player == PlayerNumber.Player2) 
                 OrthagonalLine(moves, DirectionOrthagonal.back, currentPlayer, localBoard, x, y);
-            else throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
         }
         else{
             GoldMove();

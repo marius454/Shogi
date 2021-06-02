@@ -31,7 +31,6 @@ public abstract class ShogiPiece : MonoBehaviour
         this.isAttacked = false;
 
         SetXY(x, y, changePosition);
-        // SetHeight();
         if (changePosition) SetNormalRotation();
         SetOpponents();
     }
@@ -106,7 +105,7 @@ public abstract class ShogiPiece : MonoBehaviour
         Array.Clear(moves, 0, C.numberRows*C.numberRows);
         return moves;
     }
-    // check if any of the possible moves are illegal, and remove them
+    // Check if any of the possible moves are illegal, and remove them
     public bool[,] RemoveIllegalMoves(bool[,] moves, bool checkForSelfCheck = true){
         if (checkForSelfCheck){
             for (int x=0; x < C.numberRows; x++)
@@ -135,7 +134,7 @@ public abstract class ShogiPiece : MonoBehaviour
         return drops;
     }
     public virtual void RemoveIllegalDrops(bool checkForSelfCheck){
-        // if player is in check only allow drops that would stop the check
+        // If player is in check only allow drops that would stop the check
         if(opponentPlayer.isAttackingKing){
             if (checkForSelfCheck){
                 for (int x=0; x < C.numberRows; x++)
@@ -150,9 +149,9 @@ public abstract class ShogiPiece : MonoBehaviour
         }
         // In subclasses:
         // pawns and lances can't be on the last row
-        // knights cant be on the last and next to last row
-        // cant drop pawn on a row with an unpromoted pawn
-        // cant drop a pawn in place that would cause checkmate
+        // knights can't be on the last and next to last row
+        // can't drop pawn on a row with an unpromoted pawn
+        // can't drop a pawn in place that would cause checkmate
     }
     public void RemoveDropsLastRows(bool removeNextToLast = false){
         int yLast;
@@ -170,16 +169,6 @@ public abstract class ShogiPiece : MonoBehaviour
             if (removeNextToLast) drops[x, yNextToLast] = false;
         }
     }
-    // public void SingleMove(bool[,] moves, int x, int y){
-    //     ShogiPiece potentialTile;
-        
-    //     if (x >= 0 && y >= 0 && x < C.numberRows && y < C.numberRows){
-    //         potentialTile = board.ShogiPieces[x, y];
-    //         if ((object)potentialTile == null || potentialTile.player != player){
-    //             moves[x, y] = true;
-    //         }
-    //     }
-    // }
     public void SingleMove(bool[,] moves, int x, int y, PlayerNumber currentPlayer, BoardManager board){
         ShogiPiece potentialTile;
         
@@ -191,8 +180,6 @@ public abstract class ShogiPiece : MonoBehaviour
         }
     }
     public void OrthagonalLine(bool[,] moves, DirectionOrthagonal direction, PlayerNumber currentPlayer, BoardManager board, int x, int y, bool checkForAttacker = false){
-        // int x = CurrentX;
-        // int y = CurrentY;
         ShogiPiece potentialTile;
         while (true){
             if (direction == DirectionOrthagonal.right) x++;
@@ -224,8 +211,6 @@ public abstract class ShogiPiece : MonoBehaviour
         }
     }
     public void DiagonalLine(bool[,] moves, DirectionDiagonal direction, PlayerNumber currentPlayer, BoardManager board, int x, int y, bool checkForAttacker = false){
-        // int x = CurrentX;
-        // int y = CurrentY;
         ShogiPiece potentialTile;
         while (true){
             if (direction == DirectionDiagonal.forwardLeft) {x--; y++;}
@@ -255,7 +240,7 @@ public abstract class ShogiPiece : MonoBehaviour
         }
     }
     public void GoldMove(){
-        // Select all moves in a 3x3 square around the piece, except it's current position and the tile it cannot go
+        // Select all moves in a 3x3 square around the piece, except it's current position and the tiles it cannot go
         Array.Clear(moves, 0, C.numberRows*C.numberRows);
         int x = CurrentX;
         int y = CurrentY;
@@ -277,9 +262,6 @@ public abstract class ShogiPiece : MonoBehaviour
                         SingleMove(moves, x + t, y + s, currentPlayer, localBoard);
                 }
         }
-        else {
-            throw new InvalidOperationException("An invalid value has been set for the ShogiPiece 'player' variable");
-        }
     }
     public List<ShogiPiece> GetAttackedPieces(){
         List<ShogiPiece> attackedPieces = new List<ShogiPiece>();
@@ -295,7 +277,6 @@ public abstract class ShogiPiece : MonoBehaviour
         bool wouldCauseSelfCheck = false;
         ShogiPiece tempCapture = null;
         
-        // ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
         board.ShogiPieces[CurrentX, CurrentY] = null;
         if (board.ShogiPieces[x, y]){
             tempCapture = board.ShogiPieces[x, y];
@@ -308,7 +289,6 @@ public abstract class ShogiPiece : MonoBehaviour
         bool tempKingAttackedStatus = currentPlayer.isInCheck;
         currentPlayer.CheckIfKingIsBeingAttacked();
         wouldCauseSelfCheck = currentPlayer.isInCheck;
-        // board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
 
         this.SetXY(tempX, tempY, false);
         board.ShogiPieces[tempX, tempY] = this;
@@ -326,7 +306,6 @@ public abstract class ShogiPiece : MonoBehaviour
         bool wouldCauseSelfCheck = false;
         ShogiPiece tempCapture = null;
         
-        // ShogiPiece[,] tempShogiPieces = board.ShogiPieces.Clone() as ShogiPiece[,];
         board.ShogiPieces[CurrentX, CurrentY] = null;
         if (board.ShogiPieces[x, y]){
             tempCapture = board.ShogiPieces[x, y];
@@ -339,12 +318,10 @@ public abstract class ShogiPiece : MonoBehaviour
         bool tempKingAttackedStatus = opponentPlayer.isInCheck;
         opponentPlayer.CheckIfKingIsBeingAttacked();
         if (currentPlayer.nrOfChecksInARow >= 3){
-            // Debug.Log(currentPlayer.nrOfChecksInARow + " " + currentPlayer.isAttackingKing + " " + currentPlayer.playerNumber + " " + x + " " + y);
             if(opponentPlayer.isInCheck)
                 wouldCauseSelfCheck = true;
         }
 
-        // board.ShogiPieces = tempShogiPieces.Clone() as ShogiPiece[,];
         this.SetXY(tempX, tempY, false);
         board.ShogiPieces[tempX, tempY] = this;
         if (tempCapture){
@@ -401,7 +378,7 @@ public abstract class ShogiPiece : MonoBehaviour
         }
     }
     public virtual bool IsAttacked(){
-        // only applicable to king piece
+        // Only applicable to King piece
         return false;
     }
     public virtual bool CheckIfCouldBePromoted(int y){
